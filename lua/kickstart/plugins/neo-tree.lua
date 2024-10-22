@@ -20,6 +20,7 @@ return {
         mappings = {
           ['\\'] = 'close_window',
         },
+	position = 'current',
       },
     },
   },
