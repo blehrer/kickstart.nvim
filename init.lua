@@ -656,6 +656,7 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'prettier', -- Used for most formatting
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -712,7 +713,10 @@ require('lazy').setup({
         -- python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        json = { 'prettier' },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        markdown = { 'prettier' },
+        -- markdown = { 'markdownlint' },
       },
     },
   },
@@ -758,6 +762,7 @@ require('lazy').setup({
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       luasnip.config.setup {}
+      require('luasnip.loaders.from_snipmate').load { paths = { './lua/custom/snippets' } }
 
       cmp.setup {
         snippet = {
@@ -897,7 +902,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'go', 'java' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'query', 'vim', 'vimdoc', 'go', 'java' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -965,5 +970,7 @@ require('lazy').setup({
   },
 })
 
+local peek = require 'peek'
+vim.keymap.set('n', '<leader><f8>', peek.is_open and peek.close or peek.open, { desc = 'Toggle visibility of browser preview' })
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
