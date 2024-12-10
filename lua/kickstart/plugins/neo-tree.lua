@@ -12,7 +12,6 @@ return {
   cmd = 'Neotree',
   keys = {
     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
-    { '<F49>1', ':Neotree focus %<cr>', desc = 'i+j,1: Show file in tree', silent = true },
   },
   opts = {
     filesystem = {
@@ -20,7 +19,6 @@ return {
         mappings = {
           ['\\'] = 'close_window',
         },
-        position = 'current',
       },
     },
   },
