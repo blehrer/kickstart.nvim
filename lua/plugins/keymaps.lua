@@ -65,5 +65,6 @@ return {
   vim.keymap.set('n', '<leader>l', ':Lazy<cr>', { desc = '[L]azy plugin manager' }),
   vim.keymap.set('n', '-', ':Oil<cr>', { desc = 'Edit directory with oil.nvim' }),
   vim.cmd.cabbrev('w!!', 'w !SUDO_ASKPASS="/usr/bin/pass $USER" sudo --askpass tee % > /dev/null'),
+  vim.keymap.set('n', '<leader>>', ':lua ', { desc = 'Lua prompt' }),
 }
 -- vim: ts=2 sts=2 sw=2 et

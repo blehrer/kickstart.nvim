@@ -65,6 +65,10 @@ return { -- Fuzzy Finder (files, lsp, etc)
     -- Enable Telescope extensions if they are installed
     pcall(require('telescope').load_extension, 'fzf')
     pcall(require('telescope').load_extension, 'ui-select')
+    pcall(require('telescope').load_extension, 'noice')
+    -- pcall(require('telescope').load_extension 'undo')
+    -- pcall(require('telescope').load_extension 'live_grep')
+    -- pcall(require('telescope').load_extension 'live_grep_args')
 
     -- See `:help telescope.builtin`
     local builtin = require 'telescope.builtin'
