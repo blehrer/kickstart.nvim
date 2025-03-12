@@ -1,7 +1,8 @@
+require 'lazy'
 ---@type LazyPluginSpec
 return {
   'sigmasd/deno-nvim',
-  event = LazyLoad,
+  event = 'VeryLazy',
   dependencies = {
     'mfussenegger/nvim-dap',
   },
