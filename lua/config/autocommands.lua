@@ -1,5 +1,7 @@
+vim.api.nvim_create_augroup('bl-markdown', { clear = true })
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'markdown' },
+  group = 'bl-markdown',
   callback = function()
     vim.schedule(function()
       vim.keymap.set('n', '<LocalLeader>p', ':TogglePeek<cr>', {
