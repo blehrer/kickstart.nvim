@@ -30,6 +30,7 @@
 
 --]]
 require 'config.lazy'
+require 'config.autocommands'
 vim.cmd 'colorscheme kanagawa-paper'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
