@@ -1,4 +1,4 @@
-require 'lazy'
+require 'lazy.types'
 ---@type LazyPluginSpec
 return {
   'sigmasd/deno-nvim',

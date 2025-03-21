@@ -220,11 +220,13 @@ return {
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      local lsputil = require 'lspconfig.util'
       local servers = {
         -- clangd = {},
         gopls = {},
         pyright = {},
         rust_analyzer = {},
+        superhtml = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -234,10 +236,17 @@ return {
         -- ts_ls = {},
         --
         denols = {
-          settings = {
-            init_options = { lint = true },
-            root_dir = require('lspconfig').util.root_pattern('deno.json', 'deno.jsonc'),
-          },
+          on_init = function(_)
+            vim.g.markdown_fenced_languages = {
+              'ts=typescript',
+            }
+          end,
+          root_dir = lsputil.root_pattern('deno.json', 'deno.jsonc'),
+        },
+
+        ts_ls = {
+          root_dir = lsputil.root_pattern 'package.json',
+          single_file_support = false,
         },
         java_language_server = {},
         jsonls = {},
@@ -255,6 +264,7 @@ return {
             },
           },
         },
+        yamlls = {},
       }
 
       -- Ensure the servers and tools above are installed
