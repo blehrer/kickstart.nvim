@@ -17,15 +17,22 @@ return {
         end)(),
         dependencies = {
           'folke/lazydev.nvim',
+          'benfowler/telescope-luasnip.nvim',
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function(_, opts)
+              require('luasnip.loaders.from_vscode').lazy_load()
+              if opts then
+                require('luasnip').config.setup(opts)
+              end
+              vim.tbl_map(function(type)
+                require('luasnip.loaders.from_' .. type).lazy_load()
+              end, { 'vscode', 'snipmate', 'lua' })
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
