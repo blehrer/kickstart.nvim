@@ -16,6 +16,21 @@ return { -- Collection of various small independent plugins/modules
     -- - sr)'  - [S]urround [R]eplace [)] [']
     require('mini.surround').setup()
 
+    require('mini.pick').setup()
+
+    local function get_globals()
+      ---@type table
+      local gvars = vim.fn.getcompletion('g:', 'var')
+      local gvals = vim.tbl_map(function(key)
+        return { key, vim.g[string.gsub(key, 'g:', '')] }
+      end, gvars)
+      MiniPick.start { source = {
+        items = gvals,
+      } }
+    end
+
+    vim.keymap.set('n', '<leader>3', get_globals, { desc = 'try it' })
+
     -- Simple and easy statusline.
     --  You could remove this setup call if you don't like it,
     --  and try some other statusline plugin
@@ -72,6 +87,7 @@ return { -- Collection of various small independent plugins/modules
         end,
       },
     }
+
     -- ... and there is more!
     --  Check out: https://github.com/echasnovski/mini.nvim
   end,
