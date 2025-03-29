@@ -264,6 +264,7 @@ return {
             },
           },
         },
+        ruby_lsp = {},
         theme_check = {
           init_options = {
             enableSchema = true,
@@ -274,7 +275,6 @@ return {
         },
         yamlls = {},
       }
-
       -- Ensure the servers and tools above are installed
       --
       -- To check the current status of installed tools and/or manually install
