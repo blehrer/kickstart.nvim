@@ -30,6 +30,7 @@
 
 --]]
 require 'config.lazy'
+require 'config.macros'
 require 'config.autocommands'
 vim.cmd 'colorscheme kanagawa-paper'
 
