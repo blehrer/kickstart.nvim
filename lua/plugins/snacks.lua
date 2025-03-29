@@ -22,9 +22,9 @@ return {
       words = { enabled = false },
     },
   },
-  vim.keymap.set('n', '\\', function()
-    require('snacks').explorer()
-  end, { desc = 'Toggle the file explorer' }),
+  -- vim.keymap.set('n', '\\', function()
+  --   require('snacks').explorer()
+  -- end, { desc = 'Toggle the file explorer' }),
   vim.keymap.set('n', '|', function()
     require('snacks').dashboard()
   end, { desc = 'Snacks dashboard' }),
