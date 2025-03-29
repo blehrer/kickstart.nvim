@@ -264,6 +264,14 @@ return {
             },
           },
         },
+        theme_check = {
+          init_options = {
+            enableSchema = true,
+            enableCompletions = true,
+            enableSnippets = true,
+            enableValidations = false, -- we can turn this on later if needed
+          },
+        },
         yamlls = {},
       }
 

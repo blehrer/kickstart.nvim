@@ -1,6 +1,6 @@
 vim.api.nvim_create_augroup('bl-markdown', { clear = true })
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = { 'markdown' },
+  pattern = { 'markdown', 'liquid' },
   group = 'bl-markdown',
   callback = function()
     vim.schedule(function()
