@@ -311,18 +311,16 @@ return {
         },
       }
 
-      ---@type lspconfig.Config
-      local djlspcfg = {
+      require('lspconfig').djlsp.setup {
         cmd = { vim.env['HOME'] .. '/.local/bin/djlsp' },
         root_dir = require('lspconfig.util').root_pattern 'manage.py',
         capabilities = capabilities,
-        on_attach = function(client, bufnr)
+        on_attach = function(_, _)
           if vim.bo.filetype == 'html' then
             vim.bo.filetype = 'htmldjango'
           end
         end,
       }
-      require('lspconfig').djlsp.setup(djlspcfg)
     end,
   },
 }
