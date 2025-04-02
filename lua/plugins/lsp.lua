@@ -221,6 +221,7 @@ return {
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local lsputil = require 'lspconfig.util'
+      ---@type table<string, lspconfig.Config|{}>
       local servers = {
         -- clangd = {},
         gopls = {},
@@ -308,6 +309,19 @@ return {
           end,
         },
       }
+
+      ---@type lspconfig.Config
+      local djlspcfg = {
+        cmd = { vim.env['HOME'] .. '/.local/bin/djlsp' },
+        root_dir = require('lspconfig.util').root_pattern 'manage.py',
+        capabilities = capabilities,
+        on_attach = function(client, bufnr)
+          if vim.bo.filetype == 'html' then
+            vim.bo.filetype = 'htmldjango'
+          end
+        end,
+      }
+      require('lspconfig').djlsp.setup(djlspcfg)
     end,
   },
 }

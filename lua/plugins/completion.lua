@@ -25,12 +25,15 @@ return {
             'rafamadriz/friendly-snippets',
             config = function(_, opts)
               require('luasnip.loaders.from_vscode').lazy_load()
+              local luasnip = require 'luasnip'
               if opts then
-                require('luasnip').config.setup(opts)
+                luasnip.config.setup(opts)
               end
               vim.tbl_map(function(type)
                 require('luasnip.loaders.from_' .. type).lazy_load()
               end, { 'vscode', 'snipmate', 'lua' })
+              luasnip.filetype_extend('python', { 'django' })
+              luasnip.filetype_extend('htmldjango', { 'djangohtml' })
             end,
           },
         },

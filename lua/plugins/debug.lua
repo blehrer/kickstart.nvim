@@ -1,4 +1,4 @@
--- require 'lazy'
+require 'lazy.types'
 
 ---@type LazyPluginSpec
 return {
@@ -19,6 +19,7 @@ return {
     -- Add your own debuggers here
     'leoluz/nvim-dap-go',
     'mxsdev/nvim-dap-vscode-js',
+    'mfussenegger/nvim-dap-python',
   },
   keys = {
     -- Basic debugging keymaps, feel free to change to your liking!
