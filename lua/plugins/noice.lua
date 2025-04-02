@@ -1,4 +1,5 @@
-require 'lazy'
+require 'lazy.types'
+require 'noice.config.cmdline'
 ---@type LazyPluginSpec
 return {
   'folke/noice.nvim',
@@ -11,6 +12,16 @@ return {
         -- search_down = { kind = 'search', pattern = '^/', icon = '  ', lang = 'regex' },
         -- search_up = { kind = 'search', pattern = '^%?', icon = '  ', lang = 'regex' },
       },
+    },
+  },
+  keys = {
+    {
+      '<leader>sm',
+      function()
+        require('noice.commands').cmd 'telescope'
+      end,
+      mode = 'n',
+      desc = '[S]earch [M]essages',
     },
   },
   dependencies = {

@@ -274,6 +274,7 @@ return {
             enableValidations = false, -- we can turn this on later if needed
           },
         },
+        taplo = {},
         yamlls = {},
       }
       -- Ensure the servers and tools above are installed
