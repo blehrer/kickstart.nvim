@@ -1,3 +1,5 @@
+require 'lazy.types'
+---@type LazyPluginSpec[]
 return {
   {
     'folke/snacks.nvim',
@@ -17,15 +19,36 @@ return {
       notifier = { enabled = false },
       quickfile = { enabled = true },
       scope = { enabled = true },
+      scratch = { enabled = true },
       scroll = { enabled = false },
       statuscolumn = { enabled = true },
       words = { enabled = false },
     },
+    keys = {
+      {
+        '<leader>.',
+        function()
+          Snacks.scratch()
+        end,
+        desc = 'Toggle Scratch Buffer',
+      },
+      {
+        '<leader>S',
+        function()
+          Snacks.scratch.select()
+        end,
+        desc = 'Select Scratch Buffer',
+      },
+      {
+        '|',
+        function()
+          if vim.bo.filetype ~= 'snacks_dashboard' then
+            Snacks.dashboard()
+          end
+        end,
+        desc = 'Snacks dashboard',
+        mode = 'n',
+      },
+    },
   },
-  -- vim.keymap.set('n', '\\', function()
-  --   require('snacks').explorer()
-  -- end, { desc = 'Toggle the file explorer' }),
-  vim.keymap.set('n', '|', function()
-    require('snacks').dashboard()
-  end, { desc = 'Snacks dashboard' }),
 }
