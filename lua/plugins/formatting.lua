@@ -44,8 +44,9 @@ return {
           lsp_format = lsp_format_opt,
         }
       end,
+
       formatters_by_ft = {
-        lua = { 'stylua' },
+        -- lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --

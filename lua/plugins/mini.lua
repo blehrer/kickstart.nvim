@@ -29,7 +29,7 @@ return { -- Collection of various small independent plugins/modules
       } }
     end
 
-    vim.keymap.set('n', '<leader>3', get_globals, { desc = 'try it' })
+    vim.keymap.set('n', '<leader>sng', get_globals, { desc = '[S]earch [g]lobals [v]ariables (g: variables)' })
 
     -- Simple and easy statusline.
     --  You could remove this setup call if you don't like it,

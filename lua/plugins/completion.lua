@@ -1,4 +1,23 @@
+require 'lazy.types'
+---@type LazyPluginSpec[]
 return {
+  -- {
+  --   'github/copilot.vim',
+  --   event = 'InsertEnter',
+  --   config = function()
+  --     vim.api.nvim_create_autocmd('ColorScheme', {
+  --       pattern = '*',
+  --       -- group = ...,
+  --       callback = function()
+  --         vim.api.nvim_set_hl(0, 'CopilotSuggestion', {
+  --           fg = '#555555',
+  --           ctermfg = 8,
+  --           force = true,
+  --         })
+  --       end,
+  --     })
+  --   end,
+  -- },
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
@@ -46,6 +65,7 @@ return {
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-nvim-lsp-signature-help',
+      -- 'hrsh7th/cmp-copilot',
     },
     config = function()
       -- See `:help cmp`
@@ -122,7 +142,8 @@ return {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
-          { name = 'nvim_lsp_signature_help' },
+          -- { name = 'nvim_lsp_signature_help' },
+          -- { name = 'copilot' },
         },
       }
     end,

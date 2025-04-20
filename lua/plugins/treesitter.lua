@@ -18,6 +18,7 @@ return { -- Highlight, edit, and navigate code
       'java',
       'javascript',
       'json',
+      'json5',
       'kotlin',
       'lua',
       'luadoc',

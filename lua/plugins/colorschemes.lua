@@ -1,4 +1,4 @@
-vim.keymap.set('n', '<leader>tt', function()
+vim.keymap.set('n', '<leader>uc', function()
   local picker = require('snacks').picker 'colorschemes'
   picker.selected(picker, {})
 end, { desc = 'Colorscheme picker' })

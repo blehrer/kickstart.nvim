@@ -50,10 +50,16 @@ return {
     end,
   }),
 
+  vim.cmd.cabbrev('w!!', 'w !SUDO_ASKPASS="/usr/bin/pass $USER" sudo --askpass tee % > /dev/null'),
+
   vim.keymap.set('n', '<leader>w', ':w<cr>', { desc = '[W]rite' }),
+
   vim.keymap.set('n', '<leader>q', ':q<cr>', { desc = '[Q]uit' }),
+
   vim.keymap.set('n', '<A-j>', 'a<cr><esc>k$', { desc = 'Split lines (opposite of `shift+j`)' }),
+
   vim.keymap.set('n', '<C-j>', 'a<cr><esc>k$', { desc = 'Split lines (opposite of `shift+j`)' }),
+
   vim.keymap.set('n', '<F18>', function()
     local old_name = vim.fn.expand '%'
     local new_name = vim.fn.input('New file name: ', vim.fn.expand '%', 'file')
@@ -61,16 +67,14 @@ return {
       vim.fn.execute(':saveas ' + new_name)
       vim.fn.execute(':silent !rm ' + old_name)
     end
-  end, { desc = 'Rename file' }),
+  end, { desc = 'Rename file (f18 is r on the intellij layer)' }),
+
   vim.keymap.set('n', '<leader>l', ':Lazy<cr>', { desc = '[L]azy plugin manager' }),
+
   vim.keymap.set('n', '-', ':Oil<cr>', { desc = 'Edit directory with oil.nvim' }),
-  vim.cmd.cabbrev('w!!', 'w !SUDO_ASKPASS="/usr/bin/pass $USER" sudo --askpass tee % > /dev/null'),
+
   vim.keymap.set('n', '<leader>>', ':lua ', { desc = 'Lua prompt' }),
-  vim.keymap.set('n', '<leader><del>', function()
-    require('snacks.terminal').toggle(nil, { cwd = vim.fn.expand '%:h', interactive = true })
-  end, { desc = 'Toggle terminal' }),
 
   -- @ThePrimeagen
   vim.keymap.set({ 'v', 'n' }, '<leader>rw', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = '[R]eplace [w]ord under cursor' }),
 }
--- vim: ts=2 sts=2 sw=2 et

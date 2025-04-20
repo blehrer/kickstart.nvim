@@ -1,3 +1,4 @@
+require 'vim'
 return {
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
@@ -35,6 +36,7 @@ return {
 
       -- Inlay hints
       { 'lvimuser/lsp-inlayhints.nvim' },
+      'b0o/SchemaStore.nvim',
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -210,6 +212,7 @@ return {
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      capabilities.textDocument.completion.completionItem.snippetSupport = true
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -250,7 +253,21 @@ return {
           single_file_support = false,
         },
         java_language_server = {},
-        jsonls = {},
+        jsonls = {
+          on_new_config = function(new_config)
+            ---@type SchemaOpts
+            new_config.settings.json.schemas = new_config.settings.json.schemas or {}
+            vim.list_extend(new_config.settings.json.schemas, require('schemastore').json.schemas())
+          end,
+          settings = {
+            json = {
+              format = {
+                enable = true,
+              },
+              validate = { enable = true },
+            },
+          },
+        },
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -275,7 +292,20 @@ return {
           },
         },
         taplo = {},
-        yamlls = {},
+        yamlls = {
+          capabilities = {
+            -- Have to add this for yamlls to understand that we support line folding
+            textDocument = {
+              foldingRange = {
+                dynamicRegistration = false,
+                lineFoldingOnly = true,
+              },
+            },
+          },
+          on_new_config = function(new_config)
+            new_config.settings.yaml.schemas = vim.tbl_deep_extend('force', new_config.settings.yaml.schemas or {}, require('schemastore').yaml.schemas())
+          end,
+        },
       }
       -- Ensure the servers and tools above are installed
       --
@@ -318,6 +348,7 @@ return {
         on_attach = function(_, _)
           if vim.bo.filetype == 'html' then
             vim.bo.filetype = 'htmldjango'
+            -- vim.bo.filetype = vim.bo.filetype .. '.django'
           end
         end,
       }

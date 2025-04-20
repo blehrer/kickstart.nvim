@@ -15,11 +15,38 @@ return {
       explorer = { enabled = true },
       indent = { enabled = true },
       input = { enabled = false },
-      picker = { enabled = true },
+      picker = {
+        enabled = true,
+        win = {
+          input = {
+            keys = {
+              ['<Esc><Esc>'] = { 'close', mode = { 'n', 'i' }, desc = 'Close' },
+            },
+          },
+          list = {
+            keys = {
+              ['<Esc><Esc>'] = { 'close', mode = { 'n', 'i' }, desc = 'Close' },
+            },
+          },
+          preview = {
+            keys = {
+              ['<Esc><Esc>'] = { 'close', mode = { 'n', 'i' }, desc = 'Close' },
+            },
+          },
+        },
+      },
       notifier = { enabled = false },
       quickfile = { enabled = true },
       scope = { enabled = true },
-      scratch = { enabled = true },
+      scratch = {
+        enabled = true,
+        win = {
+          relative = 'editor',
+          keys = {
+            ['<Esc><Esc>'] = { 'close', mode = { 'n', 'i' }, desc = 'Close' },
+          },
+        },
+      },
       scroll = { enabled = false },
       statuscolumn = { enabled = true },
       words = { enabled = false },
@@ -47,7 +74,20 @@ return {
           end
         end,
         desc = 'Snacks dashboard',
-        mode = 'n',
+      },
+      {
+        '<leader><del>',
+        function()
+          require('snacks.terminal').toggle(nil, { cwd = vim.fn.expand '%:h', interactive = true })
+        end,
+        desc = 'Toggle terminal',
+      },
+      {
+        '<leader>sp',
+        function()
+          Snacks.picker()
+        end,
+        desc = '[S]nacks [P]icker',
       },
     },
   },
