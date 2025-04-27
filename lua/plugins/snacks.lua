@@ -1,4 +1,4 @@
-require('lazy.types')
+require 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
   {
@@ -48,6 +48,23 @@ return {
             },
           },
         },
+        sources = {
+          colorschemes = {
+            sort = function(a, b)
+              return a.text:lower() > b.text:lower()
+            end,
+            confirm = function(picker, item)
+              picker:close()
+              if item then
+                picker.preview.state.colorscheme = nil
+                vim.schedule(function()
+                  vim.fn.writefile({ item.text }, vim.fn.stdpath 'data' .. '/colorscheme.current')
+                  vim.cmd('colorscheme ' .. item.text)
+                end)
+              end
+            end,
+          },
+        },
       },
       notifier = { enabled = false },
       quickfile = { enabled = true },
@@ -92,7 +109,7 @@ return {
       {
         '<leader><del>',
         function()
-          require('snacks.terminal').toggle(nil, { cwd = vim.fn.expand('%:h'), interactive = true })
+          require('snacks.terminal').toggle(nil, { cwd = vim.fn.expand '%:h', interactive = true })
         end,
         desc = 'Toggle terminal',
       },
@@ -102,6 +119,13 @@ return {
           Snacks.picker()
         end,
         desc = '[S]nacks [P]icker',
+      },
+      {
+        '<leader>uc',
+        function()
+          Snacks.picker.colorschemes()
+        end,
+        desc = 'UI: Colorscheme picker',
       },
     },
   },

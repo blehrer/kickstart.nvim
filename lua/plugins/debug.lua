@@ -153,7 +153,7 @@ return {
       -- Adapters
       {
         'thenbe/neotest-playwright',
-        dependencies = 'nvim-telescope/nvim',
+        dependencies = 'nvim-telescope/telescope.nvim',
         keys = {
           {
             '<leader>ta',

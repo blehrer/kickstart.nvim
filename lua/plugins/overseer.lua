@@ -2,13 +2,6 @@ require 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
   {
-    'sho-87/kanagawa-paper.nvim',
-    optional = true,
-    opts = {
-      integrations = { overseer = true },
-    },
-  },
-  {
     'stevearc/overseer.nvim',
     cmd = {
       'OverseerOpen',
