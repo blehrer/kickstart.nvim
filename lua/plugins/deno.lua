@@ -3,6 +3,11 @@ require 'lazy.types'
 return {
   'sigmasd/deno-nvim',
   event = 'VeryLazy',
+  cond = function()
+    local lsputil = require 'lspconfig.util'
+    local rp = lsputil.root_pattern('deno.json', 'deno.jsonc')
+    return rp(vim.uv.cwd()) ~= nil
+  end,
   dependencies = {
     'mfussenegger/nvim-dap',
   },
@@ -30,7 +35,7 @@ return {
         {
           type = 'pwa-node',
           request = 'launch',
-          name = 'Launch file',
+          name = 'Launch file (Deno)',
           runtimeExecutable = 'deno',
           runtimeArgs = {
             'run',

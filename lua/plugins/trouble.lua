@@ -1,8 +1,14 @@
 return {
   'folke/trouble.nvim',
+  ---@type trouble.Config
   opts = {}, -- for default options, refer to the configuration section for custom setup.
   cmd = 'Trouble',
   keys = {
+    {
+      '<leader>ps',
+      '<cmd>Trouble symbols<cr>',
+      desc = '[P]anel: [S]ymbols (current buffer)',
+    },
     {
       '<leader>tt',
       '<cmd>Trouble<cr>',

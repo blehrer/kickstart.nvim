@@ -54,13 +54,13 @@ return {
     },
     -- stylua: ignore
     keys = {
-      { "<leader>o/", "<cmd>OverseerToggle<cr>",      desc = "Task list" },
-      { "<leader>o<space>", "<cmd>OverseerRun<cr>",         desc = "Run task" },
-      { "<leader>oq", "<cmd>OverseerQuickAction<cr>", desc = "Action recent task" },
-      { "<leader>o?", "<cmd>OverseerInfo<cr>",        desc = "Overseer Info" },
-      { "<leader>ob", "<cmd>OverseerBuild<cr>",       desc = "Task builder" },
-      { "<leader>ot", "<cmd>OverseerTaskAction<cr>",  desc = "Task action" },
-      { "<leader>o<backspace>", "<cmd>OverseerClearCache",  desc = "Clear cache?" },
+      { "<leader>o/",           "<cmd>OverseerToggle<cr>",      desc = "Task list" },
+      { "<leader>o<space>",     "<cmd>OverseerRun<cr>",         desc = "Run task" },
+      { "<leader>oq",           "<cmd>OverseerQuickAction<cr>", desc = "Action recent task" },
+      { "<leader>o?",           "<cmd>OverseerInfo<cr>",        desc = "Overseer Info" },
+      { "<leader>ob",           "<cmd>OverseerBuild<cr>",       desc = "Task builder" },
+      { "<leader>ot",           "<cmd>OverseerTaskAction<cr>",  desc = "Task action" },
+      { "<leader>o<backspace>", "<cmd>OverseerClearCache",      desc = "Clear cache?" },
     },
   },
   {
@@ -86,15 +86,15 @@ return {
       })
     end,
   },
-  {
-    'nvim-neotest/neotest',
-    optional = true,
-    opts = function(_, opts)
-      opts = opts or {}
-      opts.consumers = opts.consumers or {}
-      opts.consumers.overseer = require 'neotest.consumers.overseer'
-    end,
-  },
+  -- {
+  --   'nvim-neotest/neotest',
+  --   optional = true,
+  --   opts = function(_, opts)
+  --     opts = opts or {}
+  --     opts.consumers = opts.consumers or {}
+  --     opts.consumers.overseer = require 'neotest.consumers.overseer'
+  --   end,
+  -- },
   {
     'mfussenegger/nvim-dap',
     optional = true,

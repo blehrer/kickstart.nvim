@@ -3,7 +3,10 @@ require 'lazy'
 return {
   { -- Detect tabstop and shiftwidth automatically
     'tpope/vim-sleuth',
-    -- opts = {},
+    -- no lua module... so, no opts?
+    config = function()
+      require('lazy').setup 'tpope/vim-sleuth'
+    end,
   },
   { -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
@@ -46,7 +49,7 @@ return {
       end,
 
       formatters_by_ft = {
-        -- lua = { 'stylua' },
+        lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --

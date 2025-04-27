@@ -1,0 +1,164 @@
+return {}
+-- local js_debug_dap_server = os.getenv 'HOME' .. '/.local/share/microsoft/js-debug/src/dapDebugServer.js'
+--
+-- local function detect_node()
+--   return require('lspconfig.util').root_pattern('package.json')(vim.uv.cwd()) and true or false
+-- end
+--
+-- local function detect_deno()
+--   return require('lspconfig.util').root_pattern('deno.json', 'deno.jsonc')(vim.uv.cwd()) and true or false
+-- end
+--
+-- local function register_dap_configs()
+--   print('deno:', detect_deno(), 'node:', detect_node())
+--   if detect_deno() or detect_node() then
+--     local dap = require 'dap'
+--
+--     dap.adapters['pwa-node'] = {
+--       type = 'server',
+--       host = 'localhost',
+--       port = '${port}',
+--       executable = {
+--         command = 'node',
+--         args = { js_debug_dap_server, '${port}' },
+--       },
+--     }
+--
+--     local supported_filetypes = { 'typescript', 'typescriptreact', 'javascript' }
+--     for _, ft in ipairs(supported_filetypes) do
+--       local launch_file_cfg = {
+--         type = 'pwa-node',
+--         request = 'launch',
+--         name = string.format('Launch file (%s)', detect_deno() and 'Deno' or 'Node'),
+--         runtimeExecutable = detect_deno() and 'deno' or 'node',
+--         runtimeArgs = detect_deno() and {
+--           'run',
+--           '--inspect-wait',
+--           '--allow-all',
+--         } or {
+--           'run',
+--           '--inspect-wait',
+--         },
+--         program = '${file}',
+--         cwd = '${workspaceFolder}',
+--         attachSimplePort = detect_node() and 9229 or 9329,
+--       }
+--       local playwright_file_cfg = {
+--         type = 'pwa-node',
+--         request = 'launch',
+--         name = string.format('Launch Playwright Test (%s)', detect_deno() and 'Deno' or 'Node'),
+--         runtimeExecutable = detect_deno() and 'deno' or 'npx',
+--         runtimeArgs = detect_deno() and {
+--           'task',
+--           '--inspect-wait',
+--           '--allow-all',
+--         } or {
+--           'playwright',
+--           'test',
+--           '--inspect-wait',
+--         },
+--         program = '${file}',
+--         cwd = '${workspaceFolder}',
+--         attachSimplePort = detect_node() and 9229 or 9329,
+--       }
+--       local attach_cfg = {
+--         type = "pwa-node",
+--         request = "attach",
+--         name = "Attach",
+--         processId = require 'dap.utils'.pick_process,
+--         cwd = "${workspaceFolder}",
+--       }
+--       vim.notify(string.format('ft: %s\ntbl: %s', ft, vim.inspect(launch_file_cfg)))
+--       dap.configurations[ft] = { launch_file_cfg, attach_cfg }
+--     end
+--   end
+-- end
+--
+-- require 'lazy.types'
+-- ---@type LazyPluginSpec[]
+-- return {
+--   {
+--     'mxsdev/nvim-dap-vscode-js',
+--     cond = detect_node,
+--     event = 'VeryLazy',
+--     dependencies = {
+--       {
+--         'mfussenegger/nvim-dap'
+--       },
+--       {
+--         'neovim/nvim-lspconfig'
+--       },
+--     },
+--     opts = function()
+--       return {
+--         port = 9229,
+--         debugger_cmd = { 'node', js_debug_dap_server, '${port}' },
+--         dap = {
+--           adapter = {
+--             executable = {
+--               args = { js_debug_dap_server, '${port}' },
+--             },
+--           }
+--         }
+--       }
+--     end,
+--     config = function()
+--       register_dap_configs()
+--       require('dap-vscode-js').setup(opts)
+--     end
+--   },
+--   {
+--     'sigmasd/deno-nvim',
+--     dependencies = {
+--       {
+--         'mfussenegger/nvim-dap'
+--       },
+--       {
+--         'neovim/nvim-lspconfig'
+--       },
+--     },
+--     event = 'VeryLazy',
+--     cond = detect_deno,
+--     opts = {
+--       dap = {
+--         server = {
+--           -- on_attach = ...,
+--           -- capabilities = ...,
+--           settings = {
+--             deno = {
+--               inlayHints = {
+--                 parameterNames = {
+--                   enabled = 'all',
+--                 },
+--                 parameterTypes = {
+--                   enabled = true,
+--                 },
+--                 variableTypes = {
+--                   enabled = true,
+--                 },
+--                 propertyDeclarationTypes = {
+--                   enabled = true,
+--                 },
+--                 functionLikeReturnTypes = {
+--                   enabled = true,
+--                 },
+--                 enumMemberValues = {
+--                   enabled = true,
+--                 },
+--               },
+--             },
+--           },
+--         },
+--         adapter = {
+--           executable = {
+--             args = { js_debug_dap_server, '${port}' },
+--           },
+--         },
+--       },
+--     },
+--     config = function(self, opts)
+--       register_dap_configs()
+--       require('deno-nvim').setup(opts)
+--     end
+--   }
+-- }

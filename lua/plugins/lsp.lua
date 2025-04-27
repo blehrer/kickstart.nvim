@@ -1,4 +1,3 @@
-require 'vim'
 return {
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
@@ -10,13 +9,25 @@ return {
         -- Load luvit types when the `vim.uv` word is found
         -- See https://github.com/LuaLS/lua-language-server/wiki/Libraries#manually-applying
         -- for an explanation of `${3rd}`
-        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
+        {
+          path = '${3rd}/luv/library',
+          words = { 'vim%.uv' },
+        },
+        -- {
+        --   'LazyVim',
+        --   words = 'LazyVim'
+        -- },
+        -- {
+        --   'vim',
+        --   words = 'vim'
+        -- },
       },
     },
   },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
+
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
       -- Mason must be loaded before its dependents so we need to set it up here.
@@ -31,13 +42,15 @@ return {
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
 
-      -- -- Allows for configurations per project
-      -- { 'folke/neoconf.nvim', opts = {} },
+      -- Allows for configurations per project
+      { 'folke/neoconf.nvim', opts = {} },
 
       -- Inlay hints
-      { 'lvimuser/lsp-inlayhints.nvim' },
+      -- { 'lvimuser/lsp-inlayhints.nvim' },
+
       'b0o/SchemaStore.nvim',
     },
+
     config = function()
       -- Brief aside: **What is LSP?**
       --
@@ -204,6 +217,8 @@ return {
             return diagnostic_message[diagnostic.severity]
           end,
         },
+        update_in_insert = true,
+        virtual_lines = false,
       }
 
       -- LSP servers and clients are able to communicate to each other what features they support.
@@ -239,25 +254,30 @@ return {
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
-        denols = {
-          on_init = function(_)
-            vim.g.markdown_fenced_languages = {
-              'ts=typescript',
-            }
-          end,
-          root_dir = lsputil.root_pattern('deno.json', 'deno.jsonc'),
-        },
 
         ts_ls = {
           root_dir = lsputil.root_pattern 'package.json',
           single_file_support = false,
         },
-        java_language_server = {},
+
+        denols = {
+          root_dir = lsputil.root_pattern('deno.json', 'deno.jsonc'),
+          single_file_support = false,
+          on_init = function(_)
+            vim.g.markdown_fenced_languages = {
+              'ts=typescript',
+            }
+          end,
+        },
+
         jsonls = {
+          -- lazy-load schemastore when needed
           on_new_config = function(new_config)
-            ---@type SchemaOpts
-            new_config.settings.json.schemas = new_config.settings.json.schemas or {}
-            vim.list_extend(new_config.settings.json.schemas, require('schemastore').json.schemas())
+            ---@class lsp.LSPObject
+            local preexisting_cfg = new_config.settings
+            preexisting_cfg.json {
+              schemas = require('schemastore').json.schemas(),
+            }
           end,
           settings = {
             json = {
@@ -268,6 +288,9 @@ return {
             },
           },
         },
+
+        java_language_server = {},
+
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -282,7 +305,7 @@ return {
             },
           },
         },
-        ruby_lsp = {},
+        -- ruby_lsp = {},
         theme_check = {
           init_options = {
             enableSchema = true,
@@ -303,7 +326,7 @@ return {
             },
           },
           on_new_config = function(new_config)
-            new_config.settings.yaml.schemas = vim.tbl_deep_extend('force', new_config.settings.yaml.schemas or {}, require('schemastore').yaml.schemas())
+            vim.tbl_deep_extend('force', new_config.settings.yaml.schemas or {}, require('schemastore').yaml.schemas())
           end,
         },
       }

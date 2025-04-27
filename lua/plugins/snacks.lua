@@ -1,4 +1,4 @@
-require 'lazy.types'
+require('lazy.types')
 ---@type LazyPluginSpec[]
 return {
   {
@@ -11,7 +11,21 @@ return {
       -- or leave it empty to use the default settings
       -- refer to the configuration section below
       bigfile = { enabled = true },
-      dashboard = { enabled = true },
+      dashboard = {
+        enabled = true,
+        preset = {
+          header = [[
+
+                  _)             
+  __ \   \ \   /   |   __ `__ \  
+  |   |   \ \ /    |   |   |   | 
+ _|  _|    \_/    _|  _|  _|  _| 
+                                 
+                                 
+
+        ]],
+        },
+      },
       explorer = { enabled = true },
       indent = { enabled = true },
       input = { enabled = false },
@@ -60,11 +74,11 @@ return {
         desc = 'Toggle Scratch Buffer',
       },
       {
-        '<leader>S',
+        '<leader>S/',
         function()
-          Snacks.scratch.select()
+          Snacks.scratch.open()
         end,
-        desc = 'Select Scratch Buffer',
+        desc = 'Toggle Scratch Buffer',
       },
       {
         '|',
@@ -78,7 +92,7 @@ return {
       {
         '<leader><del>',
         function()
-          require('snacks.terminal').toggle(nil, { cwd = vim.fn.expand '%:h', interactive = true })
+          require('snacks.terminal').toggle(nil, { cwd = vim.fn.expand('%:h'), interactive = true })
         end,
         desc = 'Toggle terminal',
       },

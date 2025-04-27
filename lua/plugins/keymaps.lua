@@ -73,8 +73,8 @@ return {
 
   vim.keymap.set('n', '-', ':Oil<cr>', { desc = 'Edit directory with oil.nvim' }),
 
-  vim.keymap.set('n', '<leader>>', ':lua ', { desc = 'Lua prompt' }),
+  vim.keymap.set('n', '<leader>' .. '>', ':lua ', { desc = 'Lua prompt' }),
 
   -- @ThePrimeagen
-  vim.keymap.set({ 'v', 'n' }, '<leader>rw', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = '[R]eplace [w]ord under cursor' }),
-}
+  vim.keymap.set({ 'v', 'n' }, '<leader>rw', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
+    { desc = '[R]eplace [w]ord under cursor' }), }
