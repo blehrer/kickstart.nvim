@@ -14,6 +14,9 @@ return {
         },
         'williamboman/mason.nvim',
         'jay-babu/mason-nvim-dap.nvim',
+
+        -- dap adapters:
+        'mfussenegger/nvim-dap-python',
       },
     },
     config = function(self, opts)
@@ -47,6 +50,7 @@ return {
           'js-debug-adapter',
         },
       }
+      require('dap-python').setup 'python3'
       local js_debug_dap_server = os.getenv 'HOME' .. '/.local/share/microsoft/js-debug/src/dapDebugServer.js'
       -- require('dap').adapters['pwa-node'] = {
       --   type = 'server',
@@ -243,9 +247,11 @@ return {
           playwright = require('neotest-playwright.consumers').consumers,
         },
       }
+      local dapui = require 'dapui'
+      dapui.setup {}
       return {
         debugger_cmd = { 'node', js_debug_dap_server, 8123 },
-        adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost' }, -- which adapters to register in nvim-dap
+        adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost', 'python' }, -- which adapters to register in nvim-dap
         -- log_file_path = "(stdpath cache)/dap_vscode_js.log" -- Path for file logging
         -- log_file_level = false -- Logging level for output to file. Set to false to disable file logging.
         -- log_console_level = vim.log.levels.ERROR -- Logging level for output to console. Set to false to disable console output.
