@@ -26,19 +26,29 @@ return {
         ]],
         },
       },
-      explorer = { enabled = true },
+      explorer = { enabled = false },
       indent = { enabled = true },
       input = { enabled = false },
       picker = {
         enabled = true,
+        ui_select = true,
+        layout = {
+          preset = 'telescope',
+          cycle = true,
+        },
+        enter = true,
         win = {
           input = {
             keys = {
+              ['PgDn'] = { 'list_scroll_down' },
+              ['PgUp'] = { 'list_scroll_up' },
               ['<Esc><Esc>'] = { 'close', mode = { 'n', 'i' }, desc = 'Close' },
             },
           },
           list = {
             keys = {
+              ['PgDn'] = { 'list_scroll_down' },
+              ['PgUp'] = { 'list_scroll_up' },
               ['<Esc><Esc>'] = { 'close', mode = { 'n', 'i' }, desc = 'Close' },
             },
           },
@@ -81,6 +91,7 @@ return {
       scroll = { enabled = false },
       statuscolumn = { enabled = true },
       words = { enabled = false },
+      zen = { enabled = true },
     },
     keys = {
       {
