@@ -86,3 +86,5 @@ vim.o.expandtab = true
 -- allow Ex expressions in modeline
 vim.o.modelineexpr = true
 
+-- Obsidian needs this
+vim.o.conceallevel = 1
