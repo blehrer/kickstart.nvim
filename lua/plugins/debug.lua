@@ -50,7 +50,8 @@ return {
           'js-debug-adapter',
         },
       }
-      require('dap-python').setup 'python3'
+
+      require('dap-python').setup 'python'
 
       local js_debug_dap_server = os.getenv 'HOME' .. '/.local/share/microsoft/js-debug/src/dapDebugServer.js'
       require('dap').adapters['pwa-node'] = {
@@ -66,21 +67,21 @@ return {
         {
           type = 'pwa-node',
           request = 'launch',
-          name = 'Launch file',
+          name = ('%s Launch file'):format(require('mini.icons').get('filetype', 'typescript')),
           program = '${file}',
           cwd = '${workspaceFolder}',
         },
         {
           type = 'pwa-node',
           request = 'attach',
-          name = 'Attach',
+          name = ('%s Attach'):format(require('mini.icons').get('filetype', 'typescript')),
           processId = require('dap.utils').pick_process,
           cwd = '${workspaceFolder}',
         },
         {
           type = 'pwa-node',
           request = 'launch',
-          name = 'Debug Playwright Tests',
+          name = ('%s Debug Playwright Tests'):format(require('mini.icons').get('filetype', 'typescript')),
           -- trace = true, -- include debugger info
           runtimeExecutable = 'npx',
           runtimeArgs = {
@@ -187,6 +188,7 @@ return {
       }
     end,
   },
+
   {
     'mxsdev/nvim-dap-vscode-js',
     dependencies = {
