@@ -51,46 +51,47 @@ return {
         },
       }
       require('dap-python').setup 'python3'
+
       local js_debug_dap_server = os.getenv 'HOME' .. '/.local/share/microsoft/js-debug/src/dapDebugServer.js'
-      -- require('dap').adapters['pwa-node'] = {
-      --   type = 'server',
-      --   host = 'localhost',
-      --   port = '${port}',
-      --   executable = {
-      --     command = 'node',
-      --     args = { js_debug_dap_server, '${port}' },
-      --   }
-      -- }
-      -- require('dap').configurations.typescript = {
-      --   {
-      --     type = 'pwa-node',
-      --     request = 'launch',
-      --     name = 'Launch file',
-      --     program = '${file}',
-      --     cwd = '${workspaceFolder}',
-      --   },
-      --   {
-      --     type = "pwa-node",
-      --     request = "attach",
-      --     name = "Attach",
-      --     processId = require 'dap.utils'.pick_process,
-      --     cwd = "${workspaceFolder}",
-      --   },
-      --   {
-      --     type = 'pwa-node',
-      --     request = 'launch',
-      --     name = 'Debug Playwright Tests',
-      --     -- trace = true, -- include debugger info
-      --     runtimeExecutable = 'npx',
-      --     runtimeArgs = {
-      --       'playwright',
-      --       'test',
-      --       '--debug',
-      --     },
-      --     rootPath = '${workspaceFolder}',
-      --     cwd = '${workspaceFolder}',
-      --   }
-      -- }
+      require('dap').adapters['pwa-node'] = {
+        type = 'server',
+        host = 'localhost',
+        port = '${port}',
+        executable = {
+          command = 'node',
+          args = { js_debug_dap_server, '${port}' },
+        },
+      }
+      require('dap').configurations.typescript = {
+        {
+          type = 'pwa-node',
+          request = 'launch',
+          name = 'Launch file',
+          program = '${file}',
+          cwd = '${workspaceFolder}',
+        },
+        {
+          type = 'pwa-node',
+          request = 'attach',
+          name = 'Attach',
+          processId = require('dap.utils').pick_process,
+          cwd = '${workspaceFolder}',
+        },
+        {
+          type = 'pwa-node',
+          request = 'launch',
+          name = 'Debug Playwright Tests',
+          -- trace = true, -- include debugger info
+          runtimeExecutable = 'npx',
+          runtimeArgs = {
+            'playwright',
+            'test',
+            '--debug',
+          },
+          rootPath = '${workspaceFolder}',
+          cwd = '${workspaceFolder}',
+        },
+      }
     end,
     keys = {
       -- Basic debugging keymaps, feel free to change to your liking!
