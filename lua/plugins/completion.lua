@@ -66,6 +66,7 @@ return {
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-nvim-lsp-signature-help',
       -- 'hrsh7th/cmp-copilot',
+      'rcarriga/cmp-dap',
     },
     config = function()
       -- See `:help cmp`
@@ -80,6 +81,10 @@ return {
           end,
         },
         completion = { completeopt = 'menu,menuone,noinsert' },
+
+        enabled = function()
+          return vim.bo.buftype ~= 'prompt' or require('cmp_dap').is_dap_buffer()
+        end,
 
         -- For an understanding of why these mappings were
         -- chosen, you will need to read `:help ins-completion`
@@ -142,6 +147,7 @@ return {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'dap' },
           -- { name = 'nvim_lsp_signature_help' },
           -- { name = 'copilot' },
         },
