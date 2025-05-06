@@ -19,13 +19,28 @@ vim.opt.rtp:prepend(lazypath)
 -- This is also a good place to setup other settings (vim.opt)
 require 'config.options'
 
+local plugin_subdirs = vim.tbl_filter(function(e)
+  return vim.fn.isdirectory(e) == 1
+end, vim.split(vim.fn.globpath(vim.fn.stdpath 'config' .. '/lua', 'plugins**'), '\n'))
+
+local relativize = function(path)
+  local relative_path = vim.fs.relpath(vim.fn.stdpath 'config' .. '/lua', path)
+  return string.gsub(relative_path or '', '/', '.')
+end
+
+local specs = {}
+-- collect all subdirs of `plugins` as importable specs
+for _, subdir in ipairs(plugin_subdirs) do
+  table.insert(specs, { import = relativize(subdir) })
+end
+
 -- Setup lazy.nvim
 require('lazy').setup {
   -- highlight-start
-  spec = {
-    -- import your plugins
-    { import = 'plugins' },
-  },
+  spec = specs,
+  -- spec = {
+  --   { import = 'plugins' },
+  -- },
   -- highlight-end
   -- Configure any other settings here. See the documentation for more details.
 

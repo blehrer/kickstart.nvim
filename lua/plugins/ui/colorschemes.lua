@@ -1,6 +1,6 @@
 function SavedColorscheme()
-  local cs_data_file = vim.fn.stdpath 'data' .. '/colorscheme.current'
   local fallback = 'habamax'
+  local cs_data_file = vim.fn.stdpath 'data' .. '/colorscheme.current'
   if vim.uv.fs_stat(cs_data_file) then
     local cs = vim.fn.readfile(cs_data_file, nil, 1)[1] or fallback
     vim.cmd.colorscheme(cs)
@@ -9,6 +9,19 @@ function SavedColorscheme()
   vim.cmd.colorscheme(fallback)
   return fallback
 end
+
+vim.keymap.set({ 'n' }, '<leader>ut', function()
+  ---@diagnostic disable-next-line: undefined-field
+  local current = vim.opt.background._value
+  if current == 'dark' then
+    vim.opt.background = 'light'
+  elseif current == 'light' then
+    vim.opt.background = 'dark'
+  else
+    ---@diagnostic disable-next-line: undefined-field, param-type-mismatch
+    vim.notify(string.format('vim.opt.backround is currently set to "%s"', current._value), 'warn')
+  end
+end, { desc = 'UI: Toggle light/dark' })
 
 require 'lazy.types'
 ---@type LazyPluginSpec[]
