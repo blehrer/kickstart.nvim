@@ -251,5 +251,14 @@ return {
         -- log_console_level = vim.log.levels.ERROR -- Logging level for output to console. Set to false to disable console output.
       }
     end,
+    keys = {
+      {
+        '<leader>dc',
+        function()
+          vim.api.nvim_command 'Telescope dap commands'
+        end,
+        desc = '[DAP]: [C]ommands',
+      },
+    },
   },
 }
