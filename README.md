@@ -1,4 +1,4 @@
-# kickstart.nvim
+# .config/nvim
 LazyVim/Kickstart amalgam + customization
 
 ## Installation
