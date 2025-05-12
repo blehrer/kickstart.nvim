@@ -32,6 +32,7 @@
 require 'config.lazy'
 require 'config.macros'
 require 'config.autocommands'
+require 'config.functions'
 vim.cmd.colorscheme(SavedColorscheme())
 
 -- The line beneath this is called `modeline`. See `:help modeline`
