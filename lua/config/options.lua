@@ -88,3 +88,6 @@ vim.o.modelineexpr = true
 
 -- Obsidian needs this
 vim.o.conceallevel = 1
+
+-- gui
+vim.o.termguicolors = true
