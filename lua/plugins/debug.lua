@@ -1,7 +1,50 @@
-require 'lazy.types'
+local function edit_breakpoint()
+  local buf_bps = require('dap.breakpoints').get(vim.fn.bufnr())[vim.fn.bufnr()]
+  local bp = nil
+  for _, candidate in ipairs(buf_bps) do
+    if candidate.line and candidate.line == vim.fn.line '.' then
+      bp = candidate
+      bp.is_loading = false
+      break
+    end
+  end
+  local condition = bp and bp.condition
+  local logMessage = bp and bp.logMessage
+  local hitCondition = bp and bp.hitCondition
+  local bp_props = {
+    ('Condition: (%s)\n'):format(condition or '<nil>'),
+    ('Hit Condition: (%s)\n'):format(hitCondition or '<nil>'),
+    ('Log Message: (%s)\n'):format(logMessage or '<nil>'),
+  }
+  vim.ui.select(bp_props, {
+    prompt = 'Edit breakpoint',
+  }, function(choice)
+    if choice == bp_props[1] then
+      condition = vim.fn.input {
+        prompt = 'Condition: ',
+        default = condition,
+      } or ''
+    elseif choice == bp_props[2] then
+      hitCondition = vim.fn.input {
+        prompt = 'Hit Condition: ',
+        default = hitCondition,
+      } or ''
+    elseif choice == bp_props[3] then
+      logMessage = vim.fn.input {
+        prompt = 'Log Message: ',
+        default = logMessage,
+      } or ''
+    end
+    vim.fn.inputsave()
+    require('dap').toggle_breakpoint(condition, hitCondition, logMessage, true)
+  end)
+end
 
+require 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
+
+  -- {{{DAP config
   {
     'mfussenegger/nvim-dap',
     dependencies = {
@@ -17,6 +60,11 @@ return {
 
         -- dap adapters:
         'mfussenegger/nvim-dap-python',
+        'jbyuki/one-small-step-for-vimkind',
+
+        -- dap ui stuff:
+        'theHamsta/nvim-dap-virtual-text',
+        'grapp-dev/nui-components.nvim',
       },
     },
     config = function(self, opts)
@@ -33,6 +81,9 @@ return {
       dap.listeners.before.event_exited.dapui_config = function()
         dapui.close()
       end
+      vim.cmd 'hi DapBreakpointColor guifg=#fa4848'
+      vim.fn.sign_define('DapBreakpoint', { text = '⦿', texthl = 'DapBreakpointColor', linehl = '', numhl = '' })
+      vim.fn.sign_define('DapBreakpointCondition', { text = '⨕', texthl = 'DapBreakpointColor', linehl = '', numhl = '' })
 
       require('mason-nvim-dap').setup {
         -- Makes a best effort to setup the various debuggers with
@@ -50,11 +101,24 @@ return {
           'js-debug-adapter',
         },
       }
+      require('nvim-dap-virtual-text').setup()
 
       require('dap-python').setup 'python'
 
+      dap.configurations.lua = {
+        {
+          type = 'nlua',
+          request = 'attach',
+          name = 'Attach to running Neovim instance',
+        },
+      }
+
+      dap.adapters.nlua = function(callback, config)
+        callback { type = 'server', host = config.host or '127.0.0.1', port = config.port or 8086 }
+      end
+
       local js_debug_dap_server = os.getenv 'HOME' .. '/.local/share/microsoft/js-debug/src/dapDebugServer.js'
-      require('dap').adapters['pwa-node'] = {
+      dap.adapters['pwa-node'] = {
         type = 'server',
         host = 'localhost',
         port = '${port}',
@@ -101,42 +165,50 @@ return {
         function()
           require('dap').continue()
         end,
-        desc = 'Debug: Start/Continue',
+        desc = '[D]ebug: Start/Continue',
       },
       {
         '<F1>',
         function()
           require('dap').step_into()
         end,
-        desc = 'Debug: Step Into',
+        desc = '[D]ebug: Step Into',
       },
       {
         '<F2>',
         function()
           require('dap').step_over()
         end,
-        desc = 'Debug: Step Over',
+        desc = '[D]ebug: Step Over',
       },
       {
         '<F3>',
         function()
           require('dap').step_out()
         end,
-        desc = 'Debug: Step Out',
+        desc = '[D]ebug: Step Out',
       },
       {
         '<leader>b',
         function()
           require('dap').toggle_breakpoint()
+          vim.api.nvim__redraw {
+            statusline = true,
+          }
         end,
-        desc = 'Debug: Toggle Breakpoint',
+        desc = 'Toggle [b]reakpoint',
+      },
+      {
+        '<leader>be',
+        edit_breakpoint,
+        desc = '[b]reakpoint [e]ditor',
+        mode = 'n',
       },
       {
         '<leader>B',
-        function()
-          require('dap').set_breakpoint(vim.fn.input 'Breakpoint condition: ')
-        end,
-        desc = 'Debug: Set Breakpoint',
+        edit_breakpoint,
+        desc = 'Edit [B]reakpoint',
+        mode = 'n',
       },
       -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
       {
@@ -144,10 +216,35 @@ return {
         function()
           require('dapui').toggle()
         end,
-        desc = 'Debug: See last session result.',
+        desc = '[D]ebug: See last session result.',
+      },
+      {
+        '<leader>dh',
+        function()
+          require('nvim-dap-virtual-text').toggle()
+        end,
+        desc = '[D]ebug: toggle virtual text [h]ints',
+      },
+      {
+        '<leader>dc',
+        function()
+          vim.api.nvim_command 'Telescope dap commands'
+        end,
+        desc = '[D]ebug: [C]ommands',
+      },
+      {
+        '<leader>df',
+        function()
+          local widgets = require 'dap.ui.widgets'
+          widgets.centered_float(widgets.frames)
+        end,
+        desc = '[D]ebug: floating [f]rames widget',
       },
     },
   },
+  -- }}}
+
+  -- {{{NeoTest
   {
     'nvim-neotest/neotest',
     dependencies = {
@@ -188,7 +285,9 @@ return {
       }
     end,
   },
+  -- }}}
 
+  -- {{{ nvim-dap-vscode-js
   {
     'mxsdev/nvim-dap-vscode-js',
     dependencies = {
@@ -260,14 +359,7 @@ return {
         -- log_console_level = vim.log.levels.ERROR -- Logging level for output to console. Set to false to disable console output.
       }
     end,
-    keys = {
-      {
-        '<leader>dc',
-        function()
-          vim.api.nvim_command 'Telescope dap commands'
-        end,
-        desc = '[DAP]: [C]ommands',
-      },
-    },
   },
+  ---}}}
 }
+--- vim: ts=2 sts=2 sw=2 et foldmethod=marker
