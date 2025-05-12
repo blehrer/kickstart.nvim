@@ -4,6 +4,7 @@ return {
     -- used for completion, annotations and signatures of Neovim apis
     'folke/lazydev.nvim',
     ft = 'lua',
+    enabled = true,
     opts = {
       library = {
         -- Load luvit types when the `vim.uv` word is found
@@ -15,7 +16,11 @@ return {
         },
         -- {
         --   'LazyVim',
-        --   words = 'LazyVim'
+        --   words = 'LazyVim',
+        -- },
+        -- {
+        --   'nvim-dapui',
+        --   words = 'dapui',
         -- },
         -- {
         --   'vim',
