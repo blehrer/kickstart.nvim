@@ -35,7 +35,7 @@ return {
           return 'make install_jsregexp'
         end)(),
         dependencies = {
-          'folke/lazydev.nvim',
+          { 'folke/lazydev.nvim', opts = {} },
           'benfowler/telescope-luasnip.nvim',
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
