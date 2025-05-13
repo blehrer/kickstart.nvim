@@ -1,42 +1,53 @@
 local function edit_breakpoint()
-  local buf_bps = require('dap.breakpoints').get(vim.fn.bufnr())[vim.fn.bufnr()]
-  local bp = { condition = '', logMessage = '', hitCondition = '', line = vim.fn.line '.' }
-  for _, candidate in ipairs(buf_bps) do
-    if candidate.line and candidate.line == vim.fn.line '.' then
-      bp = candidate
-      break
+  -- Search for an existing breakpoing on this line in this buffer
+  ---@return dap.SourceBreakpoint bp that was either found, or an empty placeholder
+  local function find_bp()
+    local buf_bps = require('dap.breakpoints').get(vim.fn.bufnr())[vim.fn.bufnr()]
+    ---@type dap.SourceBreakpoint
+    local bp = { condition = '', logMessage = '', hitCondition = '', line = vim.fn.line '.' }
+    for _, candidate in ipairs(buf_bps) do
+      if candidate.line and candidate.line == vim.fn.line '.' then
+        bp = candidate
+        break
+      end
     end
+    return bp
   end
-  local bp_props = {
-    ('Condition: (%s)\n'):format(bp.condition),
-    ('Hit Condition: (%s)\n'):format(bp.hitCondition),
-    ('Log Message: (%s)\n'):format(bp.logMessage),
-  }
 
   -- Elicit customization via a UI prompt
-  vim.ui.select(bp_props, {
-    prompt = 'Edit breakpoint',
-  }, function(choice)
-    if choice == bp_props[1] then
-      bp.condition = vim.fn.input {
-        prompt = 'Condition: ',
-        default = bp.condition,
-      }
-    elseif choice == bp_props[2] then
-      bp.hitCondition = vim.fn.input {
-        prompt = 'Hit Condition: ',
-        default = bp.hitCondition,
-      }
-    elseif choice == bp_props[3] then
-      bp.logMessage = vim.fn.input {
-        prompt = 'Log Message: ',
-        default = bp.logMessage,
-      }
-    end
+  ---@param bp dap.SourceBreakpoint a breakpoint
+  local function customize_bp(bp)
+    local fields = {
+      ('Condition: (%s)\n'):format(bp.condition),
+      ('Hit Condition: (%s)\n'):format(bp.hitCondition),
+      ('Log Message: (%s)\n'):format(bp.logMessage),
+    }
+    vim.ui.select(fields, {
+      prompt = 'Edit breakpoint',
+    }, function(choice)
+      if choice == fields[1] then
+        bp.condition = vim.fn.input {
+          prompt = 'Condition: ',
+          default = bp.condition,
+        }
+      elseif choice == fields[2] then
+        bp.hitCondition = vim.fn.input {
+          prompt = 'Hit Condition: ',
+          default = bp.hitCondition,
+        }
+      elseif choice == fields[3] then
+        bp.logMessage = vim.fn.input {
+          prompt = 'Log Message: ',
+          default = bp.logMessage,
+        }
+      end
 
-    -- Set breakpoint for current line, with customizations
-    require('dap').set_breakpoint(bp.condition, bp.hitCondition, bp.logMessage)
-  end)
+      -- Set breakpoint for current line, with customizations (see h:dap.set_breakpoint())
+      require('dap').set_breakpoint(bp.condition, bp.hitCondition, bp.logMessage)
+    end)
+  end
+
+  customize_bp(find_bp())
 end
 
 require 'lazy.types'
