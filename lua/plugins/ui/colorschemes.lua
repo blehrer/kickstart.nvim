@@ -10,19 +10,6 @@ function SavedColorscheme()
   return fallback
 end
 
-vim.keymap.set({ 'n' }, '<leader>ut', function()
-  ---@diagnostic disable-next-line: undefined-field
-  local current = vim.opt.background._value
-  if current == 'dark' then
-    vim.opt.background = 'light'
-  elseif current == 'light' then
-    vim.opt.background = 'dark'
-  else
-    ---@diagnostic disable-next-line: undefined-field, param-type-mismatch
-    vim.notify(string.format('vim.opt.backround is currently set to "%s"', current._value), 'warn')
-  end
-end, { desc = 'UI: Toggle light/dark' })
-
 require 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
