@@ -1,0 +1,110 @@
+-- ---@class SourceBreakpointWrapper
+-- ---@field key string
+-- ---@field bp dap.SourceBreakpoint
+-- -- Define the class table
+-- local SourceBreakpointWrapper = {}
+-- SourceBreakpointWrapper.__index = SourceBreakpointWrapper
+--
+-- --- Creates a new SourceBreakpointWrapper instance.
+-- -- @param breakpoint_data SourceBreakpointWrapper
+-- -- @return SourceBreakpointWrapper A new wrapper instance.
+-- function SourceBreakpointWrapper.new(breakpoint_data)
+--   local self = setmetatable({}, SourceBreakpointWrapper)
+--   self.key = breakpoint_data.key
+--   self.bp = breakpoint_data.bp or { line = vim.fn.line '.' }
+--   return self
+-- end
+--
+-- function SourceBreakpointWrapper:menu_key()
+--   -- from http://lua-users.org/wiki/StringRecipes#:~:text=Change%20an%20entire,w_%27%5D*)%22%2C%20tchelper)
+--   local function to_title_case(first, rest)
+--     return first:upper() .. rest:lower()
+--   end
+--   if self.key then
+--     local str = self.key
+--     if str:find '[a-z][A-Z]' then
+--       str = str:gsub('([a-z])([A-Z])', '%1 %2')
+--     end
+--     return str:gsub("(%a)([%w_']*)", to_title_case)
+--   end
+-- end
+--
+-- ---@return string?
+-- function SourceBreakpointWrapper:get()
+--   return self.bp[self.key]
+-- end
+--
+-- ---@param value string?
+-- function SourceBreakpointWrapper:set(value)
+--   self.bp[self.key] = value
+-- end
+--
+-- ---@param self SourceBreakpointWrapper?
+-- function SourceBreakpointWrapper.update(self)
+--   local dap = require 'dap'
+--   -- Search for an existing breakpoint on this line in this buffer
+--   ---@return dap.SourceBreakpoint bp that was either found, or an empty placeholder
+--   local function find_bp()
+--     ---@type dap.SourceBreakpoint
+--     local bp = { condition = '', logMessage = '', hitCondition = '', line = vim.fn.line '.' }
+--
+--     local buf_bps = require('dap.breakpoints').get(vim.fn.bufnr())[vim.fn.bufnr()]
+--     for _, candidate in ipairs(buf_bps) do
+--       if candidate.line and candidate.line == bp.line then
+--         bp = candidate
+--         break
+--       end
+--     end
+--     return bp
+--   end
+--
+--   -- Elicit customization via a UI prompt
+--   ---@param bp dap.SourceBreakpoint a breakpoint
+--   local function customize_bp(bp)
+--     ---@type SourceBreakpointWrapper[]
+--     local attrs = {
+--       SourceBreakpointWrapper.new { bp = bp, key = 'condition' },
+--       SourceBreakpointWrapper.new { bp = bp, key = 'hitCondition' },
+--       SourceBreakpointWrapper.new { bp = bp, key = 'logMessage' },
+--       SourceBreakpointWrapper.new { bp = bp, key = 'line' },
+--     }
+--     vim.ui.select(attrs, {
+--       prompt = 'Edit Breakpoint',
+--       format_item = function(item)
+--         local k = item and item:menu_key()
+--         local v = item and item:get()
+--         return ('%s: %s'):format(k, v)
+--       end,
+--       kind = 'SourceBreakpointWrapper',
+--     }, function(choice)
+--       if choice then
+--         local prompt = choice:menu_key()
+--         if choice then
+--           local update = vim.fn.input {
+--             prompt = prompt,
+--             default = choice and choice:get() or '',
+--           }
+--           choice:set(update)
+--
+--           if choice.bp.line ~= vim.fn.line '.' then
+--             -- toggle bp on current line
+--             dap.toggle_breakpoint()
+--             -- move to correct line
+--             vim.api.nvim_win_set_cursor(0, { tonumber(choice.bp.line), 0 })
+--             vim.cmd 'norm _'
+--           end
+--
+--           -- Set breakpoint for current line, with customizations (see h:dap.set_breakpoint())
+--           dap.set_breakpoint(choice.bp.condition, choice.bp.hitCondition, choice.bp.logMessage)
+--         end
+--       end
+--     end)
+--   end
+--
+--   customize_bp(self and self.bp or find_bp())
+-- end
+--
+-- vim.keymap.set('n', '<leader>db', function()
+--   SourceBreakpointWrapper:update()
+-- end, { desc = 'do update' })
+return {}

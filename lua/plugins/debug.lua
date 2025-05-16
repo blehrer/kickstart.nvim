@@ -1,55 +1,109 @@
-local function edit_breakpoint()
-  -- Search for an existing breakpoing on this line in this buffer
-  ---@return dap.SourceBreakpoint bp that was either found, or an empty placeholder
-  local function find_bp()
-    local buf_bps = require('dap.breakpoints').get(vim.fn.bufnr())[vim.fn.bufnr()]
-    ---@type dap.SourceBreakpoint
-    local bp = { condition = '', logMessage = '', hitCondition = '', line = vim.fn.line '.' }
-    for _, candidate in ipairs(buf_bps) do
-      if candidate.line and candidate.line == vim.fn.line '.' then
-        bp = candidate
-        break
-      end
-    end
-    return bp
-  end
-
-  -- Elicit customization via a UI prompt
-  ---@param bp dap.SourceBreakpoint a breakpoint
-  local function customize_bp(bp)
-    local fields = {
-      ('Condition: (%s)\n'):format(bp.condition),
-      ('Hit Condition: (%s)\n'):format(bp.hitCondition),
-      ('Log Message: (%s)\n'):format(bp.logMessage),
-    }
-    vim.ui.select(fields, {
-      prompt = 'Edit breakpoint',
-    }, function(choice)
-      if choice == fields[1] then
-        bp.condition = vim.fn.input {
-          prompt = 'Condition: ',
-          default = bp.condition,
-        }
-      elseif choice == fields[2] then
-        bp.hitCondition = vim.fn.input {
-          prompt = 'Hit Condition: ',
-          default = bp.hitCondition,
-        }
-      elseif choice == fields[3] then
-        bp.logMessage = vim.fn.input {
-          prompt = 'Log Message: ',
-          default = bp.logMessage,
-        }
-      end
-
-      -- Set breakpoint for current line, with customizations (see h:dap.set_breakpoint())
-      require('dap').set_breakpoint(bp.condition, bp.hitCondition, bp.logMessage)
-    end)
-  end
-
-  customize_bp(find_bp())
-end
-
+-- ---@class SourceBreakpointWrapper
+-- ---@field key string
+-- ---@field bp dap.SourceBreakpoint
+-- -- Define the class table
+-- local SourceBreakpointWrapper = {}
+-- SourceBreakpointWrapper.__index = SourceBreakpointWrapper
+--
+-- --- Creates a new SourceBreakpointWrapper instance.
+-- -- @param breakpoint_data SourceBreakpointWrapper
+-- -- @return SourceBreakpointWrapper A new wrapper instance.
+-- function SourceBreakpointWrapper.new(breakpoint_data)
+--   local self = setmetatable({}, SourceBreakpointWrapper)
+--   self.key = breakpoint_data.key
+--   self.bp = breakpoint_data.bp or { line = vim.fn.line '.' }
+--   return self
+-- end
+--
+-- function SourceBreakpointWrapper:menu_key()
+--   -- from http://lua-users.org/wiki/StringRecipes#:~:text=Change%20an%20entire,w_%27%5D*)%22%2C%20tchelper)
+--   local function to_title_case(first, rest)
+--     return first:upper() .. rest:lower()
+--   end
+--   if self.key then
+--     local str = self.key
+--     if str:find '[a-z][A-Z]' then
+--       str = str:gsub('([a-z])([A-Z])', '%1 %2')
+--     end
+--     return str:gsub("(%a)([%w_']*)", to_title_case)
+--   end
+-- end
+--
+-- ---@return string?
+-- function SourceBreakpointWrapper:get()
+--   return self.bp[self.key]
+-- end
+--
+-- ---@param value string?
+-- function SourceBreakpointWrapper:set(value)
+--   self.bp[self.key] = value
+-- end
+--
+-- ---@param self SourceBreakpointWrapper?
+-- function SourceBreakpointWrapper.update(self)
+--   local dap = require 'dap'
+--   -- Search for an existing breakpoint on this line in this buffer
+--   ---@return dap.SourceBreakpoint bp that was either found, or an empty placeholder
+--   local function find_bp()
+--     ---@type dap.SourceBreakpoint
+--     local bp = { condition = '', logMessage = '', hitCondition = '', line = vim.fn.line '.' }
+--
+--     local buf_bps = require('dap.breakpoints').get(vim.fn.bufnr())[vim.fn.bufnr()]
+--     for _, candidate in ipairs(buf_bps) do
+--       if candidate.line and candidate.line == bp.line then
+--         bp = candidate
+--         break
+--       end
+--     end
+--     return bp
+--   end
+--
+--   -- Elicit customization via a UI prompt
+--   ---@param bp dap.SourceBreakpoint a breakpoint
+--   local function customize_bp(bp)
+--     ---@type SourceBreakpointWrapper[]
+--     local attrs = {
+--       SourceBreakpointWrapper.new { bp = bp, key = 'condition' },
+--       SourceBreakpointWrapper.new { bp = bp, key = 'hitCondition' },
+--       SourceBreakpointWrapper.new { bp = bp, key = 'logMessage' },
+--       SourceBreakpointWrapper.new { bp = bp, key = 'line' },
+--     }
+--     vim.ui.select(attrs, {
+--       prompt = 'Edit Breakpoint',
+--       format_item = function(item)
+--         local k = item and item:menu_key()
+--         local v = item and item:get()
+--         return ('%s: %s'):format(k, v)
+--       end,
+--       kind = 'SourceBreakpointWrapper',
+--     }, function(choice)
+--       if choice then
+--         local prompt = choice:menu_key()
+--         if choice then
+--           local update = vim.fn.input {
+--             prompt = prompt,
+--             default = choice and choice:get() or '',
+--           }
+--           choice:set(update)
+--
+--           if choice.bp.line ~= vim.fn.line '.' then
+--             -- toggle bp on current line
+--             dap.toggle_breakpoint()
+--             -- move to correct line
+--             vim.api.nvim_win_set_cursor(0, { tonumber(choice.bp.line), 0 })
+--             vim.cmd 'norm _'
+--           end
+--
+--           -- Set breakpoint for current line, with customizations (see h:dap.set_breakpoint())
+--           dap.set_breakpoint(choice.bp.condition, choice.bp.hitCondition, choice.bp.logMessage)
+--         end
+--       end
+--     end)
+--   end
+--
+--   customize_bp(self and self.bp or find_bp())
+-- end
+--
 require 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
@@ -70,11 +124,59 @@ return {
 
         -- dap adapters:
         'mfussenegger/nvim-dap-python',
-        'jbyuki/one-small-step-for-vimkind',
+        {
+          'jbyuki/one-small-step-for-vimkind',
+          config = function()
+            local dap = require 'dap'
+            dap.adapters.nlua = function(callback, conf)
+              local adapter = {
+                type = 'server',
+                host = conf.host or '127.0.0.1',
+                port = conf.port or 8086,
+              }
+              if conf.start_neovim then
+                local dap_run = dap.run
+                dap.run = function(c)
+                  adapter.port = c.port
+                  adapter.host = c.host
+                end
+                require('osv').run_this()
+                dap.run = dap_run
+              end
+              callback(adapter)
+            end
+            dap.configurations.lua = {
+              {
+                type = 'nlua',
+                request = 'attach',
+                name = 'Run this file',
+                start_neovim = {},
+              },
+              {
+                type = 'nlua',
+                request = 'attach',
+                name = 'Attach to running Neovim instance (port = 8086)',
+                port = 8086,
+              },
+            }
+          end,
+        },
 
         -- dap ui stuff:
         'theHamsta/nvim-dap-virtual-text',
         'grapp-dev/nui-components.nvim',
+        {
+          -- 'blehrer/dap-breakpoints.nvim',
+          -- branch = 'multiprop-breakpoint-editing'
+          dir = vim.fs.joinpath(os.getenv 'WORKSPACE', 'blehrer', 'dap-breakpoints.nvim'),
+          opts = {
+            virtual_text = { enabled = false },
+          },
+          dependencies = {
+            'Weissle/persistent-breakpoints.nvim',
+            opts = {},
+          },
+        },
       },
     },
     config = function(self, opts)
@@ -111,20 +213,26 @@ return {
           'js-debug-adapter',
         },
       }
-      require('nvim-dap-virtual-text').setup()
+      require('nvim-dap-virtual-text').setup {}
 
       require('dap-python').setup 'python'
 
-      dap.configurations.lua = {
-        {
-          type = 'nlua',
-          request = 'attach',
-          name = 'Attach to running Neovim instance',
-        },
-      }
-
-      dap.adapters.nlua = function(callback, config)
-        callback { type = 'server', host = config.host or '127.0.0.1', port = config.port or 8086 }
+      dap.adapters.nlua = function(callback, conf)
+        local adapter = {
+          type = 'server',
+          host = conf.host or '127.0.0.1',
+          port = conf.port or 8086,
+        }
+        if conf.start_neovim then
+          local dap_run = dap.run
+          dap.run = function(c)
+            adapter.port = c.port
+            adapter.host = c.host
+          end
+          require('osv').run_this()
+          dap.run = dap_run
+        end
+        callback(adapter)
       end
 
       local js_debug_dap_server = os.getenv 'HOME' .. '/.local/share/microsoft/js-debug/src/dapDebugServer.js'
@@ -216,7 +324,10 @@ return {
       },
       {
         '<leader>B',
-        edit_breakpoint,
+        function()
+          require('dap-breakpoints.api').edit_properties()
+          -- SourceBreakpointWrapper:update()
+        end,
         desc = 'Edit [B]reakpoint',
         mode = 'n',
       },
