@@ -29,9 +29,10 @@
     - (or HTML version): https://neovim.io/doc/user/lua-guide.html
 
 --]]
+
+require 'config.options'
 require 'config.lazy'
 require 'config.macros'
-require 'config.autocommands'
 require 'config.functions'
 vim.cmd.colorscheme(SavedColorscheme())
 

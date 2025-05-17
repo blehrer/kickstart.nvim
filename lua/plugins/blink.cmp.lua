@@ -95,7 +95,23 @@ return {
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev', 'dap', 'buffer' },
+        default = function()
+          local defaults = { 'lsp', 'snippets', 'path' }
+          local ft = vim.bo.filetype
+          local node = vim.treesitter.get_node()
+          if node and vim.tbl_contains({ 'comment', 'line_comment', 'block_comment' }, node:type()) then
+            return { 'buffer' }
+          elseif ft:match 'dap' then
+            return vim.list_extend(defaults, {
+              'dap',
+              require('dap').session().adapter.options.source_filetype == 'lua' and 'lazydev',
+            })
+          elseif ft:match 'lua' then
+            return vim.list_extend(defaults, { 'lazydev' })
+          else
+            return defaults
+          end
+        end,
         providers = {
           lazydev = {
             module = 'lazydev.integrations.blink',

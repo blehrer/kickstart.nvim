@@ -14,11 +14,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Make sure to setup `mapleader` and `maplocalleader` before
--- loading lazy.nvim so that mappings are correct.
--- This is also a good place to setup other settings (vim.opt)
-require 'config.options'
-
 local plugin_subdirs = vim.tbl_filter(function(e)
   return vim.fn.isdirectory(e) == 1
 end, vim.split(vim.fn.globpath(vim.fn.stdpath 'config' .. '/lua', 'plugins**'), '\n'))
