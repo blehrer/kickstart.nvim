@@ -11,6 +11,10 @@ local ensure_installed = {
   vimls = {},
   yamlls = {},
 }
+
+local non_mason_lsp_configs = {
+  ['wordnet-ls'] = {},
+}
 ---@module 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
@@ -115,6 +119,12 @@ return {
           end,
         },
       }
+
+      -- Lsps not vended through Mason
+      for k, v in pairs(non_mason_lsp_configs) do
+        vim.lsp.enable(k)
+        vim.lsp.config(k, v)
+      end
     end,
     keys = {
 
