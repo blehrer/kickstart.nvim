@@ -101,7 +101,7 @@ return {
           local node = vim.treesitter.get_node()
           if node and vim.tbl_contains({ 'comment', 'line_comment', 'block_comment' }, node:type()) then
             return { 'buffer' }
-          elseif vim.filetype:_findany({'toml', 'yaml', 'json', 'jsonc'})
+          elseif vim.filetype._findany(ft, { 'toml', 'yaml', 'json', 'jsonc' }) then
             return vim.list_extend(defaults, {
               'buffer',
             })
