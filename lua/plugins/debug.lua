@@ -7,75 +7,67 @@ return {
     'mfussenegger/nvim-dap',
     dependencies = {
       { 'igorlfs/nvim-dap-view', opts = {} },
+      'williamboman/mason.nvim',
+      'jay-babu/mason-nvim-dap.nvim',
+
+      -- dap adapters:
+      'mfussenegger/nvim-dap-python',
       {
-        'rcarriga/nvim-dap-ui',
-        dependencies = {
-          'mfussenegger/nvim-dap',
-          'nvim-neotest/nvim-nio',
-          'folke/lazydev.nvim',
-        },
-        'williamboman/mason.nvim',
-        'jay-babu/mason-nvim-dap.nvim',
-
-        -- dap adapters:
-        'mfussenegger/nvim-dap-python',
-        {
-          'jbyuki/one-small-step-for-vimkind',
-          config = function()
-            local dap = require 'dap'
-            dap.adapters.nlua = function(callback, conf)
-              local adapter = {
-                type = 'server',
-                host = conf.host or '127.0.0.1',
-                port = conf.port or 8086,
-              }
-              if conf.start_neovim then
-                local dap_run = dap.run
-                dap.run = function(c)
-                  adapter.port = c.port
-                  adapter.host = c.host
-                end
-                require('osv').run_this()
-                dap.run = dap_run
-              end
-              callback(adapter)
-            end
-            dap.configurations.lua = {
-              {
-                type = 'nlua',
-                request = 'attach',
-                name = 'Run this file',
-                start_neovim = {},
-              },
-              {
-                type = 'nlua',
-                request = 'attach',
-                name = 'Attach to running Neovim instance (port = 8086)',
-                port = 8086,
-              },
+        'jbyuki/one-small-step-for-vimkind',
+        config = function()
+          local dap = require 'dap'
+          dap.adapters.nlua = function(callback, conf)
+            local adapter = {
+              type = 'server',
+              host = conf.host or '127.0.0.1',
+              port = conf.port or 8086,
             }
-          end,
-        },
+            if conf.start_neovim then
+              local dap_run = dap.run
+              dap.run = function(c)
+                adapter.port = c.port
+                adapter.host = c.host
+              end
+              require('osv').run_this()
+              dap.run = dap_run
+            end
+            callback(adapter)
+          end
+          dap.configurations.lua = {
+            {
+              type = 'nlua',
+              request = 'attach',
+              name = 'Run this file',
+              start_neovim = {},
+            },
+            {
+              type = 'nlua',
+              request = 'attach',
+              name = 'Attach to running Neovim instance (port = 8086)',
+              port = 8086,
+            },
+          }
+        end,
+      },
 
-        -- dap ui stuff:
-        'theHamsta/nvim-dap-virtual-text',
-        'grapp-dev/nui-components.nvim',
-        {
-          'carcuis/dap-breakpoints.nvim',
-          -- 'blehrer/dap-breakpoints.nvim',
-          -- branch = 'multiprop-breakpoint-editing'
-          -- dir = vim.fs.joinpath(os.getenv 'WORKSPACE', 'blehrer', 'dap-breakpoints.nvim'),
-          opts = {
-            virtual_text = { enabled = false },
-          },
-          dependencies = {
-            'Weissle/persistent-breakpoints.nvim',
-            opts = {},
-          },
+      -- dap ui stuff:
+      'theHamsta/nvim-dap-virtual-text',
+      'grapp-dev/nui-components.nvim',
+      {
+        'carcuis/dap-breakpoints.nvim',
+        -- 'blehrer/dap-breakpoints.nvim',
+        -- branch = 'multiprop-breakpoint-editing'
+        -- dir = vim.fs.joinpath(os.getenv 'WORKSPACE', 'blehrer', 'dap-breakpoints.nvim'),
+        opts = {
+          virtual_text = { enabled = false },
+        },
+        dependencies = {
+          'Weissle/persistent-breakpoints.nvim',
+          opts = {},
         },
       },
     },
-    config = function(self, opts)
+    config = function()
       local dap, dapui = require 'dap', require 'dap-view'
       dap.listeners.before.attach.dapui_config = function()
         dapui.open()
@@ -369,7 +361,6 @@ return {
           playwright = require('neotest-playwright.consumers').consumers,
         },
       }
-      local dapui = require 'dap-view'
       return {
         debugger_cmd = { 'node', js_debug_dap_server, 8123 },
         adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost', 'python' }, -- which adapters to register in nvim-dap
