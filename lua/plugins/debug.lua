@@ -6,69 +6,78 @@ return {
   {
     'mfussenegger/nvim-dap',
     dependencies = {
-      { 'igorlfs/nvim-dap-view', opts = {} },
-      'williamboman/mason.nvim',
-      'jay-babu/mason-nvim-dap.nvim',
-
-      -- dap adapters:
-      'mfussenegger/nvim-dap-python',
+      -- {{{Package management
       {
-        'jbyuki/one-small-step-for-vimkind',
-        config = function()
-          local dap = require 'dap'
-          dap.adapters.nlua = function(callback, conf)
-            local adapter = {
-              type = 'server',
-              host = conf.host or '127.0.0.1',
-              port = conf.port or 8086,
-            }
-            if conf.start_neovim then
-              local dap_run = dap.run
-              dap.run = function(c)
-                adapter.port = c.port
-                adapter.host = c.host
-              end
-              require('osv').run_this()
-              dap.run = dap_run
-            end
-            callback(adapter)
-          end
-          dap.configurations.lua = {
-            {
-              type = 'nlua',
-              request = 'attach',
-              name = 'Run this file',
-              start_neovim = {},
-            },
-            {
-              type = 'nlua',
-              request = 'attach',
-              name = 'Attach to running Neovim instance (port = 8086)',
-              port = 8086,
-            },
-          }
-        end,
+        'jay-babu/mason-nvim-dap.nvim',
+        dependencies = { 'williamboman/mason.nvim' },
+        lazy = false,
+        priority = 49,
+        opts = {
+          -- Makes a best effort to setup the various debuggers with
+          -- reasonable debug configurations
+          automatic_installation = true,
+
+          -- You can provide additional configuration to the handlers,
+          -- see mason-nvim-dap README for more information
+          handlers = {},
+
+          -- You'll need to check that you have the required things installed
+          -- online, please don't ask me how to install them :)
+          ensure_installed = {
+            -- Update this to ensure that you have the debuggers for the langs you want
+            'js-debug-adapter',
+          },
+        },
       },
 
-      -- dap ui stuff:
-      'theHamsta/nvim-dap-virtual-text',
-      'grapp-dev/nui-components.nvim',
+      -- }}}
+
+      -- {{{Runtime and UI
+      { 'igorlfs/nvim-dap-view', opts = {} },
+      { 'theHamsta/nvim-dap-virtual-text', opts = {}, lazy = true },
       {
         'carcuis/dap-breakpoints.nvim',
         -- 'blehrer/dap-breakpoints.nvim',
         -- branch = 'multiprop-breakpoint-editing'
         -- dir = vim.fs.joinpath(os.getenv 'WORKSPACE', 'blehrer', 'dap-breakpoints.nvim'),
+        ---@module 'dap-breakpoints'
+        ---@type DapBpConfig
         opts = {
-          virtual_text = { enabled = false },
+          virtual_text = {
+            preset = 'icons_only',
+            order = 'c',
+          },
         },
         dependencies = {
           'Weissle/persistent-breakpoints.nvim',
           opts = {},
         },
       },
+      -- }}}
+
+      -- {{{Language Support Adapters
+
+      -- {{{Lua
+      {
+        'jbyuki/one-small-step-for-vimkind',
+        lazy = true,
+      },
+      -- }}}
+
+      ---{{{Python
+      {
+        'mfussenegger/nvim-dap-python',
+        lazy = true,
+      },
+      ---}}}
+
+      -- }}}
     },
+    ---@type dap.Configuration
     config = function()
       local dap, dapui = require 'dap', require 'dap-view'
+
+      -- {{{UI Event listeners
       dap.listeners.before.attach.dapui_config = function()
         dapui.open()
       end
@@ -81,31 +90,40 @@ return {
       dap.listeners.before.event_exited.dapui_config = function()
         dapui.close()
       end
+      -- }}}
+
+      -- {{{UI colors and symbols
       vim.cmd 'hi DapBreakpointColor guifg=#fa4848'
       vim.fn.sign_define('DapBreakpoint', { text = '⦿', texthl = 'DapBreakpointColor', linehl = '', numhl = '' })
       vim.fn.sign_define('DapBreakpointCondition', { text = '⨕', texthl = 'DapBreakpointColor', linehl = '', numhl = '' })
+      -- }}}
 
-      require('mason-nvim-dap').setup {
-        -- Makes a best effort to setup the various debuggers with
-        -- reasonable debug configurations
-        automatic_installation = true,
+      -- {{{Adapters
 
-        -- You can provide additional configuration to the handlers,
-        -- see mason-nvim-dap README for more information
-        handlers = {},
+      -- {{{Python
+      require('dap-python').setup('python', {
+        justMyCode = true,
+        showReturnValue = true,
+      })
+      -- }}}
 
-        -- You'll need to check that you have the required things installed
-        -- online, please don't ask me how to install them :)
-        ensure_installed = {
-          -- Update this to ensure that you have the debuggers for the langs you want
-          'js-debug-adapter',
+      --- {{{Lua
+      dap.configurations.lua = {
+        {
+          type = 'lua',
+          request = 'attach',
+          name = 'Run this file',
+          start_neovim = {},
+        },
+        {
+          type = 'lua',
+          request = 'attach',
+          name = 'Attach to running Neovim instance (port = 8086)',
+          port = 8086,
         },
       }
-      require('nvim-dap-virtual-text').setup {}
 
-      require('dap-python').setup 'python'
-
-      dap.adapters.nlua = function(callback, conf)
+      dap.adapters.lua = function(callback, conf)
         local adapter = {
           type = 'server',
           host = conf.host or '127.0.0.1',
@@ -122,8 +140,11 @@ return {
         end
         callback(adapter)
       end
+      ---}}}
 
+      --- {{{Node
       local js_debug_dap_server = os.getenv 'HOME' .. '/.local/share/microsoft/js-debug/src/dapDebugServer.js'
+
       dap.adapters['pwa-node'] = {
         type = 'server',
         host = 'localhost',
@@ -133,126 +154,158 @@ return {
           args = { js_debug_dap_server, '${port}' },
         },
       }
-      require('dap').configurations.typescript = {
-        {
-          type = 'pwa-node',
-          request = 'launch',
-          name = ('%s Launch file'):format(require('mini.icons').get('filetype', 'typescript')),
-          program = '${file}',
-          cwd = '${workspaceFolder}',
-        },
-        {
-          type = 'pwa-node',
-          request = 'attach',
-          name = ('%s Attach'):format(require('mini.icons').get('filetype', 'typescript')),
-          processId = require('dap.utils').pick_process,
-          cwd = '${workspaceFolder}',
-        },
-        {
-          type = 'pwa-node',
-          request = 'launch',
-          name = ('%s Debug Playwright Tests'):format(require('mini.icons').get('filetype', 'typescript')),
-          -- trace = true, -- include debugger info
-          runtimeExecutable = 'npx',
-          runtimeArgs = {
-            'playwright',
-            'test',
-            '--debug',
+
+      local filetypes = require 'mason-nvim-dap.mappings.filetypes'
+      for _, ft in ipairs(filetypes['node2']) do
+        dap.configurations[ft] = {
+          {
+            type = 'pwa-node',
+            request = 'launch',
+            name = ('%s Launch file'):format(require('mini.icons').get('filetype', 'typescript')),
+            program = '${file}',
+            cwd = '${workspaceFolder}',
           },
-          rootPath = '${workspaceFolder}',
-          cwd = '${workspaceFolder}',
+          {
+            type = 'pwa-node',
+            request = 'attach',
+            name = ('%s Attach'):format(require('mini.icons').get('filetype', 'typescript')),
+            processId = require('dap.utils').pick_process,
+            cwd = '${workspaceFolder}',
+          },
+          {
+            type = 'pwa-node',
+            request = 'launch',
+            name = ('%s Debug Playwright Tests'):format(require('mini.icons').get('filetype', 'typescript')),
+            -- trace = true, -- include debugger info
+            runtimeExecutable = 'npx',
+            runtimeArgs = {
+              'playwright',
+              'test',
+              '--debug',
+            },
+            rootPath = '${workspaceFolder}',
+            cwd = '${workspaceFolder}',
+          },
+        }
+      end
+
+      ---}}}
+
+      -- }}}
+    end,
+    ---@return LazyKeysSpec[]
+    keys = function()
+      return {
+        {
+          '<leader>d<space>',
+          function()
+            require('dap').continue()
+          end,
+          desc = '[D]ebug: Start/Continue',
+        },
+        {
+          '<F5>',
+          function()
+            require('dap').continue()
+          end,
+          desc = '[D]ebug: Start/Continue',
+        },
+        {
+          '<leader>dl',
+          function()
+            require('dap').step_into()
+          end,
+          desc = '[D]ebug: Step Into',
+        },
+        {
+          '<F1>',
+          function()
+            require('dap').step_into()
+          end,
+          desc = '[D]ebug: Step Into',
+        },
+        {
+          '<leader>dj',
+          function()
+            require('dap').step_over()
+          end,
+          desc = '[D]ebug: Step Over',
+        },
+        {
+          '<F2>',
+          function()
+            require('dap').step_over()
+          end,
+          desc = '[D]ebug: Step Over',
+        },
+        {
+          '<leader>d',
+          function()
+            require('dap').step_out()
+          end,
+          desc = '[D]ebug: Step Out',
+        },
+        {
+          '<F3>',
+          function()
+            require('dap').step_out()
+          end,
+          desc = '[D]ebug: Step Out',
+        },
+        {
+          '<leader>b',
+          function()
+            require('dap-breakpoints.api').toggle_breakpoint()
+          end,
+          desc = 'Toggle [b]reakpoint',
+        },
+        {
+          '<leader>be',
+          function()
+            require('dap-breakpoints.api').edit_property { all = true }
+          end,
+          desc = '[b]reakpoint [e]ditor',
+          mode = 'n',
+        },
+        {
+          '<leader>B',
+          function()
+            require('dap-breakpoints.api').edit_property { all = true }
+          end,
+          desc = 'Edit [B]reakpoint',
+          mode = 'n',
+        },
+        -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
+        {
+          '<leader>du',
+          function()
+            require('dap-view').toggle(true)
+          end,
+          desc = '[D]ebug: See last session result.',
+        },
+        {
+          '<F7>',
+          function()
+            require('dap-view').toggle(true)
+          end,
+          desc = '[D]ebug: See last session result.',
+        },
+        {
+          '<leader>dh',
+          function()
+            require('nvim-dap-virtual-text').toggle()
+          end,
+          desc = '[D]ebug: toggle virtual text [h]ints',
+        },
+        {
+          '<leader>dc',
+          function()
+            vim.api.nvim_command 'Telescope dap commands'
+          end,
+          desc = '[D]ebug: [C]ommands',
         },
       }
     end,
-    keys = {
-      -- Basic debugging keymaps, feel free to change to your liking!
-      {
-        '<F5>',
-        function()
-          require('dap').continue()
-        end,
-        desc = '[D]ebug: Start/Continue',
-      },
-      {
-        '<F1>',
-        function()
-          require('dap').step_into()
-        end,
-        desc = '[D]ebug: Step Into',
-      },
-      {
-        '<F2>',
-        function()
-          require('dap').step_over()
-        end,
-        desc = '[D]ebug: Step Over',
-      },
-      {
-        '<F3>',
-        function()
-          require('dap').step_out()
-        end,
-        desc = '[D]ebug: Step Out',
-      },
-      {
-        '<leader>b',
-        function()
-          require('dap-breakpoints.api').toggle_breakpoint()
-          -- require('dap').toggle_breakpoint()
-          -- vim.api.nvim__redraw {
-          --   statusline = true,
-          -- }
-        end,
-        desc = 'Toggle [b]reakpoint',
-      },
-      {
-        '<leader>be',
-        function()
-          require('dap-breakpoints.api').edit_property { all = true }
-        end,
-        -- edit_breakpoint,
-        desc = '[b]reakpoint [e]ditor',
-        mode = 'n',
-      },
-      {
-        '<leader>B',
-        function()
-          require('dap-breakpoints.api').edit_property { all = true }
-        end,
-        desc = 'Edit [B]reakpoint',
-        mode = 'n',
-      },
-      -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
-      {
-        '<F7>',
-        function()
-          require('dap-view').toggle(true)
-        end,
-        desc = '[D]ebug: See last session result.',
-      },
-      {
-        '<leader>dh',
-        function()
-          require('nvim-dap-virtual-text').toggle()
-        end,
-        desc = '[D]ebug: toggle virtual text [h]ints',
-      },
-      {
-        '<leader>dc',
-        function()
-          vim.api.nvim_command 'Telescope dap commands'
-        end,
-        desc = '[D]ebug: [C]ommands',
-      },
-      {
-        '<leader>df',
-        function()
-          local widgets = require 'dap.ui.widgets'
-          widgets.centered_float(widgets.frames)
-        end,
-        desc = '[D]ebug: floating [f]rames widget',
-      },
-    },
   },
   -- }}}
 
