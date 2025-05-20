@@ -108,7 +108,6 @@ return {
           elseif ft:match 'dap' then
             return vim.list_extend(defaults, {
               'dap',
-              require('dap').session().adapter.options.source_filetype == 'lua' and 'lazydev',
             })
           elseif ft:match 'lua' then
             return vim.list_extend(defaults, { 'lazydev' })
@@ -121,7 +120,8 @@ return {
             module = 'lazydev.integrations.blink',
             score_offset = 100,
             enabled = function()
-              return vim.bo.filetype:match 'lua'
+              local sesh = require('dap').session()
+              return vim.bo.filetype:match 'lua' or (sesh and sesh.adapter.options.source_filetype:match 'lua')
             end,
           },
           dap = {

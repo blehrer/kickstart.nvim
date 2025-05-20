@@ -203,24 +203,27 @@ return {
       {
         '<leader>b',
         function()
-          require('dap').toggle_breakpoint()
-          vim.api.nvim__redraw {
-            statusline = true,
-          }
+          require('dap-breakpoints.api').toggle_breakpoint()
+          -- require('dap').toggle_breakpoint()
+          -- vim.api.nvim__redraw {
+          --   statusline = true,
+          -- }
         end,
         desc = 'Toggle [b]reakpoint',
       },
       {
         '<leader>be',
-        edit_breakpoint,
+        function()
+          require('dap-breakpoints.api').edit_property { all = true }
+        end,
+        -- edit_breakpoint,
         desc = '[b]reakpoint [e]ditor',
         mode = 'n',
       },
       {
         '<leader>B',
         function()
-          require('dap-breakpoints.api').edit_properties()
-          -- SourceBreakpointWrapper:update()
+          require('dap-breakpoints.api').edit_property { all = true }
         end,
         desc = 'Edit [B]reakpoint',
         mode = 'n',
