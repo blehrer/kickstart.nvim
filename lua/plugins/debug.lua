@@ -6,6 +6,7 @@ return {
   {
     'mfussenegger/nvim-dap',
     dependencies = {
+      { 'igorlfs/nvim-dap-view', opts = {} },
       {
         'rcarriga/nvim-dap-ui',
         dependencies = {
@@ -75,7 +76,7 @@ return {
       },
     },
     config = function(self, opts)
-      local dap, dapui = require 'dap', require 'dapui'
+      local dap, dapui = require 'dap', require 'dap-view'
       dap.listeners.before.attach.dapui_config = function()
         dapui.open()
       end
@@ -233,7 +234,7 @@ return {
       {
         '<F7>',
         function()
-          require('dapui').toggle()
+          require('dap-view').toggle(true)
         end,
         desc = '[D]ebug: See last session result.',
       },
@@ -368,8 +369,7 @@ return {
           playwright = require('neotest-playwright.consumers').consumers,
         },
       }
-      local dapui = require 'dapui'
-      dapui.setup {}
+      local dapui = require 'dap-view'
       return {
         debugger_cmd = { 'node', js_debug_dap_server, 8123 },
         adapters = { 'pwa-node', 'pwa-chrome', 'pwa-msedge', 'node-terminal', 'pwa-extensionHost', 'python' }, -- which adapters to register in nvim-dap
