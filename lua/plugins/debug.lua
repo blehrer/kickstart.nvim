@@ -60,9 +60,10 @@ return {
         'theHamsta/nvim-dap-virtual-text',
         'grapp-dev/nui-components.nvim',
         {
+          'carcuis/dap-breakpoints.nvim',
           -- 'blehrer/dap-breakpoints.nvim',
           -- branch = 'multiprop-breakpoint-editing'
-          dir = vim.fs.joinpath(os.getenv 'WORKSPACE', 'blehrer', 'dap-breakpoints.nvim'),
+          -- dir = vim.fs.joinpath(os.getenv 'WORKSPACE', 'blehrer', 'dap-breakpoints.nvim'),
           opts = {
             virtual_text = { enabled = false },
           },
