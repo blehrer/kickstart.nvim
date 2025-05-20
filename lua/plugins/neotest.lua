@@ -1,3 +1,5 @@
+---@module lazy.types
+---@type LazyPluginSpec
 return {
   'nvim-neotest/neotest',
   dependencies = {
@@ -6,7 +8,8 @@ return {
     'antoinemadec/FixCursorHold.nvim',
     'nvim-treesitter/nvim-treesitter',
 
-    -- Adapters
+    -- {{{Adapters
+    { 'haydenmeade/neotest-jest' },
     {
       'thenbe/neotest-playwright',
       dependencies = 'nvim-telescope/telescope.nvim',
@@ -20,9 +23,10 @@ return {
         },
       },
     },
+    -- }}}
   },
   lazy = true,
-  config = function()
+  config = function(_, opts)
     require('neotest').setup {
       adapters = {
         require('neotest-playwright').adapter {
@@ -31,10 +35,41 @@ return {
             enable_dynamic_test_discovery = true,
           },
         },
+
+        require 'neotest-jest' {
+          jestCommand = 'npm test --',
+          jestConfigFile = 'custom.jest.config.ts',
+          env = { CI = true },
+          cwd = function()
+            return vim.fn.getcwd()
+          end,
+        },
       },
       consumers = {
         playwright = require('neotest-playwright.consumers').consumers,
       },
     }
   end,
+  keys = {
+    {
+      '<leader>tl',
+      function()
+        require('neotest').run.run_last()
+      end,
+      desc = 'Run Last Test',
+    },
+    {
+      '<leader>tL',
+      function()
+        require('neotest').run.run_last { strategy = 'dap' }
+      end,
+      desc = 'Debug Last Test',
+    },
+    {
+      '<leader>tw',
+      "<cmd>lua require('neotest').run.run({ jestCommand = 'jest --watch ' })<cr>",
+      desc = 'Run Watch',
+    },
+  },
 }
+--- vim: ts=2 sts=2 sw=2 et foldmethod=marker
