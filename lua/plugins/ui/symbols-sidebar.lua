@@ -198,47 +198,47 @@ return {
   --     }
   --   end,
   -- },
-  {
-    'folke/edgy.nvim',
-    dependencies = {
-      'oskarrrrrrr/symbols.nvim',
-    },
-    ---@type Edgy.View.Opts[]
-    opts = {
-      right = {
-        {
-          title = function()
-            local buf_name = vim.api.nvim_buf_get_name(0) or '[No Name]'
-            return vim.fn.fnamemodify(buf_name, ':t')
-          end,
-          ft = 'Outline',
-          open = 'SymbolsOutline',
-          pinned = true,
-        },
-      },
-    },
-    keys = {
-      {
-        '<leader>er',
-        function()
-          require('edgy').toggle 'right'
-        end,
-        desc = '[E]dgy: [r]ight panel',
-      },
-      -- Show current symbol in the sidebar (unfolds symbols if needed).
-      -- Opens the sidebar if it's closed. Especially useful with deeply
-      -- nested symbols, e.g. when using with JSON files.
-      {
-        'gs',
-        function()
-          local edg = require 'edgy'
-          edg.open 'right'
-          edg.goto_main()
-
-          require('edgy').select 'right'
-        end,
-        desc = 'Show symbol in outline',
-      },
-    },
-  },
+  -- {
+  --   'folke/edgy.nvim',
+  --   dependencies = {
+  --     'oskarrrrrrr/symbols.nvim',
+  --   },
+  --   ---@type Edgy.View.Opts[]
+  --   opts = {
+  --     right = {
+  --       {
+  --         title = function()
+  --           local buf_name = vim.api.nvim_buf_get_name(0) or '[No Name]'
+  --           return vim.fn.fnamemodify(buf_name, ':t')
+  --         end,
+  --         ft = 'Outline',
+  --         open = 'SymbolsOutline',
+  --         pinned = true,
+  --       },
+  --     },
+  --   },
+  --   keys = {
+  --     {
+  --       '<leader>er',
+  --       function()
+  --         require('edgy').toggle 'right'
+  --       end,
+  --       desc = '[E]dgy: [r]ight panel',
+  --     },
+  --     -- Show current symbol in the sidebar (unfolds symbols if needed).
+  --     -- Opens the sidebar if it's closed. Especially useful with deeply
+  --     -- nested symbols, e.g. when using with JSON files.
+  --     {
+  --       'gs',
+  --       function()
+  --         local edg = require 'edgy'
+  --         edg.open 'right'
+  --         edg.goto_main()
+  --
+  --         require('edgy').select 'right'
+  --       end,
+  --       desc = 'Show symbol in outline',
+  --     },
+  --   },
+  -- },
 }
