@@ -1,7 +1,6 @@
 return {
   {
     'saghen/blink.compat',
-    opts = {},
     lazy = true,
   },
   {
@@ -46,6 +45,9 @@ return {
           'mfussenegger/nvim-dap',
         },
       },
+      {
+        'obsidian-nvim/obsidian.nvim',
+      },
     },
     event = 'VimEnter',
 
@@ -71,7 +73,11 @@ return {
       -- C-k: Toggle signature help (if signature.enabled = true)
       --
       -- See :h blink-cmp-config-keymap for defining your own keymap
-      keymap = { preset = 'default' },
+      keymap = {
+        preset = 'default',
+        ['<C-h>'] = { 'snippet_backward', 'fallback' },
+        ['<C-l>'] = { 'snippet_forward', 'fallback' },
+      },
 
       appearance = {
         -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
@@ -144,6 +150,6 @@ return {
       fuzzy = { implementation = 'prefer_rust_with_warning' },
       signature = { enabled = true },
     },
-    opts_extend = { 'sources.default' },
+    opts_extend = { 'sources.default', 'sources.completion.enabled_providers' },
   },
 }
