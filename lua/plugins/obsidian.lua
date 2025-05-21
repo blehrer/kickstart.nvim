@@ -24,7 +24,8 @@ return {
     opts = function()
       local palette = require('kanagawa-paper').load().palette
       ---@type obsidian.config.ClientOpts
-      return vim.tbl_deep_extend('force', require('obsidian.config').ClientOpts.default(), {
+      local custom_options = {
+        legacy_commands = false,
         workspaces = {
           {
             name = 'noe',
@@ -169,22 +170,12 @@ return {
           blink = true,
           nvim_cmp = false,
         },
-        map,
-      })
+      }
+      return vim.tbl_deep_extend('force', require('obsidian.config').ClientOpts.default(), custom_options)
     end,
     keys = function()
-      local function obs()
-        require('obsidian').get_client()
-      end
       local O = 'Obsidian'
       return {
-        {
-          '<leader>nst',
-          function()
-            vim.cmd 'ObsidianTags'
-          end,
-          desc = '[N]otes: [s]earch by [t]ag',
-        },
         {
           '<leader>snt',
           function()
