@@ -162,4 +162,18 @@ return {
       { 'gD', vim.lsp.buf.declaration, desc = '[G]oto [D]eclaration' },
     },
   },
+  {
+    'icholy/lsplinks.nvim',
+    opts = {},
+    keys = {
+      {
+        'gx',
+        function()
+          require('lsplinks').gx()
+        end,
+        desc = 'open via lsp, or fallback to default `open` behavior',
+        mode = { 'n', 'v' },
+      },
+    },
+  },
 }
