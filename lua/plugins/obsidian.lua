@@ -2,9 +2,9 @@ require 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
   {
-    'epwalsh/obsidian.nvim',
+    'obsidian-nvim/obsidian.nvim',
     version = '*', -- recommended, use latest release instead of latest commit
-    lazy = true,
+    lazy = false,
     -- event = {
     --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
     --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
@@ -165,37 +165,47 @@ return {
             insert_tag = '<C-l>',
           },
         },
+        completion = {
+          blink = true,
+          nvim_cmp = false,
+        },
+        map,
       })
     end,
-    keys = {
-      {
-        '<leader>nn',
-        function()
-          vim.cmd 'ObsidianNew'
-        end,
-        desc = '[N]otes: [n]ew',
-      },
-      {
-        '<leader>nst',
-        function()
-          vim.cmd 'ObsidianTags'
-        end,
-        desc = '[N]otes: [s]earch by [t]ag',
-      },
-      {
-        '<leader>snt',
-        function()
-          vim.cmd 'ObsidianTags'
-        end,
-        desc = '[S]earch: [n]otes by [t]ag',
-      },
-      {
-        '<leader>sng',
-        function()
-          vim.cmd 'ObsidianSearch'
-        end,
-        desc = '[S]earch: [n]otes by [g]rep',
-      },
-    },
+    keys = function()
+      local function obs()
+        require('obsidian').get_client()
+      end
+      local O = 'Obsidian'
+      return {
+        {
+          '<leader>nst',
+          function()
+            vim.cmd 'ObsidianTags'
+          end,
+          desc = '[N]otes: [s]earch by [t]ag',
+        },
+        {
+          '<leader>snt',
+          function()
+            vim.cmd 'ObsidianTags'
+          end,
+          desc = '[S]earch: [n]otes by [t]ag',
+        },
+        {
+          '<leader>sng',
+          function()
+            vim.cmd(O .. 'Search')
+          end,
+          desc = '[S]earch: [n]otes by [g]rep',
+        },
+        {
+          '<leader>nn',
+          function()
+            vim.cmd(O)
+          end,
+        },
+      }
+    end,
   },
 }

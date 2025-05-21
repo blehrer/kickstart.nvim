@@ -47,11 +47,10 @@ return { -- Useful plugin to show you pending keybinds.
     -- Document existing key chains
     spec = {
       { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
-      { '<leader>d', group = '[D]ebug' },
-      { '<leader>r', group = '[R]ename' },
-      { '<leader>s', group = '[S]earch' },
-      { '<leader>w', group = '[W]orkspace' },
-      { '<leader>t', group = '[T]oggle' },
+      { '<leader>t', group = '[T]ests (Neotest)' },
+      { '<leader>d', group = '[D]ebug (DAP)' },
+      { '<leader>n', group = '[N]otes (Obsidian)' },
+      { '<leader>s', group = '[S]earch (Telescope)' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
     },
   },

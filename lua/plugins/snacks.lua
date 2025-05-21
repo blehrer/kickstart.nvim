@@ -14,6 +14,17 @@ return {
       dashboard = {
         enabled = true,
         preset = {
+          keys = {
+            { icon = ' ', key = 'f', desc = 'Find File', action = ":lua Snacks.dashboard.pick('files')" },
+            { icon = ' ', key = 'g', desc = 'Grep', action = ":lua Snacks.dashboard.pick('live_grep')" },
+            { icon = ' ', key = 'N', desc = 'New Note', action = ':ObsidianNew' },
+            { icon = '󰈞 ', key = 'n', desc = 'Search Notes', action = ':ObsidianSearch' },
+            { icon = ' ', key = 'r', desc = 'Recent Files', action = ":lua Snacks.dashboard.pick('oldfiles')" },
+            { icon = ' ', key = 's', desc = 'Restore Session', section = 'session' },
+            { icon = '󰒲 ', key = 'l', desc = 'Lazy', action = ':Lazy', enabled = package.loaded.lazy ~= nil },
+            { icon = ' ', key = 'c', desc = 'Config', action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})" },
+            { icon = ' ', key = 'q', desc = 'Quit', action = ':qa' },
+          },
           header = [[
 
                   _)             
