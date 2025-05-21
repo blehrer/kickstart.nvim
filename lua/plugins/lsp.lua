@@ -1,7 +1,7 @@
 local ensure_installed = {
   bashls = {},
   denols = {},
-  java_language_server = {},
+  jdtls = {},
   jsonls = {},
   lua_ls = {},
   stylua = {},
@@ -100,8 +100,12 @@ return {
 
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
+
+      -- plugins that have to be setup before ...
+      { 'nvim-java/nvim-java', opts = {} },
     },
     config = function()
+      -- main
       local capabilities = require('blink.cmp').get_lsp_capabilities({}, true)
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)

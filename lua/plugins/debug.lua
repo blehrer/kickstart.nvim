@@ -30,7 +30,7 @@ return {
     -- }}}
 
     -- {{{Runtime and UI
-    { 'igorlfs/nvim-dap-view', opts = {} },
+    { 'igorlfs/nvim-dap-view', opts = {}, lazy = true },
     { 'theHamsta/nvim-dap-virtual-text', opts = {}, lazy = true },
     {
       'carcuis/dap-breakpoints.nvim',
@@ -49,6 +49,7 @@ return {
         'Weissle/persistent-breakpoints.nvim',
         opts = {},
       },
+      lazy = true,
     },
     -- }}}
 

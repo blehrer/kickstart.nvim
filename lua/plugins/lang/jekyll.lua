@@ -7,6 +7,7 @@ return {
     'nvim-lua/plenary.nvim',
     'nvim-telescope/telescope.nvim',
   },
+  lazy = true,
   opts = {},
   ---@type LazyKeysSpec[]
   -- keys = {

@@ -25,10 +25,11 @@ return {
         function()
           require('conform').format { async = true, lsp_format = 'fallback' }
         end,
-        mode = '',
         desc = '[F]ormat buffer',
       },
     },
+    ---@module 'conform'
+    ---@type conform.setupOpts
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
@@ -113,25 +114,6 @@ return {
           end
         end,
       })
-    end,
-  },
-  {
-    'toppair/peek.nvim',
-    event = { 'VeryLazy' },
-    build = 'deno task --quiet build:fast',
-    opts = function()
-      require('peek').setup()
-      vim.api.nvim_create_user_command('PeekOpen', require('peek').open, {})
-      vim.api.nvim_create_user_command('PeekClose', require('peek').close, {})
-      vim.api.nvim_create_user_command('TogglePeek', function()
-        local peek = require 'peek'
-        if peek.is_open() then
-          peek.close()
-        else
-          peek.open()
-        end
-      end, { desc = 'Toggle markdown preview (peek.nvim)' })
-      return {}
     end,
   },
 }
