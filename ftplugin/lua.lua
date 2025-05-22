@@ -1,9 +1,9 @@
-vim.keymap.set('n', '<leader>ds', function()
+vim.keymap.set('n', '<leader>dc', function()
   require('osv').launch { port = 8086 }
 end, {
   noremap = true,
   buffer = 0,
-  desc = '[D]ebug: Launch neovim lua debugg [s]erver',
+  desc = '[D]ebug: [c]ommence',
 })
 
 -- Log highlighted phase as a notification
