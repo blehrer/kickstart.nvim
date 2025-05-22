@@ -62,7 +62,19 @@ return {
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
-        -- pickers = {}
+        pickers = {
+          colorscheme = {
+            on_complete = {
+              function()
+                local item = require('telescope.actions.state').get_selected_entry()
+                vim.notify(vim.inspect(item))
+                vim.schedule(function()
+                  vim.fn.writefile({ item[1] }, vim.fn.stdpath 'data' .. '/colorscheme.current')
+                end)
+              end,
+            },
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
