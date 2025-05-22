@@ -149,6 +149,62 @@ return {
         end,
         desc = 'UI: Colorscheme picker',
       },
+      {
+        '<leader>sh',
+        function()
+          Snacks.picker.help()
+        end,
+        desc = '[S]earch: [H]elp',
+      },
+      {
+        '<leader>sk',
+        function()
+          Snacks.picker.keymaps()
+        end,
+        desc = '[S]earch: [K]eymaps',
+      },
+      {
+        '<leader>sf',
+        function()
+          Snacks.picker.files()
+        end,
+        desc = '[S]earch: [F]iles',
+      },
+      {
+        '<leader>ss',
+        function()
+          Snacks.picker.pickers()
+        end,
+        desc = '[S]earch: [S]elect picker',
+      },
+      {
+        '<leader>sg',
+        function()
+          Snacks.picker.grep()
+        end,
+        desc = '[S]earch: [G]rep',
+      },
+      {
+        '<leader>sd',
+        function()
+          Snacks.picker.diagnostics()
+        end,
+        desc = '[S]earch: [D]iagnostics',
+      },
+      {
+        '<leader>sr',
+        function()
+          Snacks.picker.resume()
+        end,
+        desc = '[S]earch: [R]esume',
+      },
+      {
+        '<leader><leader>',
+        function()
+          require('snacks').picker.buffers()
+        end,
+        desc = '[S]earch: buffers',
+      },
     },
     init = function()
       vim.api.nvim_create_autocmd('User', {
