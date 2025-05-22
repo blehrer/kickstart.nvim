@@ -3,7 +3,7 @@ vim.keymap.set('n', '<leader>dc', function()
 end, {
   noremap = true,
   buffer = 0,
-  desc = '[D]ebug: [c]ommence',
+  desc = '[D]ebug: [c]ontinue/start',
 })
 
 -- Log highlighted phase as a notification
