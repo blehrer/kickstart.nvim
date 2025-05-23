@@ -179,14 +179,14 @@ return {
         {
           '<leader>snt',
           function()
-            vim.cmd 'ObsidianTags'
+            vim.cmd(O, 'tags')
           end,
           desc = '[S]earch: [n]otes by [t]ag',
         },
         {
           '<leader>sng',
           function()
-            vim.cmd(O .. 'Search')
+            vim.cmd(O, 'search')
           end,
           desc = '[S]earch: [n]otes by [g]rep',
         },
