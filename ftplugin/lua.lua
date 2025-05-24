@@ -1,4 +1,4 @@
-vim.keymap.set('n', '<leader>dc', function()
+vim.keymap.set('n', '<leader>dC)', function()
   require('osv').launch { port = 8086 }
 end, {
   noremap = true,
