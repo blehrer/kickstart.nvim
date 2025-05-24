@@ -1,4 +1,4 @@
-require 'lazy.types'
+---@module 'lazy.types'
 ---@module "noice.types"
 ---@type LazyPluginSpec[]
 return {

@@ -1,10 +1,15 @@
-require 'lazy.types'
+---@module 'lazy.types'
 ---@type LazyPluginSpec
 return {
   'sigmasd/deno-nvim',
   event = 'VeryLazy',
   cond = function()
-    local lsputil = require 'lspconfig.util'
+    local success, lsputil = pcall(function()
+      require 'lspconfig.util'
+    end)
+    if not lsputil then
+      return false
+    end
     local rp = lsputil.root_pattern('deno.json', 'deno.jsonc')
     return rp(vim.uv.cwd()) ~= nil
   end,

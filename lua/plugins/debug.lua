@@ -1,4 +1,4 @@
-require 'lazy.types'
+---@module 'lazy.types'
 ---@type LazyPluginSpec
 return {
   'mfussenegger/nvim-dap',
@@ -6,7 +6,7 @@ return {
     -- {{{Package management
     {
       'jay-babu/mason-nvim-dap.nvim',
-      dependencies = { 'williamboman/mason.nvim' },
+      dependencies = { 'mason-org/mason.nvim' },
       lazy = false,
       priority = 49,
       opts = {

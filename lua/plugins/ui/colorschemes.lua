@@ -10,7 +10,7 @@ function SavedColorscheme()
   return fallback
 end
 
-require 'lazy.types'
+---@module 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
   { 'folke/tokyonight.nvim' },

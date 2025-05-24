@@ -1,4 +1,4 @@
-require 'lazy.types'
+---@module 'lazy.types'
 ---@type LazyPluginSpec
 return {
   -- 'kanedo/jekyll.nvim',

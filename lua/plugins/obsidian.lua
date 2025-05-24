@@ -1,4 +1,4 @@
-require 'lazy.types'
+---@module 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
   {
@@ -174,26 +174,32 @@ return {
       return vim.tbl_deep_extend('force', require('obsidian.config').ClientOpts.default(), custom_options)
     end,
     keys = function()
-      local O = 'Obsidian'
+      local O = function(subcommand)
+        if subcommand then
+          vim.cmd(('Obsidian %s'):format(subcommand))
+        else
+          vim.cmd 'Obsidian'
+        end
+      end
       return {
         {
           '<leader>snt',
           function()
-            vim.cmd(O, 'tags')
+            O 'tags'
           end,
           desc = '[S]earch: [n]otes by [t]ag',
         },
         {
           '<leader>sng',
           function()
-            vim.cmd(O, 'search')
+            O 'search'
           end,
           desc = '[S]earch: [n]otes by [g]rep',
         },
         {
-          '<leader>nn',
+          '<leader>n',
           function()
-            vim.cmd(O)
+            O()
           end,
         },
       }
