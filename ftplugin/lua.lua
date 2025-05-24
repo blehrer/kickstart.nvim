@@ -1,11 +1,3 @@
-vim.keymap.set('n', '<leader>dC)', function()
-  require('osv').launch { port = 8086 }
-end, {
-  noremap = true,
-  buffer = 0,
-  desc = '[D]ebug: [c]ontinue/start',
-})
-
 -- Log highlighted phase as a notification
 vim.keymap.set('v', '<leader>cl', function()
   local esc = vim.keycode '<Esc>'
@@ -23,3 +15,12 @@ vim.keymap.set('v', '<leader>cl', function()
   -- vim.notify(('setreg: %s'):format(vim.inspect(setreg)))
   vim.cmd 'norm @l'
 end, { desc = '[C]ode: [L]og highlighted as a notification' })
+
+-- launch one-step-for-vimkind
+vim.keymap.set('n', '<leader>dC)', function()
+  require('osv').launch { port = 8086 }
+end, {
+  noremap = true,
+  buffer = 0,
+  desc = '[D]ebug: [c]ontinue/start',
+})
