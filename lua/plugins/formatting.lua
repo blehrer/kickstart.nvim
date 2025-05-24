@@ -3,10 +3,6 @@ require 'lazy'
 return {
   { -- Detect tabstop and shiftwidth automatically
     'tpope/vim-sleuth',
-    -- no lua module... so, no opts?
-    config = function()
-      require('lazy').setup 'tpope/vim-sleuth'
-    end,
   },
   { -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',

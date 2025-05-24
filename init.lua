@@ -31,6 +31,7 @@
 --]]
 
 require 'config.options'
+vim.o.verbose = 0
 require 'config.lazy'
 require 'config.macros'
 require 'config.functions'
