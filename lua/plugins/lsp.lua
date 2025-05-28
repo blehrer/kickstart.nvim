@@ -10,6 +10,7 @@ local ensure_installed = {
   ts_ls = {},
   vimls = {},
   yamlls = {},
+  kotlin = {},
 }
 
 local non_mason_lsp_configs = {
