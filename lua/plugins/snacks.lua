@@ -1,3 +1,4 @@
+local exclude_patterns = { '*.class' }
 ---@module 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
@@ -18,7 +19,12 @@ return {
         enabled = true,
         preset = {
           keys = {
-            { icon = ' ', key = 'f', desc = 'Find File', action = ":lua Snacks.dashboard.pick('files')" },
+            {
+              icon = ' ',
+              key = 'f',
+              desc = 'Find File',
+              action = (":lua Snacks.dashboard.pick('files', {exclude = %s })"):format(vim.inspect(exclude_patterns)),
+            },
             { icon = ' ', key = 'g', desc = 'Grep', action = ":lua Snacks.dashboard.pick('live_grep')" },
             { icon = ' ', key = 'N', desc = 'New Note', action = ':Obsidian new' },
             { icon = '󰈞 ', key = 'n', desc = 'Find Notes', action = ':Obsidian quick_switch' },
@@ -176,7 +182,7 @@ return {
       {
         '<leader>sf',
         function()
-          Snacks.picker.files()
+          Snacks.picker.files { exclude = exclude_patterns }
         end,
         desc = '[S]earch: [F]iles',
       },

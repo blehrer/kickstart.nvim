@@ -1,41 +1,21 @@
+---@module 'lazy.types'
+---@type LazyPluginSpec
 return {
   'nvim-java/nvim-java',
-  config = false,
   dependencies = {
     {
       'neovim/nvim-lspconfig',
       opts = {
         servers = {
-          -- Your JDTLS configuration goes here
+          ---@module 'lspconfig.configs.jdtls'
           jdtls = {
-            -- settings = {
-            --   java = {
-            --     configuration = {
-            --       runtimes = {
-            --         {
-            --           name = "JavaSE-23",
-            --           path = "/usr/local/sdkman/candidates/java/23-tem",
-            --         },
-            --       },
-            --     },
-            --   },
-            -- },
+            -- Your custom jdtls settings goes here
           },
         },
         setup = {
           jdtls = function()
-            -- Your nvim-java configuration goes here
             require('java').setup {
-              -- root_markers = {
-              --   "settings.gradle",
-              --   "settings.gradle.kts",
-              --   "pom.xml",
-              --   "build.gradle",
-              --   "mvnw",
-              --   "gradlew",
-              --   "build.gradle",
-              --   "build.gradle.kts",
-              -- },
+              -- Your custom nvim-java configuration goes here
             }
           end,
         },
