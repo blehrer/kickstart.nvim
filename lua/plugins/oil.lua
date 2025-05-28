@@ -7,6 +7,9 @@ return {
       preview_win = {
         update_on_cursor_moved = true,
       },
+      view_options = {
+        show_hidden = true,
+      },
     },
     -- Optional dependencies
     dependencies = { { 'echasnovski/mini.icons', opts = {} } },
