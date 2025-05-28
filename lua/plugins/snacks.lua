@@ -5,6 +5,9 @@ return {
     'folke/snacks.nvim',
     priority = 1000,
     lazy = false,
+    dependencies = {
+      { 'andre-kotake/nvim-chezmoi', opts = {} },
+    },
     ---@type snacks.Config
     opts = {
       -- your configuration comes here
@@ -25,6 +28,12 @@ return {
             { icon = '󰒲 ', key = 'l', desc = 'Lazy', action = ':Lazy', enabled = package.loaded.lazy ~= nil },
             { icon = ' ', key = 'c', desc = 'Config', action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})" },
             { icon = ' ', key = 'q', desc = 'Quit', action = ':qa' },
+            {
+              icon = ' ',
+              key = 'z',
+              desc = 'Chezmoi Dotfiles',
+              action = ':ChezmoiManaged',
+            },
           },
           header = [[
 
