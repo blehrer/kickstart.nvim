@@ -1,0 +1,1 @@
+{"plugin + lz + lps":{"prefix":["plugin","lz","lps"],"body":["---@module 'lazy.types'","---@type LazyPluginSpec"]}}
