@@ -97,6 +97,54 @@ return {
       cyclic = true,
     }
 
+    local cardinal_directions = augend.constant.new {
+      elements = {
+        'North',
+        'West',
+        'South',
+        'East',
+      },
+      word = true,
+      cyclic = true,
+    }
+
+    local intercardinal_directions = augend.constant.new {
+      elements = {
+        'N',
+        'NW',
+        'W',
+        'SW',
+        'S',
+        'SE',
+        'E',
+        'NE',
+      },
+      word = true,
+      cyclic = true,
+    }
+
+    local relative_directions = augend.constant.new {
+      elements = {
+        'left',
+        'right',
+        'up',
+        'down',
+      },
+      word = true,
+      cyclic = true,
+    }
+
+    local capitalized_relative_directions = augend.constant.new {
+      elements = {
+        'Left',
+        'Right',
+        'Up',
+        'Down',
+      },
+      word = true,
+      cyclic = true,
+    }
+
     return {
       dials_by_ft = {
         css = 'css',
@@ -124,6 +172,10 @@ return {
           capitalized_boolean,
           augend.constant.alias.bool, -- boolean value (true <-> false)
           logical_alias,
+          cardinal_directions,
+          intercardinal_directions,
+          relative_directions,
+          capitalized_relative_directions,
         },
         vue = {
           augend.constant.new { elements = { 'let', 'const' } },
