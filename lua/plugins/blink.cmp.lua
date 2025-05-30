@@ -1,3 +1,5 @@
+---@module 'lazy.types'
+---@type LazyPluginSpec[]
 return {
   {
     'saghen/blink.compat',
@@ -23,7 +25,11 @@ return {
         dependencies = {
           'rafamadriz/friendly-snippets',
           config = function(_, opts)
-            require('luasnip.loaders.from_vscode').lazy_load()
+            require('luasnip.loaders.from_vscode').lazy_load {
+              paths = {
+                vim.fs.joinpath(vim.fn.stdpath 'config', 'snippets', 'vscode'),
+              },
+            }
             local luasnip = require 'luasnip'
             if opts then
               luasnip.config.setup(opts)

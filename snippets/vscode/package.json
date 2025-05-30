@@ -1,0 +1,42 @@
+{
+  "name": "personal-snippets",
+  "contributes": {
+    "snippets": [
+      {
+        "language": "all",
+        "path": "./ft/all.json"
+      },
+      {
+        "language": "go",
+        "path": "./ft/go.json"
+      },
+      {
+        "language": "lua",
+        "path": "./ft/lua.json"
+      },
+      {
+        "language": "java",
+        "path": "./ft/java.json"
+      },
+      {
+        "language": "python",
+        "path": "./ft/python.json"
+      },
+      {
+        "language": "sh",
+        "path": "./ft/sh.json"
+      },
+      {
+        "language": "typescript",
+        "path": "./ft/typescript.json"
+      },
+      {
+        "language": [
+          "typescriptreact",
+          "javascriptreact"
+        ],
+        "path": "./ft/react.json"
+      }
+    ]
+  }
+}
