@@ -31,14 +31,6 @@ end
 
 -- Setup lazy.nvim
 require('lazy').setup {
-  -- highlight-start
   spec = specs,
-  -- spec = {
-  --   { import = 'plugins' },
-  -- },
-  -- highlight-end
-  -- Configure any other settings here. See the documentation for more details.
-
-  -- automatically check for plugin updates
   checker = { enabled = true },
 }
