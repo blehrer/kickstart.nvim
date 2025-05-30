@@ -4,38 +4,38 @@
     "snippets": [
       {
         "language": "all",
-        "path": "./ft/all.json"
+        "path": "./ft/all.code-snippets"
       },
       {
         "language": "go",
-        "path": "./ft/go.json"
+        "path": "./ft/go.code-snippets"
       },
       {
         "language": "lua",
-        "path": "./ft/lua.json"
+        "path": "./ft/lua.code-snippets"
       },
       {
         "language": "java",
-        "path": "./ft/java.json"
+        "path": "./ft/java.code-snippets"
       },
       {
         "language": "python",
-        "path": "./ft/python.json"
+        "path": "./ft/python.code-snippets"
       },
       {
         "language": "sh",
-        "path": "./ft/sh.json"
+        "path": "./ft/sh.code-snippets"
       },
       {
         "language": "typescript",
-        "path": "./ft/typescript.json"
+        "path": "./ft/typescript.code-snippets"
       },
       {
         "language": [
           "typescriptreact",
           "javascriptreact"
         ],
-        "path": "./ft/react.json"
+        "path": "./ft/react.code-snippets"
       }
     ]
   }
