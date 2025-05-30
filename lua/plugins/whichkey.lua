@@ -1,3 +1,5 @@
+---@module 'lazy.types'
+---@type LazyPluginSpec
 return { -- Useful plugin to show you pending keybinds.
   'folke/which-key.nvim',
   event = 'VimEnter', -- Sets the loading event to 'VimEnter'
@@ -46,12 +48,12 @@ return { -- Useful plugin to show you pending keybinds.
 
     -- Document existing key chains
     spec = {
-      { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
+      { '<leader>c', group = '[C]ode' },
       { '<leader>t', group = '[T]ests (Neotest)' },
       { '<leader>d', group = '[D]ebug (DAP)' },
       { '<leader>n', group = '[N]otes (Obsidian)' },
       { '<leader>s', group = '[S]earch (Telescope)' },
-      { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+      { '<leader>h', group = 'Git [H]unk' },
     },
   },
 }
