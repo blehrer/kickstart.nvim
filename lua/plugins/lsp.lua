@@ -2,7 +2,6 @@ local ensure_installed = {
   bashls = {},
   denols = {},
   jsonls = {},
-  jdtls = {},
   lua_ls = {},
   stylua = {},
   superhtml = {},
@@ -10,7 +9,6 @@ local ensure_installed = {
   ts_ls = {},
   vimls = {},
   yamlls = {},
-  kotlin = {},
 }
 
 local non_mason_lsp_configs = {
@@ -90,9 +88,6 @@ return {
 
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
-
-      -- Allows for configurations per project
-      { 'folke/neoconf.nvim', opts = {} },
 
       -- Inlay hints
       -- { 'lvimuser/lsp-inlayhints.nvim' },
