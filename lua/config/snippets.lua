@@ -1,3 +1,4 @@
+require('luasnip.session.snippet_collection').clear_snippets 'lua'
 local ls = require 'luasnip'
 local fmt = require('luasnip.extras.fmt').fmt
 local rep = require('luasnip.extras').rep
@@ -203,6 +204,12 @@ ls.add_snippets(nil, {
       text { 'local M = {}', '', '' },
       insert(0),
       text { '', '', 'return M' },
+    }),
+    ---lz: LazyPluginSpec
+    snip('lz', {
+      text { "---@module 'lazy.types'", '---@type LazyPluginSpec', 'return {', '\t' },
+      insert(1, "'plugin'"),
+      text { '', '}' },
     }),
   },
   markdown = {
