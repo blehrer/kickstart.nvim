@@ -53,6 +53,7 @@ return {
         ]],
         },
       },
+      gitbrowse = { enabled = true },
       explorer = { enabled = false },
       indent = { enabled = true },
       input = { enabled = false },
@@ -80,6 +81,11 @@ return {
             },
           },
           preview = {
+            keys = {
+              ['<Esc><Esc>'] = { 'close', mode = { 'n', 'i' }, desc = 'Close' },
+            },
+          },
+          lazygit = {
             keys = {
               ['<Esc><Esc>'] = { 'close', mode = { 'n', 'i' }, desc = 'Close' },
             },
@@ -122,24 +128,10 @@ return {
     },
     keys = {
       {
-        '<leader>.',
-        function()
-          Snacks.scratch()
-        end,
-        desc = 'Toggle Scratch Buffer',
-      },
-      {
-        '<leader>S/',
-        function()
-          Snacks.scratch.open()
-        end,
-        desc = 'Toggle Scratch Buffer',
-      },
-      {
         '|',
         function()
           if vim.bo.filetype ~= 'snacks_dashboard' then
-            Snacks.dashboard()
+            require('snacks').dashboard()
           end
         end,
         desc = 'Snacks dashboard',
@@ -154,99 +146,100 @@ return {
       {
         '<leader>sp',
         function()
-          Snacks.picker()
+          require('snacks').picker()
         end,
         desc = '[S]nacks [P]icker',
       },
       {
         '<leader>uc',
         function()
-          Snacks.picker.colorschemes()
+          require('snacks.picker').colorschemes()
         end,
         desc = 'UI: Colorscheme picker',
       },
       {
         '<leader>sh',
         function()
-          Snacks.picker.help()
+          require('snacks.picker').help()
         end,
         desc = '[S]earch: [H]elp',
       },
       {
         '<leader>sk',
         function()
-          Snacks.picker.keymaps()
+          require('snacks.picker').keymaps()
         end,
         desc = '[S]earch: [K]eymaps',
       },
       {
         '<leader>sf',
         function()
-          Snacks.picker.files { exclude = exclude_patterns }
+          require('snacks.picker').files { exclude = exclude_patterns }
         end,
         desc = '[S]earch: [F]iles',
       },
       {
         '<leader>ss',
         function()
-          Snacks.picker.pickers()
+          require('snacks.picker').pickers()
         end,
         desc = '[S]earch: [S]elect picker',
       },
       {
         '<leader>sg',
         function()
-          Snacks.picker.grep()
+          require('snacks.picker').grep()
         end,
         desc = '[S]earch: [G]rep',
       },
       {
         '<leader>sd',
         function()
-          Snacks.picker.diagnostics()
+          require('snacks.picker').diagnostics()
         end,
         desc = '[S]earch: [D]iagnostics',
       },
       {
         '<leader>sr',
         function()
-          Snacks.picker.resume()
+          require('snacks.picker').resume()
         end,
         desc = '[S]earch: [R]esume',
       },
       {
         '<leader><leader>',
         function()
-          require('snacks').picker.buffers()
+          require('snacks.picker').buffers()
         end,
         desc = '[S]earch: buffers',
       },
     },
     init = function()
+      local snacks = require 'snacks'
       vim.api.nvim_create_autocmd('User', {
         pattern = 'VeryLazy',
         callback = function()
           -- Setup some globals for debugging (lazy-loaded)
           _G.dd = function(...)
-            Snacks.debug.inspect(...)
+            snacks.debug.inspect(...)
           end
           _G.bt = function()
-            Snacks.debug.backtrace()
+            snacks.debug.backtrace()
           end
           vim.print = _G.dd -- Override print to use snacks for `:=` command
 
           -- Create some toggle mappings
-          Snacks.toggle.option('spell', { name = 'Spelling' }):map '<leader>us'
-          Snacks.toggle.option('wrap', { name = 'Wrap' }):map '<leader>uw'
+          snacks.toggle.option('spell', { name = 'Spelling' }):map '<leader>us'
+          snacks.toggle.option('wrap', { name = 'Wrap' }):map '<leader>uw'
           -- Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
-          Snacks.toggle.diagnostics():map '<leader>ud'
+          snacks.toggle.diagnostics():map '<leader>ud'
           -- Snacks.toggle.line_number():map("<leader>ul")
-          Snacks.toggle.option('conceallevel', { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }):map '<leader>uc'
-          Snacks.toggle.treesitter():map '<leader>uT'
-          Snacks.toggle.option('background', { off = 'light', on = 'dark', name = 'Dark Background' }):map '<leader>ub'
-          Snacks.toggle.inlay_hints():map '<leader>uh'
+          snacks.toggle.option('conceallevel', { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }):map '<leader>uc'
+          snacks.toggle.treesitter():map '<leader>uT'
+          snacks.toggle.option('background', { off = 'light', on = 'dark', name = 'Dark Background' }):map '<leader>ub'
+          snacks.toggle.inlay_hints():map '<leader>uh'
           -- Snacks.toggle.indent():map("<leader>ug")
-          Snacks.toggle.dim():map '<leader>uD'
+          snacks.toggle.dim():map '<leader>uD'
         end,
       })
     end,
