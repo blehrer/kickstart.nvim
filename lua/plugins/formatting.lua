@@ -2,7 +2,8 @@ require 'lazy'
 ---@type LazyPluginSpec[]
 return {
   { -- Detect tabstop and shiftwidth automatically
-    'tpope/vim-sleuth',
+    'NMAC427/guess-indent.nvim',
+    opts = {},
   },
   { -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
@@ -106,7 +107,7 @@ return {
           -- Only run the linter in buffers that you can modify in order to
           -- avoid superfluous noise, notably within the handy LSP pop-ups that
           -- describe the hovered symbol using Markdown.
-          if vim.opt_local.modifiable:get() and vim.bo.filetype ~= 'markdown' then
+          if vim.bo.modifiable and vim.bo.filetype ~= 'markdown' then
             lint.try_lint()
           end
         end,
