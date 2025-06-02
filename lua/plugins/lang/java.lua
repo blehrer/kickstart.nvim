@@ -1,3 +1,15 @@
+---@param toolname string
+---@param version string | number
+---@param default 'default'?
+local function mise_where(toolname, version, default)
+  local tool = toolname .. '@' .. version
+  return {
+    name = toolname,
+    path = vim.system({ 'mise', 'where', tool }, { text = true }):wait().stdout:gsub('%s', ''),
+    default = default and true or false,
+  }
+end
+
 ---@module 'lazy.types'
 ---@type LazyPluginSpec
 return {
@@ -9,11 +21,12 @@ return {
       opts = {
         servers = {
           jdtls = {
-            -- Your custom jdtls settings goes here
+            require('lspconfig.configs.jdtls').default_config,
           },
         },
         setup = {
           jdtls = function()
+            require('java').setup(require 'java.config')
             require('java').setup {
               -- Your custom nvim-java configuration goes here
             }
@@ -23,16 +36,8 @@ return {
               java = {
                 configuration = {
                   runtimes = {
-                    {
-                      name = 'mise@21',
-                      path = vim.system({ 'mise', 'where', 'java@21' }, { text = true }):wait().stdout:gsub('%s', ''),
-                      default = true,
-                    },
-                    {
-                      name = 'mise@24',
-                      path = vim.system({ 'mise', 'where', 'java@24' }, { text = true }):wait().stdout:gsub('%s', ''),
-                      default = false,
-                    },
+                    mise_where('java', 21, 'default'),
+                    mise_where('java', 23),
                   },
                 },
               },
