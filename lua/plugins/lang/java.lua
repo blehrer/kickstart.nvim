@@ -1,13 +1,20 @@
----@param toolname string
+---@param tool string
 ---@param version string | number
 ---@param default 'default'?
-local function mise_where(toolname, version, default)
-  local tool = toolname .. '@' .. version
-  return {
-    name = toolname,
-    path = vim.system({ 'mise', 'where', tool }, { text = true }):wait().stdout:gsub('%s', ''),
-    default = default and true or false,
-  }
+local function mise_where(tool, version, default)
+  local name = tool .. '@' .. version
+  local success, result = pcall(function()
+    return vim.system({ 'mise', 'where', tool }, { text = true }):wait()
+  end)
+  local path = success and result.stdout:gsub('%s', '') or nil
+  local is_default = default and true or false
+  if name and path then
+    return {
+      name = name,
+      path = path,
+      default = is_default,
+    }
+  end
 end
 
 ---@module 'lazy.types'
@@ -38,6 +45,7 @@ return {
                   runtimes = {
                     mise_where('java', 21, 'default'),
                     mise_where('java', 23),
+                    mise_where('java', 24),
                   },
                 },
               },
