@@ -26,4 +26,7 @@ return {
   { 'aliqyan-21/darkvoid.nvim' },
   { 'kdheepak/monochrome.nvim' },
   { 'kyazdani42/blue-moon' },
+  { 'webhooked/kanso.nvim' },
+  { 'mellow-theme/mellow.nvim' },
+  { 'dgox16/oldworld.nvim' },
 }
