@@ -56,4 +56,12 @@ return { -- Useful plugin to show you pending keybinds.
       { '<leader>h', group = 'Git [H]unk' },
     },
   },
+  keys = {
+    {
+      '?',
+      function()
+        require('which-key').show {}
+      end,
+    },
+  },
 }
