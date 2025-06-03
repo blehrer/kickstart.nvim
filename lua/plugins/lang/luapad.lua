@@ -16,11 +16,14 @@ return {
         }, {
           prompt = 'Luapad Actions',
         }, function(choice)
-          if choice == 'luapad' then
+          if choice == 'New' then
             require('luapad').init()
-            -- elseif choice == 'Toggle (current buffer)' then
-            -- elseif choice == 'Attach to buffer' then
-            -- elseif choice == 'Detach from buffer' then
+          elseif choice == 'Toggle (current buffer)' then
+            require('luapad').toggle()
+          elseif choice == 'Attach to buffer' then
+            require('luapad').attach()
+          elseif choice == 'Detach from buffer' then
+            require('luapad').dettach()
           else
             vim.notify(('"%s" not yet written'):format(choice))
           end
