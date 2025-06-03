@@ -13,6 +13,7 @@ local ensure_installed = {
 
 local non_mason_lsp_configs = {
   ['wordnet-ls'] = {},
+  ['cfn_ls'] = {},
 }
 ---@module 'lazy.types'
 ---@type LazyPluginSpec[]
