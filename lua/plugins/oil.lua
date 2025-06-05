@@ -7,6 +7,7 @@ return {
       preview_win = {
         update_on_cursor_moved = true,
       },
+      skip_confirm_for_simple_edits = true,
       view_options = {
         show_hidden = true,
       },
