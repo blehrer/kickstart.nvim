@@ -7,7 +7,24 @@ return {
     priority = 1000,
     lazy = false,
     dependencies = {
-      { 'andre-kotake/nvim-chezmoi', opts = {} },
+      {
+        'andre-kotake/nvim-chezmoi',
+        cond = HasChezmoi,
+        dependencies = {
+          { 'nvim-lua/plenary.nvim' },
+          { 'nvim-telescope/telescope.nvim' },
+        },
+        opts = {},
+        keys = {
+          {
+            '<leader>sz',
+            function()
+              vim.cmd 'ChezmoiManaged'
+            end,
+            desc = '[S]earch: Dotfiles (che[z]moi)',
+          },
+        },
+      },
     },
     ---@type snacks.Config
     opts = {
@@ -38,7 +55,7 @@ return {
               icon = ' ',
               key = 'z',
               desc = 'Chezmoi Dotfiles',
-              action = ':ChezmoiManaged',
+              action = ':lua if vim.fn.exists(":ChezmoiManaged") == 0 then require("nvim-chezmoi").setup({}) end vim.cmd("ChezmoiManaged")',
             },
           },
           header = [[

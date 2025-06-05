@@ -11,22 +11,4 @@ return {
       vim.g['chezmoi#source_dir_path'] = os.getenv 'HOME' .. '/.local/share/chezmoi'
     end,
   },
-  {
-    'andre-kotake/nvim-chezmoi',
-    cond = HasChezmoi,
-    dependencies = {
-      { 'nvim-lua/plenary.nvim' },
-      { 'nvim-telescope/telescope.nvim' },
-    },
-    opts = {},
-    keys = {
-      {
-        '<leader>sz',
-        function()
-          vim.cmd 'ChezmoiManaged'
-        end,
-        desc = '[S]earch: Dotfiles (che[z]moi)',
-      },
-    },
-  },
 }
