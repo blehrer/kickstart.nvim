@@ -10,23 +10,27 @@ function SavedColorscheme()
   return fallback
 end
 
+local function very_lazy(plugin)
+  return vim.tbl_extend('force', plugin, { event = 'VeryLazy' })
+end
+
 ---@module 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
-  { 'folke/tokyonight.nvim' },
-  { 'rose-pine/neovim' },
   { 'sho-87/kanagawa-paper.nvim' },
-  { 'comfysage/evergarden' },
-  { 'nyoom-engineering/oxocarbon.nvim' },
-  { 'catppuccin/nvim', name = 'catppuccin' },
-  { 'foxoman/vim-helix' },
-  { 'vague2k/vague.nvim' },
-  { 'olivercederborg/poimandres.nvim' },
-  { 'slugbyte/lackluster.nvim' },
-  { 'aliqyan-21/darkvoid.nvim' },
-  { 'kdheepak/monochrome.nvim' },
-  { 'kyazdani42/blue-moon' },
-  { 'webhooked/kanso.nvim' },
-  { 'mellow-theme/mellow.nvim' },
-  { 'dgox16/oldworld.nvim' },
+  very_lazy { 'folke/tokyonight.nvim' },
+  very_lazy { 'rose-pine/neovim' },
+  very_lazy { 'comfysage/evergarden' },
+  very_lazy { 'nyoom-engineering/oxocarbon.nvim' },
+  very_lazy { 'catppuccin/nvim', name = 'catppuccin' },
+  very_lazy { 'foxoman/vim-helix' },
+  very_lazy { 'vague2k/vague.nvim' },
+  very_lazy { 'olivercederborg/poimandres.nvim' },
+  very_lazy { 'slugbyte/lackluster.nvim' },
+  very_lazy { 'aliqyan-21/darkvoid.nvim' },
+  very_lazy { 'kdheepak/monochrome.nvim' },
+  very_lazy { 'kyazdani42/blue-moon' },
+  very_lazy { 'webhooked/kanso.nvim' },
+  very_lazy { 'mellow-theme/mellow.nvim' },
+  very_lazy { 'dgox16/oldworld.nvim' },
 }
