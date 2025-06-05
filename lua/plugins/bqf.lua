@@ -60,9 +60,6 @@ return {
   dependencies = {
     {
       'junegunn/fzf',
-      build = function()
-        vim.fn['fzf#install']()
-      end,
     },
   },
   ---@module "bqf.config"
