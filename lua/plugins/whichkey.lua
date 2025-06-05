@@ -52,16 +52,8 @@ return { -- Useful plugin to show you pending keybinds.
       { '<leader>t', group = '[T]ests (Neotest)' },
       { '<leader>d', group = '[D]ebug (DAP)' },
       { '<leader>n', group = '[N]otes (Obsidian)' },
-      { '<leader>s', group = '[S]earch (Telescope)' },
-      { '<leader>h', group = 'Git [H]unk' },
-    },
-  },
-  keys = {
-    {
-      '?',
-      function()
-        require('which-key').show {}
-      end,
+      { '<leader>s', group = '[S]earch (Snacks)' },
+      { '<leader>h', group = '[H]unk (Neogit)' },
     },
   },
 }

@@ -109,7 +109,11 @@ return {
           },
         },
       },
-      notifier = { enabled = false },
+      notifier = {
+        enabled = true,
+        style = 'minimal',
+        timeout = 2000,
+      },
       quickfile = { enabled = true },
       scope = { enabled = true },
       scratch = {
@@ -127,6 +131,12 @@ return {
       zen = { enabled = true },
     },
     keys = {
+      {
+        '<Esc>',
+        function()
+          require('snacks.notifier').hide()
+        end,
+      },
       {
         '|',
         function()
@@ -205,6 +215,12 @@ return {
           require('snacks.picker').resume()
         end,
         desc = '[S]earch: [R]esume',
+      },
+      {
+        'leader<sm>',
+        function()
+          require('snacks.picker').notifications()
+        end,
       },
       {
         '<leader><leader>',
