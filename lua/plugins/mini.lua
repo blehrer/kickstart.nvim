@@ -1,3 +1,5 @@
+---@module 'lazy.types'
+---@type LazyPluginSpec
 return { -- Collection of various small independent plugins/modules
   'echasnovski/mini.nvim',
   config = function()
@@ -12,9 +14,9 @@ return { -- Collection of various small independent plugins/modules
     local hotkey = '<C-s>'
     -- Add/delete/replace surroundings (brackets, quotes, etc.)
     --
-    -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-    -- - sd'   - [S]urround [D]elete [']quotes
-    -- - sr)'  - [S]urround [R]eplace [)] [']
+    -- - <C-s>aiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+    -- - <C-s>d'   - [S]urround [D]elete [']quotes
+    -- - <C-s>r)'  - [S]urround [R]eplace [)] [']
     require('mini.surround').setup {
 
       -- Module mappings. Use `''` (empty string) to disable one.
