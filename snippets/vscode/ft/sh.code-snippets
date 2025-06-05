@@ -1,0 +1,1 @@
+{"shebang-bash":{"body":["#!/usr/bin/env -S bash","","${1:}"],"prefix":"shebang-bash"},"shebang-sh":{"body":"/usr/bin/env -S sh","prefix":"shebang-sh"},"shebang-zsh":{"body":["#/usr/bin/env -S zsh","","${1:}"],"prefix":"shebang-zsh"}}
