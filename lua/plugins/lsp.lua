@@ -124,27 +124,30 @@ return {
       end
     end,
     keys = {
+      -- WARN: This is not Goto Definition, this is Goto Declaration.
+      --  For example, in C this would take you to the header.
+      { 'gD', vim.lsp.buf.declaration, desc = '[G]oto [D]eclaration' },
 
       -- Jump to the definition of the word under your cursor.
       --  This is where a variable was first declared, or where a function is defined, etc.
       --  To jump back, press <C-t>.
-      { 'gd', require('telescope.builtin').lsp_definitions, desc = '[G]oto [D]efinition' },
+      { 'gd', vim.lsp.buf.definition, desc = '[G]oto [D]efinition' },
 
       -- Find references for the word under your cursor.
-      { 'gr', require('telescope.builtin').lsp_references, desc = '[G]oto [R]eferences' },
+      { 'gr', vim.lsp.buf.references, desc = '[G]oto [R]eferences' },
 
       -- Jump to the implementation of the word under your cursor.
       --  Useful when your language has ways of declaring types without an actual implementation.
-      { 'gI', require('telescope.builtin').lsp_implementations, desc = '[G]oto [I]mplementation' },
+      { 'gI', vim.lsp.buf.implementation, desc = '[G]oto [I]mplementation' },
 
       -- Jump to the type of the word under your cursor.
       --  Useful when you're not sure what type a variable is and you want to see
       --  the definition of its *type*, not where it was *defined*.
-      { '<leader>D', require('telescope.builtin').lsp_type_definitions, desc = 'Type [D]efinition' },
+      { '<leader>d', vim.lsp.buf.type_definition, desc = 'Type [D]efinition' },
 
       -- Fuzzy find all the symbols in your current workspace.
       --  Similar to document symbols, except searches over your entire project.
-      { '<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, desc = '[W]orkspace [S]ymbols' },
+      { '<leader>ws', vim.lsp.buf.workspace_symbol, desc = '[W]orkspace [S]ymbols' },
 
       -- Rename the variable under your cursor.
       --  Most Language Servers support renaming across files, etc.
@@ -154,10 +157,6 @@ return {
       -- or a suggestion from your LSP for this to activate.
       { '<leader>ca', vim.lsp.buf.code_action, desc = '[C]ode [A]ction', { 'n', 'x' } },
       { '<C-Enter>', vim.lsp.buf.code_action, desc = '[C]ode [A]ction', { 'n', 'x' } },
-
-      -- WARN: This is not Goto Definition, this is Goto Declaration.
-      --  For example, in C this would take you to the header.
-      { 'gD', vim.lsp.buf.declaration, desc = '[G]oto [D]eclaration' },
     },
   },
   {
