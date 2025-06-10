@@ -164,7 +164,7 @@ return {
           if opts.root_dir and opts.root_dir ~= '' then
             require('jdtls').start_or_attach(opts)
           else
-            require('astrocore').notify('jdtls: root_dir not found. Please specify a root marker', vim.log.levels.ERROR)
+            vim.notify('jdtls: root_dir not found. Please specify a root marker', vim.log.levels.ERROR)
           end
         end,
       })
