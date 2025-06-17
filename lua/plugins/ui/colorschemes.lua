@@ -17,7 +17,7 @@ end
 ---@module 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
-  { 'sho-87/kanagawa-paper.nvim' },
+  { 'sho-87/kanagawa-paper.nvim', lazy = false, priority = 100 },
   very_lazy { 'folke/tokyonight.nvim' },
   very_lazy { 'rose-pine/neovim' },
   very_lazy { 'comfysage/evergarden' },
