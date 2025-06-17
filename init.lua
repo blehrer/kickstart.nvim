@@ -32,6 +32,7 @@
 
 vim.g.plugin_log_level = vim.log.levels.INFO
 vim.o.verbose = 0
+require 'config.env'
 require 'config.options'
 require 'config.lazy'
 require 'config.macros'

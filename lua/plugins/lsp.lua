@@ -1,7 +1,9 @@
 local ensure_installed = {
+  lemminx = {},
   bashls = {},
   denols = {},
   jsonls = {},
+  jdtls = {},
   lua_ls = {},
   stylua = {},
   superhtml = {},
@@ -9,6 +11,9 @@ local ensure_installed = {
   ts_ls = {},
   vimls = {},
   yamlls = {},
+  ['java-debug-adpater'] = {},
+  ['java-test'] = {},
+  ['markdown-oxide'] = {},
 }
 
 local non_mason_lsp_configs = {
@@ -53,6 +58,7 @@ return {
       },
     },
   },
+  { 'mfussenegger/nvim-jdtls' },
   {
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -81,7 +87,6 @@ return {
       },
       {
         'WhoIsSethDaniel/mason-tool-installer.nvim',
-        ---@module 'mason-tool-installer'
         opts = {
           ensure_installed = vim.tbl_keys(ensure_installed),
         },
@@ -109,6 +114,7 @@ return {
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for ts_ls)
+            vim.notify('enabling ' .. server_name)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             vim.lsp.enable(server_name)
             vim.lsp.config(server_name, server)
