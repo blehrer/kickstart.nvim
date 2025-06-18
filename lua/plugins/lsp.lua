@@ -1,19 +1,22 @@
-local ensure_installed = {
+local lsp_ensure_installed = {
   lemminx = {},
   bashls = {},
   denols = {},
   jsonls = {},
   jdtls = {},
   lua_ls = {},
-  stylua = {},
+  markdown_oxide = {},
   superhtml = {},
   taplo = {}, --toml
   ts_ls = {},
   vimls = {},
   yamlls = {},
-  ['java-debug-adpater'] = {},
+}
+
+local nonlsp_ensure_installed = {
+  ['java-debug-adapter'] = {},
   ['java-test'] = {},
-  ['markdown-oxide'] = {},
+  stylua = {},
 }
 
 local non_mason_lsp_configs = {
@@ -78,17 +81,20 @@ return {
       },
       {
         'mason-org/mason-lspconfig.nvim',
+        lazy = false,
         ---@module 'mason-lspconfig.settings'
         ---@type MasonLspconfigSettings
         opts = {
           automatic_enable = true,
-          ensure_installed = vim.tbl_keys(ensure_installed),
+          ensure_installed = vim.tbl_keys(lsp_ensure_installed),
         },
       },
       {
         'WhoIsSethDaniel/mason-tool-installer.nvim',
+        lazy = false,
         opts = {
-          ensure_installed = vim.tbl_keys(ensure_installed),
+          ensure_installed = vim.tbl_extend('force', vim.tbl_keys(lsp_ensure_installed), vim.tbl_keys(nonlsp_ensure_installed)),
+          auto_update = true,
         },
       },
 
@@ -110,7 +116,7 @@ return {
         automatic_installation = false,
         handlers = {
           function(server_name)
-            local server = ensure_installed[server_name] or {}
+            local server = lsp_ensure_installed[server_name] or {}
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for ts_ls)
