@@ -86,6 +86,9 @@ vim.o.expandtab = true
 -- allow Ex expressions in modeline
 vim.o.modelineexpr = true
 
+-- allow project-level .exrc or .nvimrc
+vim.o.exrc = true
+
 -- Obsidian needs this
 vim.o.conceallevel = 1
 
