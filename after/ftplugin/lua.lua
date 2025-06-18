@@ -1,3 +1,6 @@
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
+
 -- Log highlighted phase as a notification
 vim.keymap.set('v', '<leader>cl', function()
   local esc = vim.keycode '<Esc>'
