@@ -10,14 +10,25 @@ function SavedColorscheme()
   return fallback
 end
 
+---@param plugin LazyPluginSpec
+---@return LazyPluginSpec
 local function very_lazy(plugin)
+  ---@type LazyPluginSpec
+  local extension = {
+    event = 'VeryLazy',
+    dir = vim.fn.stdpath 'config' .. '/colors',
+  }
   return vim.tbl_extend('force', plugin, { event = 'VeryLazy' })
 end
 
 ---@module 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
-  { 'sho-87/kanagawa-paper.nvim', lazy = false, priority = 100 },
+  { 'rebelot/kanagawa.nvim', lazy = false, priority = 100 },
+  very_lazy { 'metalelf0/base16-black-metal-scheme' },
+  very_lazy { 'metalelf0/black-metal-theme-neovim' },
+  very_lazy { 'metalelf0/base16-black-metal-scheme' },
+  very_lazy { 'sho-87/kanagawa-paper.nvim' },
   very_lazy { 'folke/tokyonight.nvim' },
   very_lazy { 'rose-pine/neovim' },
   very_lazy { 'comfysage/evergarden' },
