@@ -6,6 +6,7 @@ local ensure_installed = {
   jdtls = {},
   lua_ls = {},
   stylua = {},
+  markdown_oxide = {},
   superhtml = {},
   taplo = {}, --toml
   ts_ls = {},
@@ -13,7 +14,6 @@ local ensure_installed = {
   yamlls = {},
   ['java-debug-adpater'] = {},
   ['java-test'] = {},
-  ['markdown-oxide'] = {},
 }
 
 local non_mason_lsp_configs = {
