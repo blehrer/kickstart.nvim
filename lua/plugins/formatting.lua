@@ -115,4 +115,10 @@ return {
       })
     end,
   },
+  {
+    'aws-cloudformation/cfn-lint',
+    config = function()
+      require('lint').linters_by_ft['cloudformation'] = require 'lint.linters.cfn_lint'
+    end,
+  },
 }

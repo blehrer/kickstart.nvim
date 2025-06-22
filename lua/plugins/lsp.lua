@@ -7,6 +7,7 @@ local ensure_installed = {
   lua_ls = {},
   stylua = {},
   markdown_oxide = {},
+  ts_query_ls = {}, --treesitter query
   superhtml = {},
   taplo = {}, --toml
   ts_ls = {},
