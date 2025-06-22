@@ -135,6 +135,15 @@ return {
           vim.ui.open(url) -- need Neovim 0.10.0+
         end,
 
+        attachments = {
+          img_folder = 'assets/imgs',
+          img_text_func = function(client, path)
+            local path = client:vault_relative_path(path) or path
+            local util = require 'obsidian.util'
+            return string.format('![%s](%s)', path.name, util.urlencode(tostring(path), { keep_path_sep = true }))
+          end,
+        },
+
         -- Optional, by default when you use `:ObsidianFollowLink` on a link to an image
         -- file it will be ignored but you can customize this behavior here.
         ---@param img string
