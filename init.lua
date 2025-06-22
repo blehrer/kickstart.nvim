@@ -32,11 +32,10 @@
 
 vim.g.plugin_log_level = vim.log.levels.INFO
 vim.o.verbose = 0
-require 'config.env'
+require 'config.functions'
 require 'config.options'
 require 'config.lazy'
 require 'config.macros'
-require 'config.functions'
 vim.cmd.colorscheme(SavedColorscheme())
 
 -- The line beneath this is called `modeline`. See `:help modeline`
