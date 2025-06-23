@@ -1,11 +1,10 @@
-local ensure_installed = {
+local mason_lsps = {
   lemminx = {},
   bashls = {},
-  denols = {},
+  -- denols = {},
   jsonls = {},
   jdtls = {},
   lua_ls = {},
-  stylua = {},
   markdown_oxide = {},
   ts_query_ls = {}, --treesitter query
   superhtml = {},
@@ -13,14 +12,21 @@ local ensure_installed = {
   ts_ls = {},
   vimls = {},
   yamlls = {},
+}
+
+local non_mason_lsps = {
+  ['wordnet-ls'] = {},
+  ['cfn_ls'] = {},
+}
+
+local all_lsps = vim.tbl_deep_extend('force', mason_lsps, non_mason_lsps)
+
+local other_mason_tools = {
+  stylua = {},
   ['java-debug-adpater'] = {},
   ['java-test'] = {},
 }
 
-local non_mason_lsp_configs = {
-  ['wordnet-ls'] = {},
-  ['cfn_ls'] = {},
-}
 ---@module 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
@@ -83,14 +89,35 @@ return {
         ---@type MasonLspconfigSettings
         opts = {
           automatic_enable = true,
-          ensure_installed = vim.tbl_keys(ensure_installed),
+          ensure_installed = vim.tbl_keys(mason_lsps),
         },
       },
       {
         'WhoIsSethDaniel/mason-tool-installer.nvim',
+        ---@module 'mason-tool-installer'
         opts = {
-          ensure_installed = vim.tbl_keys(ensure_installed),
+          ensure_installed = vim.tbl_keys(other_mason_tools),
+          auto_update = true,
         },
+        config = function(self, opts)
+          require('mason-tool-installer').setup(opts)
+          vim.api.nvim_create_autocmd('User', {
+            pattern = 'MasonToolsStartingInstall',
+            callback = function()
+              vim.schedule(function()
+                print 'mason-tool-installer is starting'
+              end)
+            end,
+          })
+          vim.api.nvim_create_autocmd('User', {
+            pattern = 'MasonToolsUpdateCompleted',
+            callback = function(e)
+              vim.schedule(function()
+                print(vim.inspect(e.data)) -- print the table that lists the programs that were installed
+              end)
+            end,
+          })
+        end,
       },
 
       -- Useful status updates for LSP.
@@ -105,29 +132,12 @@ return {
       'saghen/blink.cmp',
     },
     config = function()
-      local capabilities = require('blink.cmp').get_lsp_capabilities({}, true)
-      require('mason-lspconfig').setup {
-        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
-        automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = ensure_installed[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            vim.notify('enabling ' .. server_name)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            vim.lsp.enable(server_name)
-            vim.lsp.config(server_name, server)
-            -- require('lspconfig')[server_name].setup(server)
-          end,
-        },
-      }
-
-      -- Lsps not vended through Mason
-      for k, v in pairs(non_mason_lsp_configs) do
-        vim.lsp.enable(k)
-        vim.lsp.config(k, v)
+      local include_nvim_defaults = true
+      local blink_capabilities = require('blink.cmp').get_lsp_capabilities({}, include_nvim_defaults)
+      for name, merge_target_config in pairs(all_lsps) do
+        merge_target_config.capabilities = vim.tbl_deep_extend('force', blink_capabilities, merge_target_config.capabilities or {})
+        vim.lsp.config(name, merge_target_config) -- see :help lsp-config
+        vim.lsp.enable(name)
       end
     end,
     keys = {
