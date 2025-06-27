@@ -128,7 +128,12 @@ return {
       -- Inlay hints
       -- { 'lvimuser/lsp-inlayhints.nvim' },
 
-      'b0o/SchemaStore.nvim',
+      {
+        'b0o/SchemaStore.nvim',
+        dependencies = {
+          'saghen/blink.cmp',
+        },
+      },
 
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
