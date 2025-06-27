@@ -2,6 +2,7 @@ local mason_lsps = {
   lemminx = {},
   bashls = {},
   -- denols = {},
+  gopls = {},
   jsonls = {},
   jdtls = {},
   lua_ls = {},
@@ -16,6 +17,7 @@ local mason_lsps = {
 
 local non_mason_lsps = {
   ['wordnet-ls'] = {},
+  ['openapi-ls'] = {},
   ['cfn_ls'] = {},
 }
 
@@ -23,7 +25,7 @@ local all_lsps = vim.tbl_deep_extend('force', mason_lsps, non_mason_lsps)
 
 local other_mason_tools = {
   stylua = {},
-  ['java-debug-adpater'] = {},
+  -- ['java-debug-adpater'] = {},
   ['java-test'] = {},
 }
 
@@ -131,13 +133,14 @@ return {
       -- Allows extra capabilities provided by blink.cmp
       'saghen/blink.cmp',
     },
+    lazy = false,
     config = function()
       local include_nvim_defaults = true
       local blink_capabilities = require('blink.cmp').get_lsp_capabilities({}, include_nvim_defaults)
       for name, merge_target_config in pairs(all_lsps) do
         merge_target_config.capabilities = vim.tbl_deep_extend('force', blink_capabilities, merge_target_config.capabilities or {})
-        vim.lsp.config(name, merge_target_config) -- see :help lsp-config
         vim.lsp.enable(name)
+        vim.lsp.config(name, merge_target_config) -- see :help lsp-config
       end
     end,
     keys = {
