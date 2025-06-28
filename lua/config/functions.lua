@@ -3,7 +3,7 @@ function Inspect(obj)
 end
 
 function HasChezmoi()
-  local path_cz = vim.system({ 'command', '-v', 'chezmoi' }):wait().code == 0
+  local path_cz = os.execute 'command -v chezmoi' == 0
   if path_cz then
     return true
   else
