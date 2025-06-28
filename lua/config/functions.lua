@@ -11,7 +11,8 @@ function HasChezmoi()
     local cz_lx1 = vim.fs.joinpath(os.getenv 'HOME', '.local/bin/chezmoi')
     local cz_lx2 = vim.fs.joinpath(os.getenv 'HOME', '.bin/chezmoi')
     for _, v in ipairs { cz_homebrew, cz_lx1, cz_lx2 } do
-      if vim.system({ os.getenv 'SHELL', '-c', ('[[ -x %s ]]'):format(v) }):wait().code == 0 then
+      if os.execute(('[[ -x %s ]]'):format(v)) == 0 then
+        -- if vim.system({ os.getenv 'SHELL', '-c', ('[[ -x %s ]]'):format(v) }):wait().code == 0 then
         return true
       end
     end
