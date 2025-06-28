@@ -3,6 +3,7 @@
 return {
   -- 'kanedo/jekyll.nvim',
   dir = '/Users/nobut/workspace/blehrer/jekyll.nvim',
+  optional = true,
   dependencies = {
     'nvim-lua/plenary.nvim',
     'nvim-telescope/telescope.nvim',
