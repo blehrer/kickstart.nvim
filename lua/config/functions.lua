@@ -21,7 +21,8 @@ function HasChezmoi()
 end
 
 function HasMise()
-  return vim.system({ 'command', '-v', 'mise' }):wait().code == 0
+  -- return vim.system({ 'command', '-v', 'mise' }):wait().code == 0
+  return os.execute(('[[ -x %s ]]'):format(v)) == 0
 end
 
 ---@param tool string
@@ -31,7 +32,8 @@ function MiseWhere(tool, version, default)
   if HasMise() then
     local name = version and tool .. '@' .. version or tool
     local success, result = pcall(function()
-      return vim.system({ 'mise', 'where', name }, { text = true }):wait()
+      -- return vim.system({ 'mise', 'where', name }, { text = true }):wait()
+      return os.execute(('[[ -x %s ]]'):format(v))
     end)
     if not success or result.code ~= 0 then
       error('`mise where ' .. name .. '` failed')
@@ -53,7 +55,8 @@ end
 function MiseWhich(tool)
   if HasMise() then
     local success, result = pcall(function()
-      return vim.system({ 'mise', 'which', tool }, { text = true }):wait()
+      -- return vim.system({ 'mise', 'which', tool }, { text = true }):wait()
+      return os.execute(('[[ -x %s ]]'):format(v))
     end)
     if not success or result.code ~= 0 then
       error('`mise which ' .. tool .. '` failed')
