@@ -27,4 +27,11 @@ return {
     ft = { 'go', 'gomod' },
     build = ':lua require("go.install").update_all_sync()', -- if you need to install/update all binaries
   },
+  {
+    'ngalaiko/tree-sitter-go-template',
+    opts = {},
+    config = function()
+      local m = require 'go.template'
+    end,
+  },
 }
