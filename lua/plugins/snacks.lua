@@ -10,7 +10,6 @@ return {
       {
         'andre-kotake/nvim-chezmoi',
         cond = HasChezmoi,
-        optional = true,
         dependencies = {
           { 'nvim-lua/plenary.nvim' },
           { 'nvim-telescope/telescope.nvim' },
