@@ -14,6 +14,9 @@ return {
   },
   { -- Autoformat
     'stevearc/conform.nvim',
+    build = function()
+      os.execute 'pip install setuptools'
+    end,
     event = { 'BufWritePre' },
     cmd = { 'ConformInfo' },
     keys = {

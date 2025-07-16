@@ -25,6 +25,8 @@ local all_lsps = vim.tbl_deep_extend('force', mason_lsps, non_mason_lsps)
 
 local other_mason_tools = {
   stylua = {},
+  beautysh = {},
+  ktfmt = {},
   -- ['java-debug-adpater'] = {},
   ['java-test'] = {},
 }
