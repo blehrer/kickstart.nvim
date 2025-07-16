@@ -77,6 +77,7 @@ return {
       function()
         require('bqf').toggle()
       end,
+      desc = 'Toggle quickfix list',
     },
   },
 }

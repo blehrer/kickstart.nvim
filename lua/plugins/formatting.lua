@@ -52,6 +52,9 @@ return {
         python = { 'black' },
         kotlin = { 'ktlint' },
         json = { 'fixjson', 'jsonlint' },
+        sh = { 'beautysh' },
+        bash = { 'beautysh' },
+        zsh = { 'beautysh' },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
