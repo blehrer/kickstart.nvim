@@ -35,6 +35,7 @@ vim.o.verbose = 0
 require 'config.functions'
 require 'config.options'
 require 'config.lazy'
+require 'config.keymaps'
 require 'config.macros'
 vim.cmd.colorscheme(SavedColorscheme())
 
