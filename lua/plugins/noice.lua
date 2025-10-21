@@ -21,6 +21,9 @@ return {
           },
         },
       },
+      popupmenu = {
+        backend = 'nui',
+      },
       lsp = {
         hover = {
           view = 'vsplit',

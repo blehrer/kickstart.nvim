@@ -5,13 +5,13 @@ return { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
-    init = function()
-      require('vim.treesitter.query').add_predicate('is-mise?', function(_, _, bufnr, _)
-        local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)
-        local filename = vim.fn.fnamemodify(filepath, ':t')
-        return string.match(filename, '.*mise.*%.toml$') ~= nil
-      end, { force = true, all = false })
-    end,
+    -- init = function()
+    --   require('vim.treesitter.query').add_predicate('is-mise?', function(_, _, bufnr, _)
+    --     local filepath = vim.api.nvim_buf_get_name(tonumber(bufnr) or 0)
+    --     local filename = vim.fn.fnamemodify(filepath, ':t')
+    --     return string.match(filename, '.*mise.*%.toml$') ~= nil
+    --   end, { force = true, all = false })
+    -- end,
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
       ensure_installed = {
@@ -53,6 +53,7 @@ return { -- Highlight, edit, and navigate code
       auto_install = true,
       highlight = {
         enable = true,
+        disable = { 'go' },
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
         --  If you are experiencing weird indenting issues, add the language to
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.

@@ -19,7 +19,7 @@ ls.config.set_config {
   -- minimal increase in priority.
   ext_prio_increase = 1,
   enable_autosnippets = false,
-  store_selection_keys = '<TAB>',
+  store_selection_keys = '<C-y>',
 }
 
 local function get_line_iter(str)
@@ -47,6 +47,15 @@ end
 
 local filename = function()
   return { vim.fn.expand '%:p' }
+end
+
+local function capitalize(str)
+  -- The pattern matches a lowercase letter (%l) followed by zero or more word characters (%w*)
+  -- The function captures the first character (a) and the rest of the word (b)
+  return str:gsub('(%l)(%w*)', function(a, b)
+    -- Capitalize the first captured character and concatenate with the rest of the word
+    return string.upper(a) .. b
+  end)
 end
 
 -- Make sure to not pass an invalid command, as io.popen() may write over nvim-text.
@@ -279,6 +288,157 @@ ls.add_snippets(nil, {
     }),
   },
   go = {
+
+    snip(
+      {
+        trig = 'crudrscene',
+        namr = 'CRUDR Scene',
+        dscr = 'huh.Form as tea.Model + CrudrState',
+      },
+      fmt(
+        [[import (
+          tea "github.com/charmbracelet/bubbletea"
+          "github.com/charmbracelet/huh"
+          "github.com/pb33f/libopenapi"
+          v3 "github.com/pb33f/libopenapi/datamodel/high/v3"
+      )
+      
+      // Implements SceneContext
+      type {}Scene struct {}
+        CrudrState CrudrState
+        Model {}SceneModel
+      {}
+      
+      // Implements tea.Model
+      type {}SceneModel struct {}
+        Form *huh.Form
+        Value *string
+      {}
+      
+      func (s {}Scene) NewScene(cs CrudrState) {}Scene {}
+        return {}Scene {}
+          CrudrState: cs,
+          Model: New{}SceneModel(cs.Model),
+        {}
+      {}
+      
+      func (s {}Scene) FromSceneContext(sc SceneContext) {}Scene {}
+        return {}Scene {}
+          CrudrState: sc.GetCrudrState(),
+          Model: New{}SceneModel(sc.GetCrudrState().Model),
+        {}
+      {}
+      
+      func New{}SceneModel(oaSpecModel *libopenapi.DocumentModel[v3.Document]) {}SceneModel {}
+        var value string
+        return {}SceneModel {}
+          // FIXME: add implementation of huh.Form 
+          Form : nil,
+          Value : &value,
+        {}
+      {}
+      
+      func (s {}Scene) Init() tea.Cmd {}
+        return s.Model.Form.Init()
+      {}
+      
+      func (s {}Scene) Update(msg tea.Msg) (tea.Model, tea.Cmd) {}
+        return s.Model.Form.Update(msg)
+      {}
+      
+      func (s {}Scene) View() string {}
+        return s.Model.Form.View()
+      {}
+      
+      func (s {}Scene) GetCrudrState() CrudrState {}
+        return s.CrudrState
+      {}
+      
+      func (s {}Scene) GetSceneModel() {}SceneModel {}
+        return s.Model
+      {}
+      ]],
+        {
+
+          ---{{{ _Scene struct
+          rep(1),
+          rep(2),
+          rep(1),
+          rep(3),
+          ---}}}
+
+          ---{{{ _SceneModel struct
+          insert(1, capitalize(vim.fn.expand '%:t:r'), {}),
+          insert(2, '{'),
+          insert(3, '}'),
+          ---}}}
+
+          ---{{{ SceneContext - .NewScene()
+          rep(1),
+          rep(1),
+          rep(2),
+          rep(1),
+          rep(2),
+          rep(1),
+          rep(3),
+          rep(3),
+          ---}}}
+
+          ---{{{ SceneContext - .FromSceneContext()
+          rep(1),
+          rep(1),
+          rep(2),
+          rep(1),
+          rep(2),
+          rep(1),
+          rep(3),
+          rep(3),
+          ---}}}
+
+          ---{{{ New_SceneModel()
+          rep(1),
+          rep(1),
+          rep(2),
+          rep(1),
+          rep(2),
+          rep(3),
+          rep(3),
+          ---}}}
+
+          ---{{{ tea.Model - .Init()
+          rep(1),
+          rep(2),
+          rep(3),
+          ---}}}
+
+          ---{{{ tea.Model - .Update()
+          rep(1),
+          rep(2),
+          rep(3),
+          ---}}}
+
+          ---{{{ tea.Model - .View()
+          rep(1),
+          rep(2),
+          rep(3),
+          ---}}}
+
+          ---{{{ SceneContext - .GetCrudrState()
+          rep(1),
+          rep(2),
+          rep(3),
+          ---}}}
+
+          ---{{{ SceneContext - .GetSceneContext()
+          rep(1),
+          rep(1),
+          rep(2),
+          rep(3),
+          ---}}}
+        }
+      )
+    ),
+
     snip('test', {
       text 'func ',
       insert(1, 'Name'),

@@ -103,7 +103,7 @@ return {
           ensure_installed = vim.tbl_keys(other_mason_tools),
           auto_update = true,
         },
-        config = function(self, opts)
+        config = function(_, opts)
           require('mason-tool-installer').setup(opts)
           vim.api.nvim_create_autocmd('User', {
             pattern = 'MasonToolsStartingInstall',
@@ -117,7 +117,9 @@ return {
             pattern = 'MasonToolsUpdateCompleted',
             callback = function(e)
               vim.schedule(function()
-                print(vim.inspect(e.data)) -- print the table that lists the programs that were installed
+                if #e.data > 0 then
+                  print(vim.inspect(e.data)) -- print the table that lists the programs that were installed
+                end
               end)
             end,
           })
@@ -196,6 +198,24 @@ return {
           require('lsplinks').gx()
         end,
         desc = 'open via lsp, or fallback to default `open` behavior',
+        mode = { 'n', 'v' },
+      },
+    },
+  },
+  {
+    'nvimdev/lspsaga.nvim',
+    opts = {
+      ui = {
+        code_action = '',
+      },
+    },
+    keys = {
+      {
+        '<leader>ci',
+        function()
+          vim.cmd 'Lspsaga finder'
+        end,
+        desc = 'Refs and Impls',
         mode = { 'n', 'v' },
       },
     },

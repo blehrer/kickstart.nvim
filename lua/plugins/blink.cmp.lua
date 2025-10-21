@@ -39,6 +39,23 @@ return {
             end, { 'vscode', 'snipmate', 'lua' })
             luasnip.filetype_extend('python', { 'django' })
             luasnip.filetype_extend('htmldjango', { 'djangohtml' })
+
+            --FIXME: why isn't this being lazy loaded above?
+            --TODO: separate out into 1 file per lang?
+            for _, ft_path in ipairs(vim.api.nvim_get_runtime_file('snippets/luasnippets/*.lua', true)) do
+              loadfile(ft_path)()
+            end
+
+            local list_snips = function()
+              local ft_list = luasnip.available()[vim.o.filetype]
+              local ft_snips = {}
+              for _, item in pairs(ft_list) do
+                ft_snips[item.trigger] = item.name
+              end
+              print(vim.inspect(ft_snips))
+            end
+
+            vim.api.nvim_create_user_command('SnipList', list_snips, {})
           end,
         },
       },
@@ -99,8 +116,14 @@ return {
           },
         },
         documentation = {
-          auto_show = false,
+          auto_show = true,
           auto_show_delay_ms = 500,
+        },
+        ghost_text = {
+          enabled = false,
+        },
+        menu = {
+          auto_show = true,
         },
       },
 

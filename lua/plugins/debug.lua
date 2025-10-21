@@ -25,6 +25,7 @@ return {
           'js-debug-adapter',
           'javadbg',
           'javatest',
+          'delve',
         },
       },
     },
@@ -57,19 +58,25 @@ return {
 
     -- {{{Language Support Adapters
 
+    -- {{{ Golang
+    {
+      'leoluz/nvim-dap-go',
+      opts = {},
+      ft = 'go',
+    },
+    -- }}}
     -- {{{Lua
     {
       'jbyuki/one-small-step-for-vimkind',
       lazy = true,
     },
     -- }}}
-
-    ---{{{Python
+    -- {{{ Python
     {
       'mfussenegger/nvim-dap-python',
       lazy = true,
     },
-    ---}}}
+    -- }}}
 
     -- }}}
   },
@@ -189,6 +196,7 @@ return {
       }
     end
 
+    -- }}}
     ---}}}
 
     -- }}}

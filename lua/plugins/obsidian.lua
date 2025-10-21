@@ -138,9 +138,9 @@ return {
         attachments = {
           img_folder = 'assets/imgs',
           img_text_func = function(client, path)
-            local path = client:vault_relative_path(path) or path
+            local p = client:vault_relative_path(path) or path
             local util = require 'obsidian.util'
-            return string.format('![%s](%s)', path.name, util.urlencode(tostring(path), { keep_path_sep = true }))
+            return string.format('![%s](%s)', p.name, util.urlencode(tostring(p), { keep_path_sep = true }))
           end,
         },
 
@@ -180,7 +180,8 @@ return {
           nvim_cmp = false,
         },
       }
-      return vim.tbl_deep_extend('force', require('obsidian.config').ClientOpts.default(), custom_options)
+      return custom_options
+      -- return vim.tbl_deep_extend('force', require('obsidian.config').default, custom_options)
     end,
     keys = function()
       local O = function(subcommand)

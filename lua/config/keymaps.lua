@@ -37,4 +37,7 @@ vim.keymap.set('n', '<leader>' .. '>', ':lua ', { desc = 'Lua prompt' })
 
 -- @ThePrimeagen
 vim.keymap.set({ 'v', 'n' }, '<leader>rw', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = '[R]eplace [w]ord under cursor' })
+
+-- make sure tab is unmapped
+vim.keymap.set({ 'i' }, '<Tab>', '<Tab>')
 return {}

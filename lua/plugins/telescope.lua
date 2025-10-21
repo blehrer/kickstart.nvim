@@ -87,6 +87,7 @@ return {
       pcall(require('telescope').load_extension, 'ui-select')
       pcall(require('telescope').load_extension, 'noice')
       pcall(require('telescope').load_extension, 'dap')
+      pcall(require('telescope').load_extension, 'refactoring')
       -- pcall(require('telescope').load_extension 'undo')
       -- pcall(require('telescope').load_extension 'live_grep')
       -- pcall(require('telescope').load_extension 'live_grep_args')

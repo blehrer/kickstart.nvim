@@ -2,7 +2,7 @@
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
-vim.g.maplocalleader = vim.g.mapleader
+vim.g.maplocalleader = '/'
 
 -- Turn on editorconfig support
 vim.g.editorconfig = true
@@ -50,7 +50,7 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 
 -- Keep signcolumn on by default
-vim.o.signcolumn = 'yes'
+vim.o.signcolumn = 'yes:4'
 
 -- Decrease update time
 vim.o.updatetime = 250
