@@ -12,6 +12,7 @@ local mason_lsps = {
   },
   lua_ls = {},
   markdown_oxide = {},
+  pylsp = {},
   ts_query_ls = {}, --treesitter query
   superhtml = {},
   taplo = {}, --toml
