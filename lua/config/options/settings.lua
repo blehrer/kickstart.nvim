@@ -94,4 +94,3 @@ vim.o.conceallevel = 1
 
 -- gui
 vim.o.termguicolors = true
-vim.o.winborder = 'rounded'
