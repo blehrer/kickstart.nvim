@@ -1,7 +1,9 @@
 local mason_lsps = {
   lemminx = {},
   bashls = {},
-  -- denols = {},
+  denols = {
+    root_markers = { 'deno.json', 'deno.jsonc' },
+  },
   gopls = {},
   jsonls = {},
   jdtls = {},
