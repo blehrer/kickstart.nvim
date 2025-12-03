@@ -14,7 +14,9 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
-vim.keymap.set('n', '<leader>w', ':w<cr>', { desc = '[W]rite' })
+vim.keymap.set('n', '<leader>w', '<cmd>w<cr>', { desc = '[W]rite' })
+vim.keymap.set({ 'n', 'i', 'v' }, '<C-s>', '<cmd>w<cr>', { desc = '[W]rite' })
+vim.keymap.set({ 'n', 'i', 'v' }, '<D-s>', '<cmd>w<cr>', { desc = '[W]rite' })
 
 vim.keymap.set('n', '<leader>q', ':q<cr>', { desc = '[Q]uit' })
 
