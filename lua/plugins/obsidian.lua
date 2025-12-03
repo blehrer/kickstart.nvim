@@ -23,7 +23,7 @@ return {
     },
     opts = function()
       local palette = require('kanagawa-paper').load().palette
-      ---@type obsidian.config.ClientOpts
+      ---@type obsidian.config
       local custom_options = {
         legacy_commands = false,
         workspaces = {
@@ -39,6 +39,29 @@ return {
           time_format = '%H:%M',
           -- A map for custom variables, the key should be the variable and the value a function
           substitutions = {},
+        },
+
+        frontmatter = {
+          -- Optional, alternatively you can customize the frontmatter data.
+          ---@return table
+          func = function(note)
+            -- Add the title of the note as an alias.
+            if note.title then
+              note:add_alias(note.title)
+            end
+
+            local out = { id = note.id, aliases = note.aliases, tags = note.tags }
+
+            -- `note.metadata` contains any manually added fields in the frontmatter.
+            -- So here we just make sure those fields are kept in the frontmatter.
+            if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
+              for k, v in pairs(note.metadata) do
+                out[k] = v
+              end
+            end
+
+            return out
+          end,
         },
 
         ui = {
@@ -106,27 +129,6 @@ return {
           return tostring(os.time()) .. '-' .. suffix
         end,
 
-        -- Optional, alternatively you can customize the frontmatter data.
-        ---@return table
-        note_frontmatter_func = function(note)
-          -- Add the title of the note as an alias.
-          if note.title then
-            note:add_alias(note.title)
-          end
-
-          local out = { id = note.id, aliases = note.aliases, tags = note.tags }
-
-          -- `note.metadata` contains any manually added fields in the frontmatter.
-          -- So here we just make sure those fields are kept in the frontmatter.
-          if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
-            for k, v in pairs(note.metadata) do
-              out[k] = v
-            end
-          end
-
-          return out
-        end,
-
         -- Optional, by default when you use `:ObsidianFollowLink` on a link to an external
         -- URL it will be ignored but you can customize this behavior here.
         ---@param url string
@@ -137,11 +139,6 @@ return {
 
         attachments = {
           img_folder = 'assets/imgs',
-          img_text_func = function(client, path)
-            local p = client:vault_relative_path(path) or path
-            local util = require 'obsidian.util'
-            return string.format('![%s](%s)', p.name, util.urlencode(tostring(p), { keep_path_sep = true }))
-          end,
         },
 
         -- Optional, by default when you use `:ObsidianFollowLink` on a link to an image
