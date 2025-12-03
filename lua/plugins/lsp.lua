@@ -5,11 +5,15 @@ local mason_lsps = {
   gopls = {},
   jsonls = {},
   jdtls = {},
+  helm_ls = {
+    root_markers = { 'Chart.yaml' },
+  },
   lua_ls = {},
   markdown_oxide = {},
   ts_query_ls = {}, --treesitter query
   superhtml = {},
   taplo = {}, --toml
+  tofu_ls = {},
   ts_ls = {},
   vimls = {},
   yamlls = {},
