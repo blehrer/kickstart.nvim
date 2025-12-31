@@ -1,3 +1,4 @@
+---@type {}LazyPluginSpec
 return {
   {
     'linux-cultist/venv-selector.nvim',
@@ -5,6 +6,13 @@ return {
   },
   {
     'benomahony/uv.nvim',
-    opts = {},
+    ---@type UVConfig
+    opts = {
+      auto_activate_venv = true,
+      notify_activate_venv = true,
+      keymaps = {
+        prefix = '<leader>uv',
+      },
+    },
   },
 }
