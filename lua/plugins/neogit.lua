@@ -10,11 +10,11 @@ return {
   opts = {},
   keys = {
     {
-      '<leader>g',
+      '<leader>gs',
       function()
         require('neogit').open()
       end,
-      desc = 'Neogit',
+      desc = '[g]it status (neogit)',
     },
   },
 }

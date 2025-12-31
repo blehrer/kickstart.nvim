@@ -29,6 +29,7 @@ return {
           end
         end)
       end,
+      desc = 'Luapad REPL',
     },
   },
 }

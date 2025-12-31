@@ -11,12 +11,12 @@ return { -- Collection of various small independent plugins/modules
     --  - ci'  - [C]hange [I]nside [']quote
     require('mini.ai').setup { n_lines = 500 }
 
-    local hotkey = '<C-s>'
+    local hotkey = '<localleader>s'
     -- Add/delete/replace surroundings (brackets, quotes, etc.)
     --
-    -- - <C-s>aiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-    -- - <C-s>d'   - [S]urround [D]elete [']quotes
-    -- - <C-s>r)'  - [S]urround [R]eplace [)] [']
+    -- - <hotkey>aiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+    -- - <hotkey>d'   - [S]urround [D]elete [']quotes
+    -- - <hotkey>r)'  - [S]urround [R]eplace [)] [']
     require('mini.surround').setup {
 
       -- Module mappings. Use `''` (empty string) to disable one.

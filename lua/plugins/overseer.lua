@@ -57,15 +57,6 @@ return {
     },
   },
   {
-    'folke/which-key.nvim',
-    optional = true,
-    opts = {
-      spec = {
-        { '<leader>o', group = 'overseer' },
-      },
-    },
-  },
-  {
     'folke/edgy.nvim',
     optional = true,
     opts = function(_, opts)

@@ -3,6 +3,9 @@
 return { -- Useful plugin to show you pending keybinds.
   'folke/which-key.nvim',
   event = 'VimEnter', -- Sets the loading event to 'VimEnter'
+  dependencies = {
+    'echasnovski/mini.nvim',
+  },
   ---@module 'which-key'
   ---@type wk.Config
   opts = {
@@ -48,12 +51,15 @@ return { -- Useful plugin to show you pending keybinds.
 
     -- Document existing key chains
     spec = {
-      { '<leader>c', group = '[C]ode' },
-      { '<leader>t', group = '[T]ests (Neotest)' },
-      { '<leader>d', group = '[D]ebug (DAP)' },
-      { '<leader>n', group = '[N]otes (Obsidian)' },
-      { '<leader>s', group = '[S]earch (Snacks)' },
-      { '<leader>h', group = '[H]unk (Neogit)' },
+      { '<leader>c', group = '[C]ode', icon = '' },
+      { '<leader>t', group = '[T]ests (Neotest)', icon = '' },
+      { '<leader>d', group = '[D]ebug (DAP)', icon = '' },
+      { '<leader>n', group = '[N]otes (Obsidian)', icon = '󰎚' },
+      { '<leader>s', group = '[S]earch (Snacks)', icon = '' },
+      { '<leader>o', group = '[O]verseer', icon = '' },
+      { '<leader>g', group = '[G]it', icon = '' },
+      { '<leader>u', group = '[U]I Toggles', icon = '󱥈' },
+      { '<localleader>s', group = '[S]urroundings', icon = '󰅲' },
     },
   },
 }

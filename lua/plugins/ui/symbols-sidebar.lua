@@ -6,7 +6,7 @@ return {
     opts = {},
     keys = {
       {
-        '\\s',
+        '<localleader><localleader>',
         '<cmd>SymbolsOutline<CR>',
         desc = 'Open the sidebar.',
       },
