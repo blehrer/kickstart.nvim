@@ -34,6 +34,7 @@ return {
 
     -- {{{Runtime and UI
     { 'igorlfs/nvim-dap-view', opts = {}, lazy = true },
+    { 'rcarriga/nvim-dap-ui', dependencies = { 'mfussenegger/nvim-dap', 'nvim-neotest/nvim-nio' } },
     { 'theHamsta/nvim-dap-virtual-text', opts = {}, lazy = true },
     {
       'carcuis/dap-breakpoints.nvim',
@@ -196,6 +197,17 @@ return {
       }
     end
 
+    -- }}}
+
+    -- {{{ Golang
+    dap.adapters.delve = {
+      type = 'server',
+      port = '${port}',
+      executable = {
+        command = os.getenv('TERM'):gsub('.*-', ''),
+        args = { 'dlv', 'dap', '-l', '127.0.0.1:${port}' },
+      },
+    }
     -- }}}
     ---}}}
 
