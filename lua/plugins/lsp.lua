@@ -1,3 +1,4 @@
+---@type vim.lsp.Config[]
 local mason_lsps = {
   lemminx = {},
   bashls = {},
@@ -20,6 +21,9 @@ local mason_lsps = {
   ts_ls = {},
   vimls = {},
   yamlls = {},
+  ansiblels = {
+    filetypes = { 'yaml.ansible', 'ansible' },
+  },
 }
 
 local non_mason_lsps = {
@@ -34,6 +38,7 @@ local other_mason_tools = {
   stylua = {},
   beautysh = {},
   ktfmt = {},
+  ['ansible-lint'] = {},
   -- ['java-debug-adpater'] = {},
   ['java-test'] = {},
 }
