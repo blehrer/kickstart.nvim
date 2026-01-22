@@ -11,3 +11,8 @@ function copyPath()
 end
 
 vim.keymap.set({ 'n' }, '<leader>y', copyPath, { desc = 'Copy path to current Oil entry' })
+
+vim.keymap.set('n', '~', function()
+  local oil = require 'oil'
+  vim.api.nvim_set_current_dir(oil.get_current_dir(0) or '.')
+end)
