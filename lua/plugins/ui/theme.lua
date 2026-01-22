@@ -1,0 +1,1 @@
+/home/nobut/.config/omarchy/current/theme/neovim.lua

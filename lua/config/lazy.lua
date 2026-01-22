@@ -30,6 +30,7 @@ for _, subdir in ipairs(plugin_subdirs) do
 end
 
 -- Setup lazy.nvim
+vim.g.lazyvim_check_order = false
 require('lazy').setup {
   spec = specs,
   checker = { enabled = true },
