@@ -129,30 +129,9 @@ return {
           return tostring(os.time()) .. '-' .. suffix
         end,
 
-        -- Optional, by default when you use `:ObsidianFollowLink` on a link to an external
-        -- URL it will be ignored but you can customize this behavior here.
-        ---@param url string
-        follow_url_func = function(url)
-          -- Open the URL in the default web browser.
-          vim.ui.open(url) -- need Neovim 0.10.0+
-        end,
-
         attachments = {
-          img_folder = 'assets/imgs',
+          folder = 'assets',
         },
-
-        -- Optional, by default when you use `:ObsidianFollowLink` on a link to an image
-        -- file it will be ignored but you can customize this behavior here.
-        ---@param img string
-        follow_img_func = function(img)
-          local uname = vim.system { 'uname' }
-          if uname == 'Darwin' then
-            vim.fn.jobstart { 'qlmanage', '-p', img } -- Mac OS quick look preview
-          elseif uname == 'Linux' then
-            vim.fn.jobstart { 'xdg-open', img } -- linux
-          end
-          -- vim.cmd(':silent exec "!start ' .. url .. '"') -- Windows
-        end,
 
         picker = {
           -- Set your preferred picker. Can be one of 'telescope.nvim', 'fzf-lua', or 'mini.pick'.

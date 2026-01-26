@@ -6,6 +6,9 @@ return {
         disable = {
           'missing-fields',
         },
+        globals = {
+          'vim',
+        },
       },
     },
   },

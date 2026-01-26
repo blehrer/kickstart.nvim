@@ -2,28 +2,31 @@
 local mason_lsps = {
   lemminx = {},
   bashls = {},
-  denols = {
-    root_markers = { 'deno.json', 'deno.jsonc' },
-  },
-  gopls = {},
+  -- denols = {
+  --   root_markers = { 'deno.json', 'deno.jsonc' },
+  -- },
+  -- gopls = {},
   jsonls = {},
-  jdtls = {},
+  -- jdtls = {},
   helm_ls = {
     root_markers = { 'Chart.yaml' },
   },
+  hyprls = {},
   lua_ls = {},
   markdown_oxide = {},
-  pylsp = {},
+  -- pylsp = {},
+  ruby_lsp = {},
+  rubocop = {},
   ts_query_ls = {}, --treesitter query
   superhtml = {},
   taplo = {}, --toml
-  tofu_ls = {},
+  -- tofu_ls = {},
   ts_ls = {},
   vimls = {},
   yamlls = {},
-  ansiblels = {
-    filetypes = { 'yaml.ansible', 'ansible' },
-  },
+  -- ansiblels = {
+  --   filetypes = { 'yaml.ansible', 'ansible' },
+  -- },
 }
 
 local non_mason_lsps = {
@@ -36,11 +39,11 @@ local all_lsps = vim.tbl_deep_extend('force', mason_lsps, non_mason_lsps)
 
 local other_mason_tools = {
   stylua = {},
-  beautysh = {},
-  ktfmt = {},
-  ['ansible-lint'] = {},
-  -- ['java-debug-adpater'] = {},
-  ['java-test'] = {},
+  -- beautysh = {},
+  -- ktfmt = {},
+  -- ['ansible-lint'] = {},
+  -- -- ['java-debug-adpater'] = {},
+  -- ['java-test'] = {},
 }
 
 ---@module 'lazy.types'
@@ -81,7 +84,7 @@ return {
       },
     },
   },
-  { 'mfussenegger/nvim-jdtls' },
+  -- { 'mfussenegger/nvim-jdtls' },
   {
     'neovim/nvim-lspconfig',
     dependencies = {
