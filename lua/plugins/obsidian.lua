@@ -1,3 +1,9 @@
+local function is_docker()
+  vim.fn.filereadable '/.dockerenv'
+end
+if is_docker then
+  return {}
+end
 ---@module 'lazy.types'
 ---@type LazyPluginSpec[]
 return {
