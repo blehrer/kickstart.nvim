@@ -37,6 +37,9 @@ vim.o.showmode = false
 --  See `:help 'clipboard'`
 vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
+  if vim.g.loaded_clipboard_provider == 0 then
+    vim.g.clipboard = 'osc52'
+  end
 end)
 
 -- Enable break indent
