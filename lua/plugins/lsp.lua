@@ -2,32 +2,63 @@
 local mason_lsps = {
   lemminx = {},
   bashls = {},
-  -- denols = {
-  --   root_markers = { 'deno.json', 'deno.jsonc' },
-  -- },
-  -- gopls = {},
   jsonls = {},
-  -- jdtls = {},
   helm_ls = {
     root_markers = { 'Chart.yaml' },
   },
   hyprls = {},
   lua_ls = {},
   markdown_oxide = {},
-  -- pylsp = {},
-  ruby_lsp = {},
-  rubocop = {},
   ts_query_ls = {}, --treesitter query
   superhtml = {},
   taplo = {}, --toml
-  -- tofu_ls = {},
   ts_ls = {},
   vimls = {},
   yamlls = {},
-  -- ansiblels = {
-  --   filetypes = { 'yaml.ansible', 'ansible' },
-  -- },
 }
+
+local function exedep(exenames, cfgs)
+  local exe = vim.tbl_map(vim.fn.exepath, exenames)
+  if vim.tbl_count(exe) > 0 then
+    return { configs = cfgs }
+  end
+end
+local bin_dependent = vim.tbl_map(exedep, {
+  { 'ansible', {
+    ansiblels = {},
+    ['yaml.ansible'] = {},
+  } },
+  { 'go', {
+    gopls = {},
+  } },
+  { 'java', {
+    jdtls = {},
+    ['java-debug-adpater'] = {},
+    ['java-test'] = {},
+  } },
+  { 'python3', {
+    pylsp = {},
+    beautysh = {},
+  } },
+  { 'kt', {
+    ktfmt = {},
+  } },
+  { 'tofu', {
+    tofu_ls = {},
+  } },
+  { 'deno', {
+    denols = {
+      root_markers = { 'deno.json', 'deno.jsonc' },
+    },
+  } },
+  { 'node', 'deno', 'bun', {
+    ts_ls = {},
+  } },
+  { 'ruby', {
+    ruby_lsp = {},
+    rubocop = {},
+  } },
+})
 
 local non_mason_lsps = {
   ['wordnet-ls'] = {},
@@ -35,15 +66,10 @@ local non_mason_lsps = {
   ['cfn_ls'] = {},
 }
 
-local all_lsps = vim.tbl_deep_extend('force', mason_lsps, non_mason_lsps)
+local all_lsps = vim.tbl_deep_extend('force', mason_lsps, non_mason_lsps, bin_dependent)
 
 local other_mason_tools = {
   stylua = {},
-  -- beautysh = {},
-  -- ktfmt = {},
-  -- ['ansible-lint'] = {},
-  -- -- ['java-debug-adpater'] = {},
-  -- ['java-test'] = {},
 }
 
 ---@module 'lazy.types'
