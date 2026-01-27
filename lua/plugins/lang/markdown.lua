@@ -1,10 +1,8 @@
 local cmd = function(key)
   return vim.keycode('<D-%s>'):format(key)
 end
----@module 'lazy.types'
----@type LazyPluginSpec[]
-return {
-  {
+local peek = if vim.fn.exepath('deno') then
+{
     'toppair/peek.nvim',
     ft = 'markdown',
     build = 'deno task --quiet build:fast',
@@ -23,7 +21,9 @@ return {
       return {}
     end,
   },
-  {
+else nil
+end
+local markdowny =  {
     'antonk52/markdowny.nvim',
     ft = 'markdown',
     opts = { filetypes = { 'markdown' } },
@@ -34,4 +34,6 @@ return {
       { cmd 'e', ":lua require('markdowny').code()<cr>", mode = 'v', buffer = 0, desc = 'toggle code ticks' },
     },
   },
-}
+---@module 'lazy.types'
+---@type LazyPluginSpec[]
+return { markdowny, peek }
