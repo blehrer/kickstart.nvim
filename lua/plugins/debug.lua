@@ -83,10 +83,6 @@ return {
       cond = function()
         return #vim.fn.exepath 'python' > 0
       end,
-      opts = { 'python', {
-        justMyCode = true,
-        showReturnValue = true,
-      } },
     },
     -- }}}
 
@@ -154,64 +150,76 @@ return {
     end
     ---}}}
 
+    -- {{{ Python
+    if #vim.fn.exepath 'python' > 0 then
+      dap.adapters.python = { 'python', {
+        justMyCode = true,
+        showReturnValue = true,
+      } }
+    end
+    -- }}}
+
     -- {{{Node
-    local js_debug_dap_server = os.getenv 'HOME' .. '/.local/share/microsoft/js-debug/src/dapDebugServer.js'
+    if #vim.fn.exepath 'node' > 0 then
+      local js_debug_dap_server = os.getenv 'HOME' .. '/.local/share/microsoft/js-debug/src/dapDebugServer.js'
 
-    dap.adapters['pwa-node'] = {
-      type = 'server',
-      host = 'localhost',
-      port = '${port}',
-      executable = {
-        command = 'node',
-        args = { js_debug_dap_server, '${port}' },
-      },
-    }
-
-    local filetypes = require 'mason-nvim-dap.mappings.filetypes'
-    for _, ft in ipairs(filetypes['node2']) do
-      dap.configurations[ft] = {
-        {
-          type = 'pwa-node',
-          request = 'launch',
-          name = ('%s Launch file'):format(require('mini.icons').get('filetype', ft)),
-          program = '${file}',
-          cwd = '${workspaceFolder}',
-        },
-        {
-          type = 'pwa-node',
-          request = 'attach',
-          name = ('%s Attach'):format(require('mini.icons').get('filetype', ft)),
-          processId = require('dap.utils').pick_process,
-          cwd = '${workspaceFolder}',
-        },
-        {
-          type = 'pwa-node',
-          request = 'launch',
-          name = ('%s Debug Playwright Tests'):format(require('mini.icons').get('filetype', ft)),
-          -- trace = true, -- include debugger info
-          runtimeExecutable = 'npx',
-          runtimeArgs = {
-            'playwright',
-            'test',
-            '--debug',
-          },
-          rootPath = '${workspaceFolder}',
-          cwd = '${workspaceFolder}',
+      dap.adapters['pwa-node'] = {
+        type = 'server',
+        host = 'localhost',
+        port = '${port}',
+        executable = {
+          command = 'node',
+          args = { js_debug_dap_server, '${port}' },
         },
       }
-    end
 
+      local filetypes = require 'mason-nvim-dap.mappings.filetypes'
+      for _, ft in ipairs(filetypes['node2']) do
+        dap.configurations[ft] = {
+          {
+            type = 'pwa-node',
+            request = 'launch',
+            name = ('%s Launch file'):format(require('mini.icons').get('filetype', ft)),
+            program = '${file}',
+            cwd = '${workspaceFolder}',
+          },
+          {
+            type = 'pwa-node',
+            request = 'attach',
+            name = ('%s Attach'):format(require('mini.icons').get('filetype', ft)),
+            processId = require('dap.utils').pick_process,
+            cwd = '${workspaceFolder}',
+          },
+          {
+            type = 'pwa-node',
+            request = 'launch',
+            name = ('%s Debug Playwright Tests'):format(require('mini.icons').get('filetype', ft)),
+            -- trace = true, -- include debugger info
+            runtimeExecutable = 'npx',
+            runtimeArgs = {
+              'playwright',
+              'test',
+              '--debug',
+            },
+            rootPath = '${workspaceFolder}',
+            cwd = '${workspaceFolder}',
+          },
+        }
+      end
+    end
     -- }}}
 
     -- {{{ Golang
-    dap.adapters.delve = {
-      type = 'server',
-      port = '${port}',
-      executable = {
-        command = os.getenv('TERM'):gsub('.*-', ''),
-        args = { 'dlv', 'dap', '-l', '127.0.0.1:${port}' },
-      },
-    }
+    if #vim.fn.exepath 'go' > 0 then
+      dap.adapters.delve = {
+        type = 'server',
+        port = '${port}',
+        executable = {
+          command = os.getenv('TERM'):gsub('.*-', ''),
+          args = { 'dlv', 'dap', '-l', '127.0.0.1:${port}' },
+        },
+      }
+    end
     -- }}}
     ---}}}
 
