@@ -1,8 +1,7 @@
-local cmd = function(key)
-  return vim.keycode('<D-%s>'):format(key)
-end
-local peek = if vim.fn.exepath('deno') then
-{
+local md_plugins = {}
+
+if #vim.fn.exepath 'deno' > 0 then
+  vim.list_extend(md_plugins, {
     'toppair/peek.nvim',
     ft = 'markdown',
     build = 'deno task --quiet build:fast',
@@ -20,10 +19,15 @@ local peek = if vim.fn.exepath('deno') then
       end, { desc = 'Toggle markdown preview (peek.nvim)' })
       return {}
     end,
-  },
-else nil
+  })
 end
-local markdowny =  {
+
+local cmd = function(key)
+  return vim.keycode('<D-%s>'):format(key)
+end
+
+vim.list_extend(md_plugins, {
+  {
     'antonk52/markdowny.nvim',
     ft = 'markdown',
     opts = { filetypes = { 'markdown' } },
@@ -31,9 +35,15 @@ local markdowny =  {
       { cmd 'b', ":lua require('markdowny').bold()<cr>", mode = 'v', buffer = 0, desc = 'toggle bold' },
       { cmd 'i', ":lua require('markdowny').italic()<cr>", mode = 'v', buffer = 0, desc = 'toggle italics' },
       { cmd 'k', ":lua require('markdowny').link()<cr>", mode = 'v', buffer = 0, desc = 'toggle link' },
-      { cmd 'e', ":lua require('markdowny').code()<cr>", mode = 'v', buffer = 0, desc = 'toggle code ticks' },
+      {
+        cmd 'e',
+        ":lua require('markdowny').code()<cr>",
+        mode = 'v',
+        buffer = 0,
+        desc = 'toggle code ticks',
+      },
     },
   },
----@module 'lazy.types'
----@type LazyPluginSpec[]
-return { markdowny, peek }
+})
+
+return md_plugins

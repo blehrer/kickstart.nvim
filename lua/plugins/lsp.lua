@@ -17,47 +17,75 @@ local mason_lsps = {
   yamlls = {},
 }
 
-local function exedep(exenames, cfgs)
-  local exe = vim.tbl_map(vim.fn.exepath, exenames)
+local bin_dependent = {}
+
+local function env_satisfies(candidate)
+  local exe = vim.tbl_filter(function(e)
+    return e:len() > 0
+  end, vim.tbl_map(vim.fn.exepath, candidate[1]))
   if vim.tbl_count(exe) > 0 then
-    return { configs = cfgs }
+    for _, value in ipairs(candidate[2]) do
+      vim.list_extend(bin_dependent, value)
+    end
   end
 end
-local bin_dependent = vim.tbl_map(exedep, {
-  { 'ansible', {
-    ansiblels = {},
-    ['yaml.ansible'] = {},
-  } },
-  { 'go', {
-    gopls = {},
-  } },
-  { 'java', {
-    jdtls = {},
-    ['java-debug-adpater'] = {},
-    ['java-test'] = {},
-  } },
-  { 'python3', {
-    pylsp = {},
-    beautysh = {},
-  } },
-  { 'kt', {
-    ktfmt = {},
-  } },
-  { 'tofu', {
-    tofu_ls = {},
-  } },
-  { 'deno', {
-    denols = {
-      root_markers = { 'deno.json', 'deno.jsonc' },
+
+vim.tbl_map(env_satisfies, {
+  {
+    { 'ansible' },
+    {
+      ansiblels = {},
+      ['yaml.ansible'] = {},
     },
-  } },
-  { 'node', 'deno', 'bun', {
-    ts_ls = {},
-  } },
-  { 'ruby', {
-    ruby_lsp = {},
-    rubocop = {},
-  } },
+  },
+  {
+    { 'go' },
+    {
+      gopls = {},
+    },
+  },
+  {
+    { 'java' },
+    {
+      jdtls = {},
+      ['java-debug-adpater'] = {},
+      ['java-test'] = {},
+    },
+  },
+  {
+    { 'python3' },
+    {
+      pylsp = {},
+      beautysh = {},
+    },
+  },
+  {
+    { 'kt' },
+    { ktfmt = {} },
+  },
+  {
+    { 'tofu' },
+    { tofu_ls = {} },
+  },
+  {
+    { 'deno' },
+    {
+      denols = {
+        root_markers = { 'deno.json', 'deno.jsonc' },
+      },
+    },
+  },
+  {
+    { 'node', 'deno', 'bun' },
+    { ts_ls = {} },
+  },
+  {
+    { 'ruby' },
+    {
+      ruby_lsp = {},
+      rubocop = {},
+    },
+  },
 })
 
 local non_mason_lsps = {
@@ -110,7 +138,12 @@ return {
       },
     },
   },
-  -- { 'mfussenegger/nvim-jdtls' },
+  {
+    'mfussenegger/nvim-jdtls',
+    enabled = function()
+      return #vim.fn.exepath 'java' > 0
+    end,
+  },
   {
     'neovim/nvim-lspconfig',
     dependencies = {
