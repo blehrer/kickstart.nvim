@@ -130,7 +130,11 @@ if HasMise() then
       },
     },
   }
-  return config
+  if workspace_java_home then
+    return config
+  else
+    return {}
+  end
 else
-  return nil
+  return {}
 end
