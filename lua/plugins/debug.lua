@@ -22,10 +22,10 @@ return {
         -- online, please don't ask me how to install them :)
         ensure_installed = {
           -- Update this to ensure that you have the debuggers for the langs you want
-          'js-debug-adapter',
-          'javadbg',
-          'javatest',
-          'delve',
+          -- 'js-debug-adapter',
+          -- 'javadbg',
+          -- 'javatest',
+          -- 'delve',
         },
       },
     },
@@ -63,6 +63,10 @@ return {
     {
       'leoluz/nvim-dap-go',
       opts = {},
+      lazy = true,
+      cond = function()
+        return #vim.fn.exepath 'go' > 0
+      end,
       ft = 'go',
     },
     -- }}}
@@ -76,6 +80,13 @@ return {
     {
       'mfussenegger/nvim-dap-python',
       lazy = true,
+      cond = function()
+        return #vim.fn.exepath 'python' > 0
+      end,
+      opts = { 'python', {
+        justMyCode = true,
+        showReturnValue = true,
+      } },
     },
     -- }}}
 
@@ -107,13 +118,6 @@ return {
     -- }}}
 
     -- {{{Adapters
-
-    -- {{{Python
-    require('dap-python').setup('python', {
-      justMyCode = true,
-      showReturnValue = true,
-    })
-    -- }}}
 
     -- {{{Lua
     dap.configurations.lua = {
