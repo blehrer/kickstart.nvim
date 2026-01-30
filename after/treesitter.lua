@@ -29,6 +29,7 @@ local ensure_installed = {
   'markdown_inline',
   'mermaid',
   'python',
+  'ruby',
   'query',
   'sql',
   'terraform',

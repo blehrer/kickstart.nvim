@@ -1,7 +1,9 @@
 return {
   {
     'weizheheng/ror.nvim',
-    opts = {},
+    opts = function()
+      return {}
+    end,
     cond = function()
       return #vim.fn.exepath 'ruby' > 0
     end,

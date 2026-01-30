@@ -1,5 +1,7 @@
-local success, schema_catalogue = pcall(require('schemastore.catalog').json.schemas)
+local success, schema_module = pcall(require 'schemastore.catalog')
+
 if success then
+  schema_catalogue = schema_catalogue.json.schemas
   ---@module 'schemastore.catalog'
   ---@type SchemaEntry[]
   local schemas = vim.tbl_filter(function(s)
