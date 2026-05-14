@@ -140,7 +140,8 @@ return {
       {
         '<leader><del>',
         function()
-          require('snacks.terminal').toggle(nil, { cwd = vim.fn.expand '%:h', interactive = true })
+          require('snacks.terminal').toggle()
+          -- (nil, { cwd = vim.fn.expand '%:h', interactive = true })
         end,
         desc = 'Toggle terminal',
       },
@@ -175,7 +176,7 @@ return {
       {
         '<leader>sf',
         function()
-          require('snacks.picker').files { exclude = exclude_patterns }
+          require('snacks.picker').files { exclude = exclude_patterns, hidden = true }
         end,
         desc = '[S]earch: [F]iles',
       },
@@ -187,9 +188,23 @@ return {
         desc = '[S]earch: [S]elect picker',
       },
       {
+        '<leader>sc',
+        function()
+          require('snacks.picker').lsp_symbols()
+        end,
+        '[S]earch code (in current file)',
+      },
+      {
+        '<leader>sC',
+        function()
+          require('snacks.picker').lsp_workspace_symbols()
+        end,
+        '[S]earch code (workspace)',
+      },
+      {
         '<leader>sg',
         function()
-          require('snacks.picker').grep()
+          require('snacks.picker').grep { hidden = true }
         end,
         desc = '[S]earch: [G]rep',
       },

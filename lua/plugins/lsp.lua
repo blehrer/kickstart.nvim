@@ -2,6 +2,7 @@
 local mason_lsps = {
   lemminx = {},
   bashls = {},
+  gitlab_ci_ls = {},
   jsonls = {},
   helm_ls = {
     root_markers = { 'Chart.yaml' },

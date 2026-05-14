@@ -6,6 +6,7 @@ return {
   dependencies = {
     'nvim-lua/plenary.nvim',
     'nvim-treesitter/nvim-treesitter',
+    'lewis6991/async.nvim',
   },
   keys = {
     { '<leader>r', '', desc = '+refactor', mode = { 'n', 'v' } },
@@ -116,7 +117,4 @@ return {
     show_success_message = true, -- shows a message with information about the refactor on success
     -- i.e. [Refactor] Inlined 3 variable occurrences
   },
-  config = function(_, opts)
-    require('refactoring').setup(opts)
-  end,
 }
