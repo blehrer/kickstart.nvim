@@ -1,6 +1,6 @@
 require 'lazy'
 ---@type LazyPluginSpec[]
-if true then
+if false then
   return {}
 else
   return {
@@ -62,6 +62,7 @@ else
           bash = { 'beautysh' },
           zsh = { 'beautysh' },
           markdown = { 'prettier' },
+          typescript = { 'prettier' },
           --
           -- You can use 'stop_after_first' to run the first available formatter from the list
           -- javascript = { "prettierd", "prettier", stop_after_first = true },

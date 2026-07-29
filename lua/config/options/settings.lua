@@ -97,3 +97,8 @@ vim.o.conceallevel = 1
 
 -- gui
 vim.o.termguicolors = true
+
+-- diagnostics
+vim.diagnostic.config {
+  source = true,
+}

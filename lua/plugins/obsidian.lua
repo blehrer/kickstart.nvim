@@ -11,6 +11,11 @@ return {
     'obsidian-nvim/obsidian.nvim',
     version = '*', -- recommended, use latest release instead of latest commit
     lazy = false,
+    event = {
+      -- Change the path below to the absolute path of your Obsidian vault
+      'BufReadPre ' .. vim.fn.expand '~' .. 'vaults/noe/**/*.md',
+      'BufNewFile ' .. vim.fn.expand '~' .. 'Documents/Student/**/*.md',
+    },
     -- event = {
     --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
     --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
@@ -36,6 +41,10 @@ return {
           {
             name = 'noe',
             path = '~/vaults/noe',
+          },
+          {
+            name = 'work',
+            path = '~/Documents/Student',
           },
         },
         notes_subdir = 'notes',

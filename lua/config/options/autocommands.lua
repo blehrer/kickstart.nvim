@@ -71,3 +71,24 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end
   end,
 })
+
+vim.api.nvim_set_hl(0, 'MergeTargetBackground', { bg = '#a6a6a6', default = true })
+vim.api.nvim_create_autocmd('OptionSet', {
+  pattern = 'diff',
+  callback = function()
+    if vim.v.option_new == '1' then
+      local tgt = vim.g.tgt_buf
+      local current_buf = vim.api.nvim_get_current_buf()
+
+      -- If this window is hosting the target/merge buffer, tint its background
+      if tgt and current_buf == tgt then
+        -- Normal: applies to standard background lines
+        -- NormalNC: applies when you temporarily switch focus to another split
+        vim.wo.winhighlight = 'Normal:MergeTargetBackground,NormalNC:MergeTargetBackground'
+      end
+    else
+      -- Clear the custom window background if diff mode is turned off
+      vim.wo.winhighlight = ''
+    end
+  end,
+})

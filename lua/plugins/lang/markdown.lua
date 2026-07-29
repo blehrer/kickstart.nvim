@@ -3,9 +3,9 @@ local md_plugins = {}
 if #vim.fn.exepath 'deno' > 0 then
   vim.list_extend(md_plugins, {
     'toppair/peek.nvim',
-    ft = 'markdown',
+    event = { 'VeryLazy' },
     build = 'deno task --quiet build:fast',
-    opts = function()
+    config = function()
       require('peek').setup()
       vim.api.nvim_create_user_command('PeekOpen', require('peek').open, {})
       vim.api.nvim_create_user_command('PeekClose', require('peek').close, {})
@@ -17,7 +17,6 @@ if #vim.fn.exepath 'deno' > 0 then
           peek.open()
         end
       end, { desc = 'Toggle markdown preview (peek.nvim)' })
-      return {}
     end,
   })
 end
@@ -42,6 +41,35 @@ vim.list_extend(md_plugins, {
         buffer = 0,
         desc = 'toggle code ticks',
       },
+    },
+  },
+  {
+
+    {
+      'MeanderingProgrammer/render-markdown.nvim',
+      dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' },
+      opts = {
+        -- Ensures the renderer runs even when a buffer is inside a diff window
+        file_types = { 'markdown', 'vimwiki', 'DiffviewFiles' },
+      },
+    },
+
+    {
+      'sindrets/diffview.nvim',
+      dependencies = { 'nvim-lua/plenary.nvim' },
+      config = function()
+        require('diffview').setup {
+          hooks = {
+            -- Automatically force concealment and markdown rendering when viewing a diff
+            diff_buf_read = function(bufnr)
+              if vim.bo[bufnr].filetype == 'markdown' then
+                vim.wo.conceallevel = 2
+                vim.wo.concealcursor = 'nc'
+              end
+            end,
+          },
+        }
+      end,
     },
   },
 })

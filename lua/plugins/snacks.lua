@@ -1,7 +1,7 @@
 local exclude_patterns = { '*.class' }
 ---@module 'lazy.types'
 ---@type LazyPluginSpec[]
-return {
+M = {
   {
     'folke/snacks.nvim',
     priority = 1000,
@@ -206,6 +206,15 @@ return {
         function()
           require('snacks.picker').grep { hidden = true }
         end,
+        mode = 'n',
+        desc = '[S]earch: [G]rep',
+      },
+      {
+        '<leader>sg',
+        function()
+          require('snacks.picker').grep { hidden = true, search = vim.fn.s }
+        end,
+        mode = 'v',
         desc = '[S]earch: [G]rep',
       },
       {
@@ -267,3 +276,4 @@ return {
     end,
   },
 }
+return M

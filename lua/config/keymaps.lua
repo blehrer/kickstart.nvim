@@ -42,4 +42,45 @@ vim.keymap.set({ 'v', 'n' }, '<leader>rw', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Le
 
 -- make sure tab is unmapped
 vim.keymap.set({ 'i' }, '<Tab>', '<Tab>')
+
+vim.keymap.set('n', '<leader>re', '<cmd>restart<cr>', { desc = 'Restart Neovim' })
+vim.keymap.set({ 'n', 'v' }, 'gl', function()
+  vim.diagnostic.open_float {
+    source = true,
+  }
+end)
+vim.keymap.set('n', 'g<', function()
+  vim.diagnostic.setqflist { open = true }
+end, { desc = 'Diagnostics to quickfix list' })
+
+-- Search project for exact visual selection using Snacks.picker
+vim.keymap.set('v', '<leader>sg', function()
+  -- 1. Get visual selection marks correctly
+  local srow, scol = vim.fn.line 'v', vim.fn.col 'v'
+  local erow, ecol = vim.fn.line '.', vim.fn.col '.'
+
+  -- 2. Use vim.region to handle multi-byte UTF-8 boundaries cleanly
+  -- This creates a safe structure that avoids slicing multi-byte characters into hex chunks
+  local region = vim.region(0, { srow - 1, scol - 1 }, { erow - 1, ecol }, 'v', true)
+
+  local lines = {}
+  for row, cols in pairs(region) do
+    local line_text = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1] or ''
+    -- Slice the line using exact byte regions resolved by vim.region
+    table.insert(lines, string.sub(line_text, cols[1] + 1, cols[2]))
+  end
+  local selection = table.concat(lines, '\n')
+
+  -- 3. Clear visual highlight state before opening the picker UI
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'n', false)
+
+  -- 4. Pass the clean string to Snacks picker
+  if selection and selection ~= '' then
+    Snacks.picker.grep {
+      search = selection, -- Pre-fills the global project search field
+      live = true, -- Allows you to modify the search query live
+    }
+  end
+end, { desc = 'Search project for visual selection with Snacks' })
+
 return {}

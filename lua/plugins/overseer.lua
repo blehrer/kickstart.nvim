@@ -86,4 +86,18 @@ return {
       require('overseer').enable_dap()
     end,
   },
+  {
+    'oclay1st/gradle.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'MunifTanjim/nui.nvim',
+    },
+    opts = {
+      gradle_executable = './gradlew',
+    },
+    keys = {
+      { '<leader>G', desc = '+Gradle', mode = { 'n', 'v' } },
+      { '<leader>Gg', '<cmd>Gradle<cr>', desc = 'Gradle Projects' },
+    },
+  },
 }

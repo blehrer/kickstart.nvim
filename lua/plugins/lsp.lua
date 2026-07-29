@@ -1,8 +1,9 @@
----@type vim.lsp.Config[]
+---@type table<string, vim.lsp.Config[]>
 local mason_lsps = {
   lemminx = {},
   bashls = {},
   gitlab_ci_ls = {},
+  gradle_ls = {},
   jsonls = {},
   helm_ls = {
     root_markers = { 'Chart.yaml' },
@@ -256,7 +257,7 @@ return {
       local blink_capabilities = require('blink.cmp').get_lsp_capabilities({}, include_nvim_defaults)
       for name, merge_target_config in pairs(all_lsps) do
         merge_target_config.capabilities = vim.tbl_deep_extend('force', blink_capabilities, merge_target_config.capabilities or {})
-        vim.lsp.enable(name)
+        vim.lsp.enable(tostring(name))
         vim.lsp.config(name, merge_target_config) -- see :help lsp-config
       end
     end,

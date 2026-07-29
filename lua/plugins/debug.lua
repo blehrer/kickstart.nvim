@@ -22,7 +22,7 @@ return {
         -- online, please don't ask me how to install them :)
         ensure_installed = {
           -- Update this to ensure that you have the debuggers for the langs you want
-          -- 'js-debug-adapter',
+          'js-debug-adapter',
           -- 'javadbg',
           -- 'javatest',
           -- 'delve',
@@ -161,7 +161,7 @@ return {
 
     -- {{{Node
     if #vim.fn.exepath 'node' > 0 then
-      local js_debug_dap_server = os.getenv 'HOME' .. '/.local/share/microsoft/js-debug/src/dapDebugServer.js'
+      local js_debug_dap_server = vim.fn.stdpath 'data' .. '/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js'
 
       dap.adapters['pwa-node'] = {
         type = 'server',
