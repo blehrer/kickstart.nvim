@@ -7,6 +7,10 @@ local symbols_opts = {
   mode = 'symbols',
   pinned = true,
   focus = false,
+  follow = true,
+  restore = false,
+  multiline = false,
+  format = '{kind_icon} {symbol.name} {pos}',
   auto_preview = false,
   win = {
     type = 'split',
@@ -39,7 +43,7 @@ function M.open(main_win)
   state.main_win = main_win
 
   symbols_opts.win.win = main_win
-  require('trouble').open(vim.tbl_extend('force', symbols_opts, { new = true }))
+  require('trouble').open(symbols_opts)
   hover.open(main_win)
 
   if valid_win(main_win) then
