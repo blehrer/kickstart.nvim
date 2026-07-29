@@ -122,6 +122,11 @@ function M.setup()
   })
 
   M.setup_keymaps()
+  require('config.lsp_panels').setup_keymaps()
+
+  vim.api.nvim_create_user_command('LspPanels', function()
+    require('config.lsp_panels').toggle()
+  end, { desc = 'Toggle LSP doc + symbol panels' })
 
   vim.api.nvim_create_user_command('LspInfo', function()
     vim.cmd('checkhealth vim.lsp')
