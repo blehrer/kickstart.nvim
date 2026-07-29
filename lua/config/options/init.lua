@@ -1,5 +1,0 @@
-require 'config.options.autocommands'
-require 'config.options.lsp'
-require 'config.options.settings'
-require 'config.options.diagnostics'
-vim.opt.rtp:prepend '/opt/homebrew/opt/fzf'

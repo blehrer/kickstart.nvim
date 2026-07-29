@@ -1,8 +1,0 @@
-tags
-test.sh
-.luarc.json
-nvim
-
-spell/
-lua/disabled/
-lazy-lock.json
