@@ -3,6 +3,12 @@ vim.g.have_nerd_font = true
 
 vim.g.markdown_fenced_languages = { 'ts=typescript' }
 
+vim.opt.rtp:prepend('/opt/homebrew/opt/fzf')
+
+function Inspect(obj)
+  vim.notify(vim.inspect(obj))
+end
+
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.mouse = 'a'
@@ -53,6 +59,9 @@ vim.diagnostic.config({
   virtual_text = {
     source = 'if_many',
     spacing = 2,
+    format = function(diagnostic)
+      return diagnostic.message
+    end,
   },
   update_in_insert = true,
 })

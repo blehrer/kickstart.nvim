@@ -28,7 +28,16 @@ require('snacks').setup({
         },
         { icon = ' ', key = 'q', desc = 'Quit', action = ':qa' },
       },
-      header = '',
+      header = [[
+
+                  _)             
+  __ \   \ \   /   |   __ `__ \  
+  |   |   \ \ /    |   |   |   | 
+ _|  _|    \_/    _|  _|  _|  _| 
+                                 
+                                 
+
+        ]],
     },
   },
   explorer = { enabled = false },
@@ -137,7 +146,21 @@ vim.keymap.set('n', '<Esc>', function()
   vim.cmd.nohlsearch()
 end, { desc = 'Clear search highlight' })
 
-Snacks.toggle.option('spell'Snacks.toggle.option('spell', { name = 'Spelling' }):map('<leader>us')
+local notifications = require('config.notifications')
+
+-- Neovim requires an uppercase name; abbrev makes :notifications work at the prompt.
+vim.api.nvim_create_user_command('Notifications', notifications.show, {
+  desc = 'Notification history (like :messages)',
+})
+vim.cmd('cnoreabbrev notifications Notifications')
+
+vim.keymap.set('n', '<leader>un', notifications.show, { desc = 'Notification history' })
+
+vim.keymap.set('n', '<leader>uN', function()
+  Snacks.notifier.hide()
+end, { desc = 'Dismiss notifications' })
+
+Snacks.toggle.option('spell', { name = 'Spelling' }):map('<leader>us')
 Snacks.toggle.option('wrap', { name = 'Wrap' }):map('<leader>uw')
 Snacks.toggle.diagnostics():map('<leader>ud')
 Snacks.toggle.treesitter():map('<leader>uT')

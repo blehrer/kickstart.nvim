@@ -3,4 +3,5 @@ vim.g.maplocalleader = '\\'
 
 require('config.ui2')
 require('config.options')
+require('config.keymaps')
 require('config.autocmds')
