@@ -51,7 +51,7 @@ Lockfile: `nvim-pack-lock.json` (commit for reproducible installs).
 | `<leader>b` | DAP breakpoint |
 | `<leader>.` | Luapad REPL menu |
 
-Set `GITHUB_TOKEN` / `GITLAB_TOKEN` for codereview.nvim.
+codereview.nvim reads `GITLAB_TOKEN` from the environment, or from 1Password (`op://Employee/GITLAB_API_TOKEN/credential`). Set `GITHUB_TOKEN` for GitHub repos.
 
 ## LSP (Mason)
 
