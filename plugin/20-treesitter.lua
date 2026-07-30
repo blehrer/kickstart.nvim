@@ -46,7 +46,9 @@ local langs = {
 }
 
 if vim.fn.has('nvim-0.12') == 1 then
-  require('nvim-treesitter').install(langs):wait(300000)
+  vim.schedule(function()
+    require('nvim-treesitter').install(langs)
+  end)
 end
 
 vim.api.nvim_create_autocmd('FileType', {

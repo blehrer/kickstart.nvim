@@ -11,18 +11,66 @@ require('neogit').setup({
   integrations = { snacks = true },
 })
 
+local gitlab_token_cache ---@type string|false|nil
+
+local function ensure_gitlab_token()
+  if vim.env.GITLAB_TOKEN and vim.env.GITLAB_TOKEN ~= '' then
+    return true
+  end
+  if gitlab_token_cache == false then
+    return false
+  end
+  if gitlab_token_cache then
+    vim.env.GITLAB_TOKEN = gitlab_token_cache
+    return true
+  end
+  -- SECURITY-REVIEW: token fetched from 1Password CLI on first CodeReview use
+  local result = vim.system({ 'op', 'read', 'op://Employee/GITLAB_API_TOKEN/credential' }):wait()
+  local token = result.code == 0 and result.stdout and vim.trim(result.stdout) or ''
+  gitlab_token_cache = token ~= '' and token or false
+  if token ~= '' then
+    vim.env.GITLAB_TOKEN = token
+    return true
+  end
+  return false
+end
+
 require('codereview').setup({
   picker = 'snacks',
-  -- SECURITY-REVIEW: set tokens via environment or op:// in your local override
+  base_url = 'https://gitlab.disney.com',
   github_token = vim.env.GITHUB_TOKEN,
-  gitlab_token = vim.env.GITLAB_TOKEN,
+  ai = {
+    provider = 'custom_cmd',
+    custom_cmd = {
+      cmd = vim.fn.expand('~/.local/bin/agent'),
+      args = { '--format', 'stream-json' },
+    },
+  },
 })
 
 vim.keymap.set('n', '<leader>gs', function()
   require('neogit').open()
 end, { desc = 'Git status (neogit)' })
 
-vim.keymap.set('n', '<leader>gm', '<cmd>CodeReview<cr>', { desc = 'Code review MR/PR' })
+vim.keymap.set('n', '<leader>gm', function()
+  if not ensure_gitlab_token() then
+    vim.notify('GitLab token unavailable (set GITLAB_TOKEN or sign in to 1Password)', vim.log.levels.WARN)
+    return
+  end
+  vim.cmd.CodeReview()
+end, { desc = 'Code review MR/PR' })
+
+vim.api.nvim_create_autocmd('CmdlineChanged', {
+  group = vim.api.nvim_create_augroup('CodeReviewGitLabToken', { clear = true }),
+  callback = function()
+    if vim.env.GITLAB_TOKEN and vim.env.GITLAB_TOKEN ~= '' then
+      return
+    end
+    if vim.fn.getcmdline():match('^CodeReview') then
+      ensure_gitlab_token()
+    end
+  end,
+})
 
 local function prompt_for_rendered_md_diff(args)
   if not (vim.wo.diff or vim.b[args.buf].codereview_enabled) then
