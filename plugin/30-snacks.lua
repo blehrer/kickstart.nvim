@@ -1,3 +1,5 @@
+if vim.g.vscode then return end
+
 vim.pack.add({ 'https://github.com/folke/snacks.nvim' })
 
 local exclude_patterns = { '*.class' }
@@ -106,9 +108,13 @@ vim.keymap.set('n', '|', function()
   end
 end, { desc = 'Snacks dashboard' })
 
-vim.keymap.set('n', '<leader><del>', function()
+local toggle_terminal = function()
   Snacks.terminal.toggle()
-end, { desc = 'Toggle terminal' })
+end
+
+vim.keymap.set({ 'n', 't' }, '<C-/>', toggle_terminal, { desc = 'Toggle terminal' })
+vim.keymap.set({ 'n', 't' }, '<C-_>', toggle_terminal, { desc = 'Toggle terminal' })
+vim.keymap.set('n', '<leader><del>', toggle_terminal, { desc = 'Toggle terminal' })
 
 vim.keymap.set('n', '<leader>sh', function()
   Snacks.picker.help()

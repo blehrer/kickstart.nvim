@@ -1,3 +1,5 @@
+if vim.g.vscode then return end
+
 vim.pack.add({
   'https://github.com/nvim-lua/plenary.nvim',
   'https://github.com/lewis6991/gitsigns.nvim',
@@ -43,7 +45,7 @@ require('codereview').setup({
     provider = 'custom_cmd',
     custom_cmd = {
       cmd = vim.fn.expand('~/.local/bin/agent'),
-      args = { '--format', 'stream-json' },
+      args = { '-p', '--output-format', 'text' },
     },
   },
 })
