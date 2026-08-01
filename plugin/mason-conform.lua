@@ -1,3 +1,5 @@
+if vim.g.vscode then return end
+
 vim.pack.add({
   'https://github.com/mason-org/mason.nvim',
   'https://github.com/stevearc/conform.nvim',

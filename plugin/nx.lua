@@ -1,3 +1,5 @@
+if vim.g.vscode then return end
+
 local cache_warmed = false
 
 local function warm_cache()

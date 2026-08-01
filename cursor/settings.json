@@ -1,0 +1,26 @@
+{
+  "workbench.preferredDarkColorTheme": "Kanso",
+  "window.autoDetectColorScheme": true,
+  "workbench.colorTheme": "Kanso",
+  "workbench.activityBar.orientation": "vertical",
+  "editor.accessibilitySupport": "off",
+  "cursor.composer.shouldChimeAfterChatFinishes": true,
+  "cursor.composer.conversationDensity": "compact-ungrouped",
+
+  "vscode-neovim.neovimExecutablePaths.darwin": "/Users/brian.lehrer.-nd/.config/kickstart.nvim/cursor/nvim-cursor.sh",
+  "vscode-neovim.neovimInitVimPaths.darwin": "/Users/brian.lehrer.-nd/.config/kickstart.nvim/cursor/nvim-init.lua",
+  "vscode-neovim.useWSL": false,
+  "vscode-neovim.neovimClean": false,
+
+  "editor.lineNumbers": "relative",
+  "editor.cursorLine": true,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.renderWhitespace": "boundary",
+  "editor.smoothScrolling": true,
+  "editor.scrollBeyondLastLine": false,
+  "editor.minimap.enabled": false,
+  "editor.stickyScroll.enabled": false,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

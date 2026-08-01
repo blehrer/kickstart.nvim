@@ -1,3 +1,5 @@
+if vim.g.vscode then return end
+
 vim.pack.add({
   'https://github.com/MeanderingProgrammer/render-markdown.nvim',
   'https://github.com/3rd/image.nvim',

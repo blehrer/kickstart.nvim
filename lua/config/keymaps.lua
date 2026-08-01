@@ -16,7 +16,9 @@ vim.keymap.set('n', '<leader>>', ':lua ', { desc = 'Lua prompt' })
 -- Guard against plugins remapping <Tab> in insert mode out from under us
 vim.keymap.set('i', '<Tab>', '<Tab>')
 
-vim.keymap.set('n', '<leader>re', '<cmd>restart<cr>', { desc = 'Restart Neovim' })
+if not vim.g.vscode then
+  vim.keymap.set('n', '<leader>re', '<cmd>restart<cr>', { desc = 'Restart Neovim' })
+end
 
 vim.keymap.set({ 'n', 'v' }, 'gl', function()
   vim.diagnostic.open_float({ source = true })
@@ -26,7 +28,8 @@ vim.keymap.set('n', 'g<', function()
   vim.diagnostic.setqflist({ open = true })
 end, { desc = 'Diagnostics to quickfix' })
 
--- Visual selection → project grep (Snacks)
+-- Visual selection → project grep (Snacks; Cursor uses keybindings.json for <leader>sg)
+if not vim.g.vscode then
 vim.keymap.set('v', '<leader>sg', function()
   local srow, scol = vim.fn.line('v'), vim.fn.col('v')
   local erow, ecol = vim.fn.line('.'), vim.fn.col('.')
@@ -45,3 +48,4 @@ vim.keymap.set('v', '<leader>sg', function()
     Snacks.picker.grep({ search = selection, live = true })
   end
 end, { desc = 'Search project for visual selection' })
+end

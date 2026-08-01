@@ -1,0 +1,52 @@
+[
+  {
+    "command": "vscode-neovim.escape",
+    "key": "escape",
+    "when": "editorTextFocus && neovim.init"
+  },
+  {
+    "command": "vscode-neovim.escape",
+    "key": "ctrl+c",
+    "when": "editorTextFocus && neovim.init && neovim.mode != normal"
+  },
+  {
+    "key": "space s f",
+    "command": "workbench.action.quickOpen",
+    "when": "editorTextFocus && neovim.init && neovim.mode == normal"
+  },
+  {
+    "key": "space s g",
+    "command": "workbench.action.findInFiles",
+    "when": "editorTextFocus && neovim.init && neovim.mode == normal"
+  },
+  {
+    "key": "space space",
+    "command": "workbench.action.showAllEditors",
+    "when": "editorTextFocus && neovim.init && neovim.mode == normal"
+  },
+  {
+    "key": "space g s",
+    "command": "workbench.view.scm",
+    "when": "editorTextFocus && neovim.init && neovim.mode == normal"
+  },
+  {
+    "key": "space f",
+    "command": "editor.action.formatDocument",
+    "when": "editorTextFocus && neovim.init && neovim.mode == normal"
+  },
+  {
+    "key": "space n x",
+    "command": "nx.run",
+    "when": "editorTextFocus && neovim.init && neovim.mode == normal"
+  },
+  {
+    "key": "space n t",
+    "command": "nxConsole.run-task-projects-view",
+    "when": "editorTextFocus && neovim.init && neovim.mode == normal"
+  },
+  {
+    "key": "space t r",
+    "command": "testing.runAtCursor",
+    "when": "editorTextFocus && neovim.init && neovim.mode == normal"
+  }
+]

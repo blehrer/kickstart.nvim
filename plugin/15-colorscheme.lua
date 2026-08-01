@@ -1,3 +1,5 @@
+if vim.g.vscode then return end
+
 vim.pack.add({
   'https://github.com/webhooked/kanso.nvim',
   'https://github.com/rebelot/kanagawa.nvim',

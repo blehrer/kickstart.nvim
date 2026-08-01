@@ -1,3 +1,5 @@
+if vim.g.vscode then return end
+
 vim.pack.add({
   'https://github.com/kevinhwang91/nvim-bqf',
   'https://github.com/folke/trouble.nvim',
