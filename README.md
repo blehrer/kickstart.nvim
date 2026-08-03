@@ -12,7 +12,7 @@ Modular Neovim config for 0.12+ using native `vim.pack`, experimental `ui2` + ti
 ## Install
 
 ```bash
-export NVIM_APPNAME=nvim.new   # or symlink ~/.config/nvim.new → ~/.config/nvim
+export NVIM_APPNAME=kickstart.nvim   # datadir: ~/.local/share/kickstart.nvim
 nvim
 ```
 
@@ -32,6 +32,12 @@ scripts/              smoke checks
 
 ```vim
 :lua vim.pack.update()
+```
+
+Fresh install (drops lazy.nvim leftovers and reinstalls from lockfile):
+
+```bash
+./scripts/reinstall-plugins.sh
 ```
 
 Lockfile: `nvim-pack-lock.json` (commit for reproducible installs).

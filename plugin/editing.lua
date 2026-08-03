@@ -8,43 +8,7 @@ vim.pack.add({
 
 require('nvim-autopairs').setup({})
 
-local augend = require('dial.augend')
-require('dial.config').augends:register_group({
-  default = {
-    augend.integer.alias.decimal,
-    augend.integer.alias.hex,
-    augend.date.alias['%Y/%m/%d'],
-    augend.constant.alias.bool,
-  },
-})
-
-vim.g.dials_by_ft = {
-  markdown = 'markdown',
-  javascript = 'typescript',
-  typescript = 'typescript',
-  typescriptreact = 'typescript',
-  javascriptreact = 'typescript',
-}
-
-require('dial.config').augends:register_group({
-  markdown = { augend.misc.alias.markdown_header },
-  typescript = { augend.constant.new({ elements = { 'let', 'const' } }) },
-})
-
-local function dial(increment, g)
-  local mode = vim.fn.mode(true)
-  local is_visual = mode == 'v' or mode == 'V' or mode == '\22'
-  local func = (increment and 'inc' or 'dec') .. (g and '_g' or '_') .. (is_visual and 'visual' or 'normal')
-  local group = vim.g.dials_by_ft[vim.bo.filetype] or 'default'
-  return require('dial.map')[func](group)
-end
-
-vim.keymap.set({ 'n', 'v' }, '<C-a>', function()
-  return dial(true)
-end, { expr = true, desc = 'Increment' })
-vim.keymap.set({ 'n', 'v' }, '<C-x>', function()
-  return dial(false)
-end, { expr = true, desc = 'Decrement' })
+require('config.dial').setup()
 
 require('autolist').setup({})
 
