@@ -24,6 +24,10 @@
       "rev": "f2634758455cfa52a8acea6f142dcd6271a1bf57",
       "src": "https://github.com/monaqa/dial.nvim"
     },
+    "fidget.nvim": {
+      "rev": "6f793b2bcd2d35e201c09520f698bb763220908a",
+      "src": "https://github.com/j-hui/fidget.nvim"
+    },
     "gitsigns.nvim": {
       "rev": "31d6fb2d618bca1482b9f274751ead5f03461408",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
@@ -47,6 +51,10 @@
     "lazydev.nvim": {
       "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
       "src": "https://github.com/folke/lazydev.nvim"
+    },
+    "lua-mimetypes": {
+      "rev": "37fee7d88a15652faf35833d0773e2feb285c4c4",
+      "src": "https://github.com/lunarmodules/lua-mimetypes"
     },
     "mason-lspconfig.nvim": {
       "rev": "7adc933dabcc7c86ae6b07aff7ee68eac398491f",
@@ -136,6 +144,10 @@
       "rev": "f422cb5c6855f150e2ddcfaf44e7157b98b34f6a",
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
+    "rest.nvim": {
+      "rev": "714d5512aaec5565d55652480c16c26f8d95645d",
+      "src": "https://github.com/rest-nvim/rest.nvim"
+    },
     "sidekick.nvim": {
       "rev": "208e1c5b8170c01fd1d07df0139322a76479b235",
       "src": "https://github.com/folke/sidekick.nvim"
@@ -159,6 +171,10 @@
     "which-key.nvim": {
       "rev": "3aab2147e74890957785941f0c1ad87d0a44c15a",
       "src": "https://github.com/folke/which-key.nvim"
+    },
+    "xml2lua": {
+      "rev": "b0d2b0b156b4e66078da2dc4b31d978daa69b3ef",
+      "src": "https://github.com/manoelcampos/xml2lua"
     }
   }
 }

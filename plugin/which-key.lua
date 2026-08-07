@@ -17,5 +17,6 @@ require('which-key').setup({
     { '<leader>u', group = 'UI toggles' },
     { '<leader>c', group = 'Code' },
     { '<leader>x', group = 'Trouble' },
+    { '<leader>h', group = 'HTTP (rest.nvim)' },
   },
 })

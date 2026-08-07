@@ -22,6 +22,7 @@ local langs = {
   'gotmpl',
   'gowork',
   'graphql',
+  'http',
   'html',
   'hyprlang',
   'java',

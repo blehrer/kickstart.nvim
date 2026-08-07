@@ -29,6 +29,8 @@ local modules = {
   'codereview',
   'sidekick',
   'nvim-treesitter',
+  'rest-nvim',
+  'fidget',
   'tiny-cmdline',
   'lazydev',
   'lspconfig',
