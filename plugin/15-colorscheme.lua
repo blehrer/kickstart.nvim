@@ -14,15 +14,37 @@ require('kanagawa').setup({
 })
 
 local function dotfiles_theme()
-  local out = vim.fn.system({ 'chezmoi', 'data', '--format', 'json' })
-  if vim.v.shell_error ~= 0 then
+  local data_path = vim.env.HOME .. '/.local/share/chezmoi/home/.chezmoidata.toml'
+  if vim.fn.filereadable(data_path) == 1 then
+    for _, line in ipairs(vim.fn.readfile(data_path)) do
+      local theme = line:match('^theme%s*=%s*"(.-)"')
+      if theme then
+        return theme
+      end
+    end
+  end
+
+  if vim.fn.executable('chezmoi') == 1 then
+    local out = vim.fn.system({ 'chezmoi', 'data', '--format', 'json' })
+    if vim.v.shell_error == 0 then
+      local ok, data = pcall(vim.json.decode, out)
+      if ok and type(data.theme) == 'string' and data.theme ~= '' then
+        return data.theme
+      end
+    end
+  end
+
+  return 'kanagawa'
+end
+
+local function scheme_family(name)
+  if name:match('^kanso') then
+    return 'kanso'
+  end
+  if name:match('^kanagawa') then
     return 'kanagawa'
   end
-  local ok, data = pcall(vim.json.decode, out)
-  if ok and type(data.theme) == 'string' and data.theme ~= '' then
-    return data.theme
-  end
-  return 'kanagawa'
+  return nil
 end
 
 local function default_colorscheme(family)
@@ -36,14 +58,17 @@ local function default_colorscheme(family)
 end
 
 local function load_colorscheme()
+  local family = dotfiles_theme()
   local path = vim.fn.stdpath('data') .. '/colorscheme.current'
+
   if vim.fn.filereadable(path) == 1 then
     local name = vim.trim(vim.fn.readfile(path)[1] or '')
-    if name ~= '' and pcall(vim.cmd.colorscheme, name) then
+    if name ~= '' and scheme_family(name) == family and pcall(vim.cmd.colorscheme, name) then
       return
     end
   end
-  vim.cmd.colorscheme(default_colorscheme(dotfiles_theme()))
+
+  vim.cmd.colorscheme(default_colorscheme(family))
 end
 
 load_colorscheme()
