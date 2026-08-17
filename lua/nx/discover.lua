@@ -8,22 +8,107 @@ M.kinds = {
   { target = 'test', label = 'Unit / integration test' },
 }
 
+local CACHE_DIR = vim.fn.stdpath('data') .. '/nx-projects'
+local NOTIFY_ID = 'nx-project-list'
 local list_cache = {}
 local detail_cache = {}
 local pw_cache = {}
+local inflight = {}
+
+local function notify_status(msg, level)
+  vim.notify(msg, level or vim.log.levels.INFO, { id = NOTIFY_ID, title = 'Nx' })
+end
+
+local function emit_status(token, msg, level)
+  notify_status(msg, level)
+  local job = inflight[token]
+  if not job then
+    return
+  end
+  for _, picker in ipairs(job.pickers) do
+    if picker and not picker.closed then
+      picker.title = msg
+      picker:update_titles()
+    end
+  end
+end
 
 local function nx_mtime(root)
   return vim.fn.getftime(root .. '/nx.json')
 end
 
-local function cache_key(root, target)
-  return root .. '\0' .. (target or '*') .. '\0' .. tostring(nx_mtime(root))
+local function cache_token(remote_id, target)
+  return (remote_id or '') .. '\0' .. (target or '*')
+end
+
+local function mem_key(root, target)
+  local remote_id = workspace.git_remote_id(root)
+  return cache_token(remote_id, target) .. '\0' .. tostring(nx_mtime(root))
+end
+
+local function disk_path(remote_id, target)
+  local hash = vim.fn.sha256(cache_token(remote_id, target))
+  return CACHE_DIR .. '/' .. hash:sub(1, 16) .. '.json'
+end
+
+local function names_to_stubs(names)
+  local stubs = {}
+  for _, name in ipairs(names) do
+    stubs[#stubs + 1] = { name = name }
+  end
+  return stubs
+end
+
+local function read_disk_cache(remote_id, target, mtime)
+  local path = disk_path(remote_id, target)
+  if vim.fn.filereadable(path) ~= 1 then
+    return nil, false
+  end
+  local ok, data = pcall(vim.fn.json_decode, table.concat(vim.fn.readfile(path), '\n'))
+  if not ok or type(data) ~= 'table' then
+    return nil, false
+  end
+  if data.remote_id ~= remote_id then
+    return nil, false
+  end
+  if (target or '*') ~= (data.target or '*') then
+    return nil, false
+  end
+  if type(data.names) ~= 'table' or #data.names == 0 then
+    return nil, false
+  end
+  local stale = tonumber(data.nx_mtime) ~= tonumber(mtime)
+  return names_to_stubs(data.names), stale
+end
+
+local function write_disk_cache(remote_id, target, mtime, names)
+  vim.fn.mkdir(CACHE_DIR, 'p')
+  local payload = {
+    remote_id = remote_id,
+    target = target,
+    nx_mtime = mtime,
+    names = names,
+    recorded_at = os.date('!%Y-%m-%dT%H:%M:%SZ'),
+  }
+  vim.fn.writefile({ vim.fn.json_encode(payload) }, disk_path(remote_id, target))
 end
 
 local function run_nx(root, args)
-  local cmd = { 'npx', 'nx' }
-  vim.list_extend(cmd, args)
-  return vim.system(cmd, { cwd = root, text = true, env = vim.fn.environ() }):wait()
+  return vim.system(workspace.nx_cmd(root, args), { cwd = root, text = true, env = vim.fn.environ() }):wait()
+end
+
+local function decode_project_names(stdout)
+  local ok, decoded = pcall(vim.fn.json_decode, stdout)
+  if not ok then
+    return nil
+  end
+  if type(decoded) == 'table' and decoded[1] then
+    return decoded
+  end
+  if type(decoded) == 'table' then
+    return vim.tbl_keys(decoded)
+  end
+  return nil
 end
 
 --- Fast name list via `nx show projects` (uses nx daemon when running).
@@ -37,19 +122,7 @@ local function nx_project_names(root, target)
   if result.code ~= 0 or not result.stdout or result.stdout == '' then
     return nil
   end
-
-  local ok, decoded = pcall(vim.fn.json_decode, result.stdout)
-  if not ok then
-    return nil
-  end
-
-  if type(decoded) == 'table' and decoded[1] then
-    return decoded
-  end
-  if type(decoded) == 'table' then
-    return vim.tbl_keys(decoded)
-  end
-  return nil
+  return decode_project_names(result.stdout)
 end
 
 --- ponytail: scoped glob fallback — apps/libs only, not whole repo
@@ -88,6 +161,22 @@ local function fallback_project_names(root, target)
   return names
 end
 
+local function stub_names(stubs)
+  local names = {}
+  for _, stub in ipairs(stubs) do
+    names[#names + 1] = stub.name
+  end
+  return names
+end
+
+local function store_list(root, target, stubs)
+  list_cache[mem_key(root, target)] = stubs
+  local remote_id = workspace.git_remote_id(root)
+  if remote_id then
+    write_disk_cache(remote_id, target, nx_mtime(root), stub_names(stubs))
+  end
+end
+
 function M.project_at(path)
   local data = workspace.read_json(path)
   if not data then
@@ -101,26 +190,126 @@ function M.project_at(path)
   }
 end
 
---- Lightweight stubs `{ name }` — call M.hydrate before reading targets/root.
+--- Disk cache (stale ok), or empty — never blocks on nx CLI or glob scan.
 function M.list(root, target)
   root = root or workspace.root()
   if not root then
     return {}
   end
 
-  local key = cache_key(root, target)
-  if list_cache[key] then
-    return list_cache[key]
+  local key = mem_key(root, target)
+  local mem = list_cache[key]
+  if mem and #mem > 0 then
+    return mem
   end
 
-  local names = nx_project_names(root, target) or fallback_project_names(root, target)
-  local stubs = {}
-  for _, name in ipairs(names) do
-    stubs[#stubs + 1] = { name = name }
+  local remote_id = workspace.git_remote_id(root)
+  local mtime = nx_mtime(root)
+  if remote_id then
+    local cached = read_disk_cache(remote_id, target, mtime)
+    if cached then
+      list_cache[key] = cached
+      return cached
+    end
   end
 
-  list_cache[key] = stubs
-  return stubs
+  return {}
+end
+
+function M.inflight(root, target)
+  local remote_id = workspace.git_remote_id(root)
+  return inflight[cache_token(remote_id, target)] ~= nil
+end
+
+--- Async nx fetch; single-flight per remote+target. opts.on_done(stubs?, err?).
+function M.refresh_list(root, target, opts)
+  opts = opts or {}
+  root = root or workspace.root()
+  if not root then
+    if opts.on_done then
+      opts.on_done(nil, 'no nx.json')
+    end
+    return false
+  end
+
+  local remote_id = workspace.git_remote_id(root)
+  local token = cache_token(remote_id, target)
+  local pending = inflight[token]
+  if pending then
+    if opts.on_done then
+      pending.waiters[#pending.waiters + 1] = opts.on_done
+    end
+    if opts.picker then
+      pending.pickers[#pending.pickers + 1] = opts.picker
+      if not opts.picker.closed then
+        opts.picker.title = pending.status or 'Nx: loading project list…'
+        opts.picker:update_titles()
+      end
+    end
+    return false
+  end
+
+  inflight[token] = {
+    waiters = opts.on_done and { opts.on_done } or {},
+    pickers = opts.picker and { opts.picker } or {},
+    status = 'Nx: loading project list…',
+  }
+  emit_status(token, inflight[token].status)
+
+  local args = { 'show', 'projects', '--json' }
+  if target then
+    args[#args + 1] = '--with-target=' .. target
+  end
+
+  vim.system(workspace.nx_cmd(root, args), { cwd = root, text = true, env = vim.fn.environ() }, function(result)
+    vim.schedule(function()
+      local stubs, err
+      if result.code == 0 and result.stdout and result.stdout ~= '' then
+        local names = decode_project_names(result.stdout)
+        if names then
+          stubs = names_to_stubs(names)
+          store_list(root, target, stubs)
+        else
+          err = 'failed to parse nx output'
+        end
+      else
+        err = (result.stderr and vim.trim(result.stderr) ~= '') and vim.trim(result.stderr)
+          or 'nx show projects failed'
+        local names = fallback_project_names(root, target)
+        if #names > 0 then
+          stubs = names_to_stubs(names)
+          store_list(root, target, stubs)
+          err = err .. ' (saved glob fallback)'
+        end
+      end
+
+      local job = inflight[token]
+      inflight[token] = nil
+      local waiters = job and job.waiters or {}
+
+      if stubs and #stubs > 0 then
+        local msg = ('Nx: %d projects loaded'):format(#stubs)
+        if err then
+          msg = msg .. ' — ' .. err
+        end
+        notify_status(msg, err and vim.log.levels.WARN or vim.log.levels.INFO)
+        for _, picker in ipairs(job and job.pickers or {}) do
+          if picker and not picker.closed then
+            picker.title = msg
+            picker:update_titles()
+          end
+        end
+      else
+        notify_status(err or 'Nx: no projects found', vim.log.levels.ERROR)
+      end
+
+      for _, cb in ipairs(waiters) do
+        cb(stubs, err)
+      end
+    end)
+  end)
+
+  return true
 end
 
 --- Load targets/root for one project (one nx daemon call).
@@ -134,7 +323,7 @@ function M.hydrate(stub, root)
     return stub
   end
 
-  local dkey = cache_key(root, nil) .. '\0' .. stub.name
+  local dkey = mem_key(root, nil) .. '\0' .. stub.name
   if detail_cache[dkey] then
     return vim.tbl_extend('force', stub, detail_cache[dkey])
   end
@@ -154,7 +343,6 @@ function M.hydrate(stub, root)
     end
   end
 
-  -- fallback: scan scoped paths for matching name
   for _, path in ipairs(scoped_project_paths(root)) do
     local p = M.project_at(path)
     if p and p.name == stub.name then
@@ -211,7 +399,6 @@ function M.projects_with_any_target(root)
   return out
 end
 
---- Playwright browser/device projects; cached by playwright.config.ts mtime.
 function M.playwright_projects(project_root)
   local config = project_root .. '/playwright.config.ts'
   if vim.fn.filereadable(config) ~= 1 then
@@ -270,6 +457,13 @@ end
 function M.invalidate()
   list_cache = {}
   detail_cache = {}
+end
+
+if os.getenv('NVIM_NX_DISCOVER_SELF_CHECK') == '1' then
+  assert(workspace.normalize_remote('git@GitHub.com:Org/Repo.git') == 'git@github.com:Org/Repo')
+  assert(workspace.normalize_remote('https://GitHub.com/Org/Repo.git') == 'https://github.com/org/repo')
+  local stubs = names_to_stubs({ 'a', 'b' })
+  assert(#stubs == 2 and stubs[1].name == 'a')
 end
 
 return M

@@ -10,9 +10,7 @@ local function nx_mtime(root)
 end
 
 local function run_nx(root, args)
-  local cmd = { 'npx', 'nx' }
-  vim.list_extend(cmd, args)
-  return vim.system(cmd, { cwd = root, text = true, env = vim.fn.environ() }):wait()
+  return vim.system(workspace.nx_cmd(root, args), { cwd = root, text = true, env = vim.fn.environ() }):wait()
 end
 
 local function graph_dependencies(data)

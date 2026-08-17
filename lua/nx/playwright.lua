@@ -149,48 +149,145 @@ function M.pick_flags()
   end)
 end
 
-local function dap_runtime_args(cmd)
-  local args = { 'playwright' }
+local function has_workers_flag(parts)
+  for _, part in ipairs(parts) do
+    if part:match('^%-%-workers=') or part == '--workers' then
+      return true
+    end
+  end
+  return false
+end
+
+local function has_reporter_flag(parts)
+  for _, part in ipairs(parts) do
+    if part:match('^%-%-reporter=') or part == '--reporter' then
+      return true
+    end
+  end
+  return false
+end
+
+-- ponytail: no --debug — Inspector ignores IDE breakpoints; force list reporter so dist/ writes cannot kill the run
+local function dap_playwright_args(cmd)
+  local args = {}
   local saw_test = false
   for i = 2, #cmd do
     local part = cmd[i]
     if part == 'test' then
       args[#args + 1] = 'test'
-      args[#args + 1] = '--debug'
       saw_test = true
-    elseif not part:match('^%-%-reporter=') then
+    elseif part ~= '--debug' and not part:match('^%-%-reporter=') then
       args[#args + 1] = part
     end
   end
   if not saw_test then
-    table.insert(args, 2, 'test')
-    table.insert(args, 3, '--debug')
+    table.insert(args, 1, 'test')
+  end
+  if not has_workers_flag(args) then
+    args[#args + 1] = '--workers=1'
+  end
+  if not has_reporter_flag(args) then
+    args[#args + 1] = '--reporter=list'
   end
   return args
 end
 
-local function dap_strategy(spec, label)
-  return {
+M.dap_log_path = vim.fn.stdpath('data') .. '/nx-dap-last.log'
+
+local function log_dap(line)
+  local path = M.dap_log_path
+  local prior = vim.fn.filereadable(path) == 1 and table.concat(vim.fn.readfile(path), '\n') .. '\n' or ''
+  vim.fn.writefile({ prior .. line }, path)
+end
+
+function M.launch_dap(cfg)
+  local args = cfg.runtimeArgs or {}
+  local cmd_line = table.concat(vim.list_extend({ cfg.runtimeExecutable or '?' }, args), ' ')
+  local msg = ('DAP → %s (cwd %s)'):format(cmd_line, cfg.cwd or '?')
+  vim.notify(msg, vim.log.levels.INFO)
+  log_dap(('%s %s'):format(os.date('!%Y-%m-%dT%H:%M:%SZ'), msg))
+
+  require('dap').run(vim.tbl_extend('force', cfg, {
     type = 'pwa-node',
     request = 'launch',
+    sourceMaps = true,
+    outputCapture = 'std',
+    resolveSourceMapLocations = { '${workspaceFolder}/**', '!**/node_modules/**' },
+  }))
+end
+
+function M.nx_session_env(session)
+  local env = vim.tbl_extend('force', vim.fn.environ(), require('neotest-playwright.adapter-options').options.env or {})
+  if session.nx_project then
+    env.NX_TASK_TARGET_PROJECT = session.nx_project
+  end
+  if session.env and session.env ~= '' then
+    env.NX_TASK_TARGET_CONFIGURATION = session.env
+  end
+  return env
+end
+
+function M.run_nx_dap(session)
+  local ws = session.workspace_root
+  local pw_dir = session.nx_root
+  if not ws or not pw_dir then
+    vim.notify('Nx DAP: missing workspace_root or nx_root', vim.log.levels.ERROR)
+    return
+  end
+
+  local bin = ws .. '/node_modules/.bin/playwright'
+  if vim.fn.executable(bin) ~= 1 then
+    vim.notify('playwright not found: ' .. bin, vim.log.levels.ERROR)
+    return
+  end
+
+  M.apply_session(session)
+  local extra = vim.tbl_filter(function(part)
+    return part ~= '--debug'
+  end, session:extra_parts())
+
+  local build_command = require('neotest-playwright.build-command').buildCommand
+  local cmd = build_command({
+    bin = bin,
+    config = pw_dir .. '/playwright.config.ts',
+    projects = session.pw_project and { session.pw_project } or {},
+  }, extra)
+
+  M.launch_dap({
+    name = ('Nx %s:%s'):format(session.nx_project, session.env or 'default'),
+    runtimeExecutable = bin,
+    runtimeArgs = dap_playwright_args(cmd),
+    cwd = pw_dir,
+    env = M.nx_session_env(session),
+  })
+end
+
+local function dap_strategy(spec, label)
+  local bin = spec.command[1]
+  return {
     name = label,
-    runtimeExecutable = 'npx',
-    runtimeArgs = dap_runtime_args(spec.command),
+    runtimeExecutable = bin,
+    runtimeArgs = dap_playwright_args(spec.command),
     cwd = spec.cwd,
     env = spec.env,
-    sourceMaps = true,
-    resolveSourceMapLocations = { '${workspaceFolder}/**', '!**/node_modules/**' },
   }
 end
 
 local function attach_dap_strategy(spec, label)
+  local base = {
+    type = 'pwa-node',
+    request = 'launch',
+    sourceMaps = true,
+    outputCapture = 'std',
+    resolveSourceMapLocations = { '${workspaceFolder}/**', '!**/node_modules/**' },
+  }
   if spec[1] then
     for _, item in ipairs(spec) do
-      item.strategy = dap_strategy(item, label)
+      item.strategy = vim.tbl_extend('force', base, dap_strategy(item, label))
     end
     return spec
   end
-  spec.strategy = dap_strategy(spec, label)
+  spec.strategy = vim.tbl_extend('force', base, dap_strategy(spec, label))
   return spec
 end
 
@@ -296,23 +393,28 @@ function M.run_dap(opts)
   local pw_dir = M.find_pw_dir(buf_path)
   local adapter_opts = require('neotest-playwright.adapter-options').options
   local build_command = require('neotest-playwright.build-command').buildCommand
+  local session = opts.session or M.active_session
+  local env = session and M.nx_session_env(session) or vim.tbl_extend('force', vim.fn.environ(), adapter_opts.env or {})
+
+  local bin = adapter_opts.get_playwright_binary()
+  if vim.fn.executable(bin) ~= 1 then
+    vim.notify('playwright not found: ' .. bin, vim.log.levels.ERROR)
+    return
+  end
+
   local cmd = build_command({
-    bin = adapter_opts.get_playwright_binary(),
+    bin = bin,
     config = adapter_opts.get_playwright_config(),
     projects = adapter_opts.projects,
     testFilter = buf_path,
   }, adapter_opts.extra_args)
 
-  require('dap').run({
-    type = 'pwa-node',
-    request = 'launch',
+  M.launch_dap({
     name = 'Playwright: ' .. vim.fn.fnamemodify(buf_path, ':t'),
-    runtimeExecutable = 'npx',
-    runtimeArgs = dap_runtime_args(cmd),
+    runtimeExecutable = bin,
+    runtimeArgs = dap_playwright_args(cmd),
     cwd = pw_dir,
-    env = adapter_opts.env,
-    sourceMaps = true,
-    resolveSourceMapLocations = { '${workspaceFolder}/**', '!**/node_modules/**' },
+    env = env,
   })
 end
 

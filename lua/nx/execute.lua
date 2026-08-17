@@ -40,24 +40,7 @@ local function resolve_run_target(session)
 end
 
 local function run_nx_dap(session)
-  local extra = session:extra_parts()
-  if not vim.tbl_contains(extra, '--debug') then
-    extra[#extra + 1] = '--debug'
-  end
-  local cmd = run.compose(session.nx_project, session.target, session.env, table.concat(extra, ' '))
-  local adapter_opts = require('neotest-playwright.adapter-options').options
-
-  require('dap').run({
-    type = 'pwa-node',
-    request = 'launch',
-    name = ('Nx %s:%s'):format(session.nx_project, session.target),
-    runtimeExecutable = cmd[1],
-    runtimeArgs = { unpack(cmd, 2) },
-    cwd = session.workspace_root,
-    env = adapter_opts.env,
-    sourceMaps = true,
-    resolveSourceMapLocations = { '${workspaceFolder}/**', '!**/node_modules/**' },
-  })
+  pw.run_nx_dap(session)
 end
 
 function M.run_e2e(session)
@@ -89,7 +72,7 @@ function M.run_e2e_dap(session)
   pw.apply_session(session)
   local target = resolve_run_target(session)
   if target and target ~= session.nx_root and pw.is_pw_spec(target) then
-    pw.run_dap({ path = target })
+    pw.run_dap({ path = target, session = session })
     return
   end
   run_nx_dap(session)

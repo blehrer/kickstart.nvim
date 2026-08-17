@@ -7,30 +7,6 @@ local pickers = require('nx.pickers')
 
 local M = {}
 
-local function bump_current_project(projects)
-  local pj = workspace.nearest_project_json()
-  if not pj then
-    return projects
-  end
-  local data = workspace.read_json(pj)
-  local current_name = data and data.name
-  if not current_name then
-    return projects
-  end
-  local ordered = {}
-  for _, p in ipairs(projects) do
-    if p.name == current_name then
-      ordered[#ordered + 1] = p
-    end
-  end
-  for _, p in ipairs(projects) do
-    if p.name ~= current_name then
-      ordered[#ordered + 1] = p
-    end
-  end
-  return ordered
-end
-
 local function show_review(session)
   review.review(session, function(should_run, s)
     if not should_run then
@@ -81,10 +57,6 @@ function M.run(opts)
     projects = discover.list(root)
   end
 
-  if opts.prefer_current_project then
-    projects = bump_current_project(projects)
-  end
-
   local function on_project(project)
     if not project then
       return
@@ -101,7 +73,9 @@ function M.run(opts)
     end)
   end
 
-  pickers.pick_project(root, opts.target, on_project, projects)
+  pickers.pick_project(root, opts.target, on_project, projects, {
+    prefer_current = opts.prefer_current_project,
+  })
 end
 
 return M
