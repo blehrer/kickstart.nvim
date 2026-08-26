@@ -5,3 +5,4 @@ nvim.log
 *.db
 .beads-credential-key
 .beads/proxieddb/
+.cursor
