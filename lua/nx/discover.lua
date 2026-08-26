@@ -12,6 +12,8 @@ local CACHE_DIR = vim.fn.stdpath('data') .. '/nx-projects'
 local NOTIFY_ID = 'nx-project-list'
 local list_cache = {}
 local detail_cache = {}
+local path_index = {}
+local nx_unavailable = {}
 local pw_cache = {}
 local inflight = {}
 
@@ -93,8 +95,13 @@ local function write_disk_cache(remote_id, target, mtime, names)
   vim.fn.writefile({ vim.fn.json_encode(payload) }, disk_path(remote_id, target))
 end
 
-local function run_nx(root, args)
-  return vim.system(workspace.nx_cmd(root, args), { cwd = root, text = true, env = vim.fn.environ() }):wait()
+local function run_nx(root, args, timeout_ms)
+  return vim.system(workspace.nx_cmd(root, args), {
+    cwd = root,
+    text = true,
+    env = vim.fn.environ(),
+    timeout = timeout_ms or 15000,
+  }):wait()
 end
 
 local function decode_project_names(stdout)
@@ -147,18 +154,49 @@ local function scoped_project_paths(root)
   return paths
 end
 
-local function fallback_project_names(root, target)
+local function index_key(root)
+  return mem_key(root, nil) .. '\0paths'
+end
+
+local function get_path_index(root)
+  return path_index[index_key(root)]
+end
+
+--- Scan apps/libs project.json; cache name → path for fast hydrate.
+local function scan_projects(root, target)
   local names = {}
+  local index = {}
   for _, path in ipairs(scoped_project_paths(root)) do
     local data = workspace.read_json(path)
     if data and data.name then
+      index[data.name] = path
       if not target or vim.tbl_get(data, 'targets', target) then
         names[#names + 1] = data.name
       end
     end
   end
   table.sort(names)
+  path_index[index_key(root)] = index
   return names
+end
+
+local function fallback_project_names(root, target)
+  return scan_projects(root, target)
+end
+
+local function hydrate_from_index(stub, root, dkey)
+  local index = get_path_index(root)
+  local path = index and index[stub.name]
+  if not path then
+    return nil
+  end
+  local p = M.project_at(path)
+  if not p then
+    return nil
+  end
+  local detail = { root = p.root, path = p.path, targets = p.targets }
+  detail_cache[dkey] = detail
+  return vim.tbl_extend('force', stub, detail)
 end
 
 local function stub_names(stubs)
@@ -275,6 +313,7 @@ function M.refresh_list(root, target, opts)
       else
         err = (result.stderr and vim.trim(result.stderr) ~= '') and vim.trim(result.stderr)
           or 'nx show projects failed'
+        nx_unavailable[root] = true
         local names = fallback_project_names(root, target)
         if #names > 0 then
           stubs = names_to_stubs(names)
@@ -312,7 +351,7 @@ function M.refresh_list(root, target, opts)
   return true
 end
 
---- Load targets/root for one project (one nx daemon call).
+--- Load targets/root for one project — project.json first; nx only when needed.
 function M.hydrate(stub, root)
   if stub.targets and stub.root then
     return stub
@@ -328,30 +367,52 @@ function M.hydrate(stub, root)
     return vim.tbl_extend('force', stub, detail_cache[dkey])
   end
 
-  local result = run_nx(root, { 'show', 'project', stub.name, '--json' })
-  if result.code == 0 and result.stdout and result.stdout ~= '' then
-    local ok, data = pcall(vim.fn.json_decode, result.stdout)
-    if ok and type(data) == 'table' then
-      local rel = data.root or data.sourceRoot or ''
-      local detail = {
-        root = rel ~= '' and (root .. '/' .. rel) or root,
-        path = rel ~= '' and (root .. '/' .. rel .. '/project.json') or '',
-        targets = data.targets or {},
-      }
-      detail_cache[dkey] = detail
-      return vim.tbl_extend('force', stub, detail)
+  local from_index = hydrate_from_index(stub, root, dkey)
+  if from_index then
+    return from_index
+  end
+
+  if not get_path_index(root) then
+    scan_projects(root, nil)
+    from_index = hydrate_from_index(stub, root, dkey)
+    if from_index then
+      return from_index
     end
   end
 
-  for _, path in ipairs(scoped_project_paths(root)) do
-    local p = M.project_at(path)
-    if p and p.name == stub.name then
-      detail_cache[dkey] = { root = p.root, path = p.path, targets = p.targets }
-      return vim.tbl_extend('force', stub, detail_cache[dkey])
+  if not nx_unavailable[root] then
+    local result = run_nx(root, { 'show', 'project', stub.name, '--json' }, 8000)
+    if result.code == 0 and result.stdout and result.stdout ~= '' then
+      local ok, data = pcall(vim.fn.json_decode, result.stdout)
+      if ok and type(data) == 'table' then
+        local rel = data.root or data.sourceRoot or ''
+        local detail = {
+          root = rel ~= '' and (root .. '/' .. rel) or root,
+          path = rel ~= '' and (root .. '/' .. rel .. '/project.json') or '',
+          targets = data.targets or {},
+        }
+        detail_cache[dkey] = detail
+        return vim.tbl_extend('force', stub, detail)
+      end
+    else
+      nx_unavailable[root] = true
     end
   end
 
   return stub
+end
+
+--- Background index build so select does not pay for a cold glob on first pick.
+function M.warm_path_index(root)
+  root = root or workspace.root()
+  if not root or get_path_index(root) then
+    return
+  end
+  vim.schedule(function()
+    if not get_path_index(root) then
+      scan_projects(root, nil)
+    end
+  end)
 end
 
 function M.projects(root)
@@ -457,6 +518,8 @@ end
 function M.invalidate()
   list_cache = {}
   detail_cache = {}
+  path_index = {}
+  nx_unavailable = {}
 end
 
 if os.getenv('NVIM_NX_DISCOVER_SELF_CHECK') == '1' then

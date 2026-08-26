@@ -109,6 +109,7 @@ function M.pick_project(root, target, on_choice, projects, opts)
     title = prompt,
     layout = layout_for_items(items),
     on_show = function(picker)
+      discover.warm_path_index(root)
       sync_list_layout(picker, items)
       if not opts.auto_refresh then
         return
