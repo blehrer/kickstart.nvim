@@ -85,7 +85,7 @@ function M.setup_keymaps()
   map('n', '<leader>ld', vim.lsp.buf.type_definition, 'LSP type definition')
   map('n', '<leader>ws', vim.lsp.buf.workspace_symbol, 'LSP workspace symbols')
   map('n', '<leader>rn', vim.lsp.buf.rename, 'LSP rename')
-  map({ 'n', 'x' }, '<leader>ca', vim.lsp.buf.code_action, 'LSP code action')
+  map({ 'n', 'x' }, '<leader>ca', require('config.code_actions').code_action, 'Code action')
 end
 
 function M.setup()
