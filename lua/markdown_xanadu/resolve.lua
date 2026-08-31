@@ -37,12 +37,11 @@ function M.resolve_file(base, ref)
     return vim.fn.fnamemodify(full, ':p')
   end
 
-  local candidates = {
-    base .. '/' .. ref .. '.md',
-    base .. '/' .. ref,
-    config.fixture_root() .. '/' .. ref .. '.md',
-    config.fixture_root() .. '/' .. ref,
-  }
+  local candidates = {}
+  for _, root in ipairs(config.vault_roots(base)) do
+    candidates[#candidates + 1] = root .. '/' .. ref .. '.md'
+    candidates[#candidates + 1] = root .. '/' .. ref
+  end
 
   for _, cand in ipairs(candidates) do
     cand = vim.fn.fnamemodify(cand, ':p')

@@ -11,6 +11,27 @@ local M = {}
 
 local augroup = vim.api.nvim_create_augroup('markdown_xanadu', { clear = true })
 
+local function track_main(main_win)
+  if main_win and vim.api.nvim_win_is_valid(main_win) then
+    vim.g.markdown_xanadu_main_win = main_win
+  end
+end
+
+local function refresh_ui()
+  local main = vim.g.markdown_xanadu_main_win
+  if not (main and vim.api.nvim_win_is_valid(main)) then
+    return
+  end
+  local buf = vim.api.nvim_win_get_buf(main)
+  if #registry.open_entries(buf) > 0 then
+    viewport.refresh_gutter(main)
+    highlight.refresh(buf, main)
+  end
+  if sidebar.is_open() then
+    sidebar.refresh(main)
+  end
+end
+
 function M.is_open()
   return sidebar.is_open()
 end
@@ -28,7 +49,7 @@ end
 
 function M.open(main_win)
   main_win = main_win or vim.api.nvim_get_current_win()
-  vim.g.markdown_xanadu_main_win = main_win
+  track_main(main_win)
   sidebar.open(main_win)
   registry.scan(vim.api.nvim_win_get_buf(main_win))
   sidebar.refresh(main_win)
@@ -60,6 +81,7 @@ function M.go_definition_split()
   if not link then
     return
   end
+  track_main(win)
   registry.scan(buf)
   local entry = registry.entry_at_line(buf, row)
   if entry then
@@ -106,10 +128,14 @@ function M.setup_buffer(bufnr)
 end
 
 function M.setup()
+  vim.api.nvim_set_hl(0, 'MarkdownXanaduLinkActive', { link = 'LspReferenceRead', default = true })
+  vim.api.nvim_set_hl(0, 'MarkdownXanaduLinkOpen', { link = 'Visual', default = true })
+  vim.api.nvim_set_hl(0, 'MarkdownXanaduLinkInactive', { fg = '#6b7280', default = true })
+
   vim.api.nvim_create_user_command('MarkdownXanaduDemo', M.demo, {})
   vim.api.nvim_create_user_command('MarkdownXanaduToggle', M.toggle, {})
 
-  vim.keymap.set('n', '<A-2>', M.toggle, { desc = 'Xanadu panels (transclusions)' })
+  require('config.terminal_alt').set('n', '<A-2>', M.toggle, { desc = 'Xanadu panels (transclusions)' })
   vim.keymap.set('n', 'q', function()
     if M.is_open() then
       M.close()
@@ -127,11 +153,7 @@ function M.setup()
   vim.api.nvim_create_autocmd({ 'WinScrolled', 'CursorMoved', 'WinResized', 'VimResized' }, {
     group = augroup,
     callback = function()
-      local main = vim.g.markdown_xanadu_main_win
-      if main and vim.api.nvim_win_is_valid(main) and sidebar.is_open() then
-        viewport.refresh_gutter(main)
-        sidebar.refresh(main)
-      end
+      refresh_ui()
     end,
   })
 

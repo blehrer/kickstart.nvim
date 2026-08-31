@@ -1,21 +1,33 @@
 local config = require('markdown_xanadu.config')
+local focus = require('markdown_xanadu.focus')
 local registry = require('markdown_xanadu.registry')
 local gutter = require('markdown_xanadu.gutter')
 
 local M = {}
 
----@type { main_win: integer, main_buf: integer, entries: markdown_xanadu.Entry[] }[]
-local stacks = {}
-
 local function valid_win(win)
   return win and vim.api.nvim_win_is_valid(win)
 end
 
----@param main_win integer
----@return markdown_xanadu.Entry[]
-local function lru_entries(main_win)
-  local buf = vim.api.nvim_win_get_buf(main_win)
-  return registry.open_entries(buf)
+---@param bufnr integer
+---@return integer?
+local function stack_bottom(bufnr)
+  local open = registry.open_entries(bufnr)
+  for i = #open, 1, -1 do
+    if open[i].embed_win and valid_win(open[i].embed_win) then
+      return open[i].embed_win
+    end
+  end
+  return nil
+end
+
+---@param embed_win integer
+---@param resolved { file: string, line: integer, col: integer }
+local function load_embed(embed_win, resolved)
+  vim.cmd('edit ' .. vim.fn.fnameescape(resolved.file))
+  vim.api.nvim_win_set_cursor(embed_win, { resolved.line, resolved.col })
+  vim.wo[embed_win].wrap = false
+  vim.wo[embed_win].number = true
 end
 
 ---@param main_win integer
@@ -26,9 +38,19 @@ function M.open(main_win, entry)
     return
   end
 
+  vim.g.markdown_xanadu_main_win = main_win
+
   local cfg = config.get()
   local buf = vim.api.nvim_win_get_buf(main_win)
   local open = registry.open_entries(buf)
+
+  if entry.embed_win and valid_win(entry.embed_win) then
+    vim.api.nvim_set_current_win(main_win)
+    M.refresh_gutter(main_win)
+    pcall(require('markdown_xanadu.highlight').refresh, buf, main_win)
+    return
+  end
+
   if #open >= cfg.max_open_embeds then
     local oldest = open[1]
     if oldest.embed_win and valid_win(oldest.embed_win) then
@@ -37,25 +59,30 @@ function M.open(main_win, entry)
     registry.set_open(buf, oldest, false, nil)
   end
 
-  if entry.embed_win and valid_win(entry.embed_win) then
-    vim.api.nvim_set_current_win(entry.embed_win)
-    return
+  local resolved = entry.resolved
+  local bottom = stack_bottom(buf)
+
+  if not bottom then
+    vim.api.nvim_win_call(main_win, function()
+      local width = math.max(20, math.floor(vim.api.nvim_win_get_width(main_win) * cfg.embed_width))
+      vim.cmd('vertical rightbelow ' .. width .. 'split')
+      local embed_win = vim.api.nvim_get_current_win()
+      load_embed(embed_win, resolved)
+      registry.set_open(buf, entry, true, embed_win)
+      vim.api.nvim_set_current_win(main_win)
+    end)
+  else
+    vim.api.nvim_win_call(bottom, function()
+      vim.cmd('horizontal belowright split')
+      local embed_win = vim.api.nvim_get_current_win()
+      load_embed(embed_win, resolved)
+      registry.set_open(buf, entry, true, embed_win)
+      vim.api.nvim_set_current_win(main_win)
+    end)
   end
 
-  local resolved = entry.resolved
-  vim.api.nvim_win_call(main_win, function()
-    local width = math.floor(vim.api.nvim_win_get_width(main_win) * cfg.embed_width)
-    vim.cmd('vertical rightbelow ' .. math.max(width, 20) .. 'split')
-    local embed_win = vim.api.nvim_get_current_win()
-    vim.cmd('edit ' .. vim.fn.fnameescape(resolved.file))
-    vim.api.nvim_win_set_cursor(embed_win, { resolved.line, resolved.col })
-    vim.wo[embed_win].wrap = false
-    vim.wo[embed_win].number = true
-    registry.set_open(buf, entry, true, embed_win)
-    vim.api.nvim_set_current_win(main_win)
-  end)
-
   M.refresh_gutter(main_win)
+  pcall(require('markdown_xanadu.highlight').refresh, buf, main_win)
 end
 
 ---@param main_win integer
@@ -67,6 +94,7 @@ function M.close(main_win, entry)
   local buf = vim.api.nvim_win_get_buf(main_win)
   registry.set_open(buf, entry, false, nil)
   M.refresh_gutter(main_win)
+  pcall(require('markdown_xanadu.highlight').refresh, buf, main_win)
 end
 
 ---@param main_win integer
@@ -86,10 +114,12 @@ function M.refresh_gutter(main_win)
     return
   end
   local buf = vim.api.nvim_win_get_buf(main_win)
+  local active_id = focus.active_id(buf, main_win)
   local pairs = {}
   for _, entry in ipairs(registry.open_entries(buf)) do
     if entry.embed_win and valid_win(entry.embed_win) and entry.resolved then
       pairs[#pairs + 1] = {
+        id = entry.id,
         left_win = main_win,
         right_win = entry.embed_win,
         left_line = entry.link.range[1] + 1,
@@ -101,7 +131,7 @@ function M.refresh_gutter(main_win)
     gutter.close()
     return
   end
-  gutter.schedule(main_win, pairs)
+  gutter.schedule(main_win, pairs, active_id)
 end
 
 ---@param main_win integer
@@ -135,7 +165,7 @@ function M.close_all(main_win)
     return
   end
   local buf = vim.api.nvim_win_get_buf(main_win)
-  for _, entry in ipairs(registry.open_entries(buf)) do
+  for _, entry in ipairs(vim.list_extend({}, registry.open_entries(buf))) do
     M.close(main_win, entry)
   end
   gutter.close()

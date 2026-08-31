@@ -74,6 +74,12 @@ function M.close()
   state.win = nil
   state.main_win = nil
   state.main_buf = nil
+  pcall(function()
+    local main = vim.g.markdown_xanadu_main_win
+    if main and vim.api.nvim_win_is_valid(main) then
+      require('markdown_xanadu.viewport').refresh_gutter(main)
+    end
+  end)
 end
 
 function M.refresh()
@@ -150,6 +156,12 @@ function M.open(main_win)
   })
 
   M.refresh()
+  pcall(function()
+    local main = vim.g.markdown_xanadu_main_win
+    if main and vim.api.nvim_win_is_valid(main) then
+      require('markdown_xanadu.viewport').refresh_gutter(main)
+    end
+  end)
 end
 
 return M

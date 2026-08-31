@@ -14,19 +14,45 @@ local M = {}
 ---@type table<integer, markdown_xanadu.Entry[]>
 local by_buf = {}
 
+---@type table<integer, string[]>
+local open_order = {}
+
+---@param bufnr integer
+---@param id string
+local function remove_from_order(bufnr, id)
+  local order = open_order[bufnr]
+  if not order then
+    return
+  end
+  for i, oid in ipairs(order) do
+    if oid == id then
+      table.remove(order, i)
+      break
+    end
+  end
+end
+
 ---@param bufnr integer
 ---@return markdown_xanadu.Entry[]
 function M.scan(bufnr)
   local links = parse.links_in_buffer(bufnr)
+  local old = by_buf[bufnr] or {}
+  local preserved = {}
+  for _, e in ipairs(old) do
+    preserved[e.id] = { open = e.open, embed_win = e.embed_win }
+  end
   local entries = {}
   for _, link in ipairs(links) do
+    local id = parse.link_id(link)
     local resolved = resolve.resolve(bufnr, link)
+    local keep = preserved[id]
     entries[#entries + 1] = {
-      id = parse.link_id(link),
+      id = id,
       link = link,
       label = parse.link_label(link),
       resolved = resolved,
-      open = false,
+      open = keep and keep.open or false,
+      embed_win = keep and keep.embed_win or nil,
     }
   end
   by_buf[bufnr] = entries
@@ -67,6 +93,7 @@ end
 ---@param bufnr integer
 function M.clear(bufnr)
   by_buf[bufnr] = nil
+  open_order[bufnr] = nil
 end
 
 ---@param bufnr integer
@@ -76,14 +103,23 @@ end
 function M.set_open(bufnr, entry, open, embed_win)
   entry.open = open
   entry.embed_win = embed_win
+  open_order[bufnr] = open_order[bufnr] or {}
+  if open then
+    remove_from_order(bufnr, entry.id)
+    open_order[bufnr][#open_order[bufnr] + 1] = entry.id
+  else
+    remove_from_order(bufnr, entry.id)
+  end
 end
 
+--- Open embeds in stack order (oldest / top-first).
 ---@param bufnr integer
 ---@return markdown_xanadu.Entry[]
 function M.open_entries(bufnr)
   local out = {}
-  for _, e in ipairs(M.get(bufnr)) do
-    if e.open then
+  for _, id in ipairs(open_order[bufnr] or {}) do
+    local e = M.find(bufnr, id)
+    if e and e.open then
       out[#out + 1] = e
     end
   end

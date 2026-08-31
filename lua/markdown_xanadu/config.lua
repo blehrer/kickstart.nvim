@@ -6,8 +6,10 @@ function M.get()
     root = nil,
     sidebar_width = 0.22,
     embed_width = 0.45,
+    embed_layout = 'stack',
     follow = true,
     max_open_embeds = 3,
+    gutter_inactive = true,
   }
   return vim.tbl_deep_extend('force', defaults, vim.g.markdown_xanadu or {})
 end
@@ -49,6 +51,46 @@ function M.corpus_root()
     return fixture
   end
   return base
+end
+
+---@param base string
+---@return string[]
+function M.vault_roots(base)
+  local roots = {}
+  local seen = {}
+  local function add(r)
+    if not r or r == '' then
+      return
+    end
+    r = vim.fn.fnamemodify(r, ':p'):gsub('/$', '')
+    if not seen[r] then
+      seen[r] = true
+      roots[#roots + 1] = r
+    end
+  end
+
+  local cfg = M.get()
+  if cfg.root and cfg.root ~= '' then
+    add(cfg.root)
+  end
+
+  add(base)
+  local dir = base
+  for _ = 1, 20 do
+    add(dir)
+    local parent = vim.fn.fnamemodify(dir, ':h')
+    if parent == dir then
+      break
+    end
+    dir = parent
+  end
+
+  local corpus = M.corpus_root()
+  if corpus then
+    add(corpus)
+  end
+
+  return roots
 end
 
 return M

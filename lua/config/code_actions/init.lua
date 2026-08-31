@@ -27,6 +27,15 @@ end
 
 ---@param actions { action: config.code_actions.Action|lsp.CodeAction|lsp.Command, ctx?: lsp.HandlerContext, custom?: boolean }[]
 ---@param opts? vim.lsp.buf.code_action.Opts
+local function picker_kind(actions)
+  for _, entry in ipairs(actions) do
+    if entry.custom or not entry.ctx then
+      return nil
+    end
+  end
+  return 'codeaction'
+end
+
 local function pick_and_apply(actions, opts)
   if #actions == 0 then
     vim.notify('No code actions available', vim.log.levels.INFO)
@@ -83,9 +92,11 @@ local function pick_and_apply(actions, opts)
     return
   end
 
+  local kind = picker_kind(actions)
+
   vim.ui.select(actions, {
     prompt = 'Code actions:',
-    kind = 'codeaction',
+    kind = kind,
     format_item = function(item)
       if item.custom then
         return item.action.title

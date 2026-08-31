@@ -65,7 +65,7 @@ function M.toggle()
 end
 
 function M.setup_keymaps()
-  vim.keymap.set('n', '<A-1>', M.toggle, { desc = 'LSP panels (docs + symbols)' })
+  require('config.terminal_alt').set('n', '<A-1>', M.toggle, { desc = 'LSP panels (docs + symbols)' })
 end
 
 return M

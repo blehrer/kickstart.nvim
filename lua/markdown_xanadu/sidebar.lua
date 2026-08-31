@@ -28,6 +28,16 @@ local function format_row(entry)
   return ('%s%s L%d %s'):format(icon, status, line, entry.label)
 end
 
+local function sync_selected_from_sidebar()
+  if not valid_win(state.sidebar_win) then
+    return
+  end
+  local row = vim.api.nvim_win_get_cursor(state.sidebar_win)[1]
+  if row >= 3 then
+    state.selected = row - 2
+  end
+end
+
 ---@param bufnr integer
 local function render(bufnr)
   if not state.sidebar_buf or not vim.api.nvim_buf_is_valid(state.sidebar_buf) then
@@ -45,6 +55,9 @@ local function render(bufnr)
   vim.api.nvim_buf_set_lines(state.sidebar_buf, 0, -1, false, lines)
   vim.bo[state.sidebar_buf].modifiable = false
   vim.api.nvim_buf_clear_namespace(state.sidebar_buf, ns, 0, -1)
+  if state.selected >= 1 and state.selected <= #entries then
+    vim.api.nvim_buf_add_highlight(state.sidebar_buf, ns, 'Visual', state.selected + 2, 0, -1)
+  end
   if config.get().follow and state.main_win and valid_win(state.main_win) then
     local row = vim.api.nvim_win_get_cursor(state.main_win)[1]
     state.cursor_line = row
@@ -129,16 +142,40 @@ function M.open(main_win)
   })
 
   vim.keymap.set('n', '<CR>', function()
+    sync_selected_from_sidebar()
     M.toggle_selected()
   end, { buffer = state.sidebar_buf, desc = 'Toggle transclusion open' })
 
   vim.keymap.set('n', 'x', function()
+    sync_selected_from_sidebar()
     M.close_selected()
   end, { buffer = state.sidebar_buf, desc = 'Close transclusion embed' })
 
   vim.keymap.set('n', 'o', function()
+    sync_selected_from_sidebar()
     M.goto_selected()
   end, { buffer = state.sidebar_buf, desc = 'Go to transclusion line' })
+
+  vim.keymap.set('n', 'j', function()
+    vim.cmd('normal! j')
+    sync_selected_from_sidebar()
+    render(main_buf)
+  end, { buffer = state.sidebar_buf, desc = 'Next transclusion' })
+
+  vim.keymap.set('n', 'k', function()
+    vim.cmd('normal! k')
+    sync_selected_from_sidebar()
+    render(main_buf)
+  end, { buffer = state.sidebar_buf, desc = 'Previous transclusion' })
+
+  vim.api.nvim_create_autocmd({ 'CursorMoved' }, {
+    group = state.augroup,
+    buffer = state.sidebar_buf,
+    callback = function()
+      sync_selected_from_sidebar()
+      render(main_buf)
+    end,
+  })
 end
 
 function M.goto_selected()
@@ -167,6 +204,7 @@ function M.toggle_selected()
   end
   viewport.toggle(state.main_win, entry)
   render(buf)
+  viewport.refresh_gutter(state.main_win)
 end
 
 function M.close_selected()
@@ -181,6 +219,7 @@ function M.close_selected()
   end
   viewport.close(state.main_win, entry)
   render(buf)
+  viewport.refresh_gutter(state.main_win)
 end
 
 ---@param main_win integer

@@ -26,6 +26,8 @@ function M.run()
     'backlinks_spec.lua',
     'registry_spec.lua',
     'gutter_spec.lua',
+    'gutter_grid_spec.lua',
+    'viewport_spec.lua',
     'ui_spec.lua',
   }
 
