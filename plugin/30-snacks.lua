@@ -166,12 +166,7 @@ vim.keymap.set('n', '<leader>uN', function()
   Snacks.notifier.hide()
 end, { desc = 'Dismiss notifications' })
 
-Snacks.toggle.option('spell', { name = 'Spelling' }):map('<leader>us')
-Snacks.toggle.option('wrap', { name = 'Wrap' }):map('<leader>uw')
-Snacks.toggle.diagnostics():map('<leader>ud')
-Snacks.toggle.treesitter():map('<leader>uT')
-Snacks.toggle.inlay_hints():map('<leader>uh')
-Snacks.toggle.dim():map('<leader>uD')
+require('config.ui_toggle').setup_snacks()
 
 vim.keymap.set('n', '<leader>uc', function()
   Snacks.picker.colorschemes()
