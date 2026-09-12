@@ -7,6 +7,7 @@ require('oil').setup({
     update_on_cursor_moved = true,
     show_hidden = true,
   },
+  skip_confirm_for_simple_edits = true,
 })
 
 vim.keymap.set('n', '-', function()
