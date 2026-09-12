@@ -21,6 +21,8 @@ function M.run()
   package.loaded['xanadu_test_harness'] = h
 
   local specs = {
+    'slug_spec.lua',
+    'complete_spec.lua',
     'parse_spec.lua',
     'resolve_spec.lua',
     'backlinks_spec.lua',

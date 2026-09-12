@@ -27,6 +27,9 @@ harness.run_spec('parse', function()
       if link and case.expect then
         harness.assert_eq('parse kind', link.kind, case.expect.kind)
         harness.assert_eq('parse path', link.path, case.expect.path)
+        if case.expect.heading then
+          harness.assert_eq('parse heading', link.heading, case.expect.heading)
+        end
       end
     end
     vim.api.nvim_buf_delete(buf, { force = true })

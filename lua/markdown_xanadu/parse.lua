@@ -37,6 +37,9 @@ end
 ---@return string?, string?, string?
 local function parse_md_dest(dest)
   dest = vim.trim(dest)
+  if dest:match('^<.->$') then
+    dest = dest:sub(2, -2)
+  end
   if dest:match('^https?://') or dest:match('^mailto:') then
     return
   end

@@ -6,6 +6,7 @@ local registry = require('markdown_xanadu.registry')
 local sidebar = require('markdown_xanadu.sidebar')
 local viewport = require('markdown_xanadu.viewport')
 local highlight = require('markdown_xanadu.highlight')
+require('markdown_xanadu.complete')
 
 local M = {}
 
@@ -36,7 +37,18 @@ function M.is_open()
   return sidebar.is_open()
 end
 
+local function bind_close_q()
+  vim.keymap.set('n', 'q', function()
+    M.close()
+  end, { desc = 'Close Xanadu panels' })
+end
+
+local function unbind_close_q()
+  pcall(vim.keymap.del, 'n', 'q', { desc = 'Close Xanadu panels' })
+end
+
 function M.close()
+  unbind_close_q()
   if sidebar.is_open() and sidebar.close then
     local main = vim.g.markdown_xanadu_main_win
     if main and vim.api.nvim_win_is_valid(main) then
@@ -53,6 +65,7 @@ function M.open(main_win)
   sidebar.open(main_win)
   registry.scan(vim.api.nvim_win_get_buf(main_win))
   sidebar.refresh(main_win)
+  bind_close_q()
 end
 
 function M.toggle()
@@ -120,11 +133,18 @@ function M.setup_buffer(bufnr)
   end
 
   highlight.setup(bufnr)
-  registry.scan(bufnr)
+  local ok, err = pcall(registry.scan, bufnr)
+  if not ok then
+    vim.notify('markdown_xanadu: ' .. tostring(err), vim.log.levels.WARN)
+  end
+  vim.bo[bufnr].omnifunc = 'v:lua.markdown_xanadu_omni'
 
   vim.keymap.set('n', 'gd', M.go_definition, { buffer = bufnr, desc = 'Transclusion / LSP definition' })
   vim.keymap.set('n', 'gD', M.go_definition_split, { buffer = bufnr, desc = 'Transclusion in split viewport' })
   vim.keymap.set('n', 'gr', M.references, { buffer = bufnr, desc = 'Transclusion backlinks / LSP references' })
+  vim.keymap.set('n', '<leader>yh', function()
+    resolve.yank_anchor(bufnr)
+  end, { buffer = bufnr, desc = 'Yank GitLab heading anchor' })
 end
 
 function M.setup()
@@ -134,13 +154,11 @@ function M.setup()
 
   vim.api.nvim_create_user_command('MarkdownXanaduDemo', M.demo, {})
   vim.api.nvim_create_user_command('MarkdownXanaduToggle', M.toggle, {})
+  vim.api.nvim_create_user_command('MarkdownYankAnchor', function()
+    resolve.yank_anchor()
+  end, { desc = 'Yank GitLab heading anchor for cursor' })
 
   require('config.terminal_alt').set('n', '<A-2>', M.toggle, { desc = 'Xanadu panels (transclusions)' })
-  vim.keymap.set('n', 'q', function()
-    if M.is_open() then
-      M.close()
-    end
-  end, { desc = 'Close Xanadu panels' })
 
   vim.api.nvim_create_autocmd('FileType', {
     group = augroup,

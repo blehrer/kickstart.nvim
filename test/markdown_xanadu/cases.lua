@@ -29,6 +29,16 @@ return {
       col = 33,
       expect = { kind = 'link', path = 'targets/alpha' },
     },
+    {
+      file = 'links/gitlab-brackets.md',
+      line = 2,
+      col = 5,
+      expect = {
+        kind = 'link',
+        path = '../edge-cases/gitlab-slugs.md',
+        heading = 'install-macos',
+      },
+    },
   },
   resolve = {
     {
@@ -50,6 +60,16 @@ return {
       from = 'links/standard-md.md',
       link = { path = '../targets/alpha.md' },
       expect = { file_suffix = 'targets/alpha.md', line = 1, col = 0 },
+    },
+    {
+      from = 'links/gitlab-brackets.md',
+      link = { path = '../edge-cases/gitlab-slugs.md', heading = 'install-macos' },
+      expect = { file_suffix = 'edge-cases/gitlab-slugs.md', line = 3, col = 0 },
+    },
+    {
+      from = 'edge-cases/duplicate-headings.md',
+      link = { path = 'duplicate-headings', heading = 'summary-1' },
+      expect = { file_suffix = 'duplicate-headings.md', line = 7, col = 0 },
     },
     {
       from = 'edge-cases/missing-target.md',
