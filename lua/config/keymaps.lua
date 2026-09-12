@@ -28,6 +28,17 @@ vim.keymap.set('n', 'g<', function()
   vim.diagnostic.setqflist({ open = true })
 end, { desc = 'Diagnostics to quickfix' })
 
+local gf = require('config.gf')
+vim.keymap.set('n', 'gf', function()
+  gf.goto_file('gf')
+end, { desc = 'Goto file (smart)' })
+vim.keymap.set('n', 'gF', function()
+  gf.goto_file('gF')
+end, { desc = 'Goto file, other window (smart)' })
+vim.keymap.set('n', '<C-w>f', function()
+  gf.goto_file('<C-w>f')
+end, { desc = 'Goto file in split (smart)' })
+
 -- Visual selection → project grep (Snacks; Cursor uses keybindings.json for <leader>sg)
 if not vim.g.vscode then
 vim.keymap.set('v', '<leader>sg', function()
