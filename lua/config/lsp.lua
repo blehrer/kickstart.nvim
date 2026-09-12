@@ -48,6 +48,11 @@ M.servers = {
   dockerls = {
     filetypes = { 'dockerfile' },
   },
+  -- Only attach in PKM vaults; upstream includes `.git` and wedges non-vault repos on open.
+  markdown_oxide = {
+    root_markers = { '.obsidian', '.moxide.toml' },
+    workspace_required = true,
+  },
 }
 
 M.ensure_installed = vim.tbl_keys(M.servers)
