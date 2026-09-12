@@ -17,6 +17,14 @@ function M.mode()
   return mode_labels[vim.fn.mode()] or vim.fn.mode():upper()
 end
 
+function M.recording()
+  local reg = vim.fn.reg_recording()
+  if reg == '' then
+    return ''
+  end
+  return '%#WarningMsg# REC @' .. reg .. ' %#Normal#'
+end
+
 function M.git()
   local branch = vim.b.gitsigns_head
   if not branch or branch == '' then
@@ -54,11 +62,20 @@ function M.filename()
 end
 
 function M.setup()
+  local group = vim.api.nvim_create_augroup('StatuslineRecording', { clear = true })
+  vim.api.nvim_create_autocmd({ 'RecordingEnter', 'RecordingLeave' }, {
+    group = group,
+    callback = function()
+      vim.cmd.redrawstatus()
+    end,
+  })
+
   vim.opt.statusline = table.concat({
     '%<',
     '%#ModeMsg#',
     '%{% v:lua.require("config.statusline").mode() %}',
     '%#Normal#',
+    '%{% v:lua.require("config.statusline").recording() %}',
     '%{% v:lua.require("config.statusline").git() %}',
     '%=',
     ' %{% v:lua.require("config.statusline").filename() %} ',
