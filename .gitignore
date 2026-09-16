@@ -1,4 +1,5 @@
 nvim.log
+/package-lock.json
 
 # Beads / Dolt files (added by bd init)
 .dolt/
