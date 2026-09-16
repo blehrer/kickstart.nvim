@@ -2,6 +2,8 @@ if vim.g.vscode then
   return
 end
 
+-- gq → prettier on prose (tables/fences skipped); ref links guarded automatically.
+-- Last resort: <!-- prettier-ignore-start --> … <!-- prettier-ignore-end --> in the file.
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'markdown',
   group = vim.api.nvim_create_augroup('format-markdown', { clear = true }),

@@ -1,226 +1,215 @@
 local M = {}
 
-local ATOMIC_PATTERNS = {
-  '!?%b[]%b()',
-  '!?%[%[[^%]]+%]%]',
-  '`[^`]*`',
-}
+local REF_DEF = '^%s*%[[^%]]+%]:'
+local REF_INLINE = '%[[^%]]+%]%[[^%]]+%]'
+local LINK_INLINE = '%[[^%]]+%]%([^%)]+%)'
+local FMT_IGNORE = '<!-- md-fmt-ignore -->'
 
 local function is_table_line(line)
-  if line:match('^%s*|') then
-    return true
-  end
-  return line:match('^%s*:?%-+:') and line:find('|', 1, true) ~= nil
+  return line:match('^%s*|') ~= nil
 end
 
-local function display_width(s)
-  return vim.fn.strdisplaywidth(s)
+local function is_fence_line(line)
+  return line:match('^%s*```') ~= nil or line:match('^%s*~~~') ~= nil
 end
 
---- ponytail: textwidth(lnum) returns 0 unless 'formatoptions' has 't'; Neovim may lack textwidth().
-local function effective_width()
-  local width = vim.bo.textwidth
-  if width <= 0 then
-    width = vim.o.textwidth
-  end
-  if width <= 0 then
-    local ok, tw = pcall(vim.fn.textwidth)
-    if ok and tw and tw > 0 then
-      width = tw
+function M.should_skip(lines)
+  for _, line in ipairs(lines) do
+    if is_table_line(line) or is_fence_line(line) then
+      return true
     end
   end
-  if width <= 0 then
-    local win = vim.api.nvim_get_current_win()
-    if win and vim.api.nvim_win_is_valid(win) then
-      width = vim.api.nvim_win_get_width(win) - vim.o.wrapmargin
-    end
-  end
-  return width
+  return false
 end
 
----@param text string
----@return string[]
-local function tokenize(text)
-  local tokens = {}
-  local pos = 1
-  while pos <= #text do
-    if text:sub(pos, pos):match('%s') then
-      pos = pos + 1
-    else
-      local matched = false
-      for _, pat in ipairs(ATOMIC_PATTERNS) do
-        local s, e = text:find(pat, pos)
-        if s == pos then
-          tokens[#tokens + 1] = text:sub(s, e)
-          pos = e + 1
-          matched = true
-          break
-        end
-      end
-      if not matched then
-        local s, e = text:find('%S+', pos)
-        if not s then
-          break
-        end
-        tokens[#tokens + 1] = text:sub(s, e)
-        pos = e + 1
-      end
-    end
-  end
-  return tokens
+local function line_needs_guard(line)
+  return line:match(REF_INLINE) ~= nil or line:match(LINK_INLINE) ~= nil
 end
 
----@param line string
----@return string first_indent, string cont_indent
-local function leading_markup(line)
-  local bullet = line:match('^(%s*[-*+]%s+)')
-  if bullet then
-    return bullet, bullet:gsub('%S', ' ') .. '  '
-  end
-  local ordered = line:match('^(%s*%d+%.%s+)')
-  if ordered then
-    return ordered, ordered:gsub('%S', ' ') .. '  '
-  end
-  local quote = line:match('^(>+%s*)')
-  if quote then
-    return quote, quote
-  end
-  local ws = line:match('^(%s*)') or ''
-  return ws, ws
-end
-
----@param tokens string[]
----@param width integer
----@param first_indent string
----@param cont_indent string
----@return string[]
-local function wrap_tokens(tokens, width, first_indent, cont_indent)
-  local lines = {}
-  local line = first_indent
-  local indent_width = display_width(first_indent)
-
-  local function has_body()
-    return display_width(line) > indent_width
-  end
-
-  local function flush()
-    lines[#lines + 1] = line
-    line = cont_indent
-    indent_width = display_width(cont_indent)
-  end
-
-  for _, tok in ipairs(tokens) do
-    local sep = has_body() and ' ' or ''
-    local candidate = line .. sep .. tok
-
-    if has_body() and display_width(candidate) > width then
-      flush()
-      candidate = line .. tok
-    end
-
-    line = candidate
-  end
-
-  if line ~= '' then
-    lines[#lines + 1] = line
-  end
-
-  if #lines == 0 then
-    lines[1] = first_indent
-  end
-
-  return lines
-end
-
----@param lines string[]
----@param width integer
----@return string[]
-local function format_prose_block(lines, width)
-  if #lines == 0 then
-    return lines
-  end
-
-  local result = {}
-  local block = {}
-
-  local function flush_block()
-    if #block == 0 then
-      return
-    end
-    local first_indent, cont_indent = leading_markup(block[1])
-    local parts = {}
-    for _, ln in ipairs(block) do
-      parts[#parts + 1] = vim.trim(ln:sub(#first_indent + 1))
-    end
-    local text = table.concat(parts, ' ')
-    if text == '' then
-      vim.list_extend(result, block)
-    else
-      vim.list_extend(result, wrap_tokens(tokenize(text), width, first_indent, cont_indent))
-    end
-    block = {}
-  end
-
-  for _, ln in ipairs(lines) do
-    if ln:match('^%s*$') then
-      flush_block()
-      result[#result + 1] = ''
-    else
-      block[#block + 1] = ln
-    end
-  end
-  flush_block()
-  return result
-end
-
---- Reflow markdown prose while keeping links, images, and table rows intact.
----@param lines string[]
----@param opts? { width?: integer }
----@return string[]
-function M.format_line_range(lines, opts)
-  opts = opts or {}
-  local width = opts.width or 80
-  if width <= 0 then
-    return lines
-  end
-
+local function collapse_prettier_ref_damage(lines)
   local out = {}
-  local prose = {}
-
-  local function flush_prose()
-    if #prose == 0 then
-      return
+  local i = 1
+  while i <= #lines do
+    local line = lines[i]
+    if i < #lines and line:match('^(%s*%[[^%]]+%]:)%s*$') then
+      local next_line = lines[i + 1]
+      if next_line:match('^%s+https?://') or next_line:match('^%s+//') then
+        table.insert(out, line .. ' ' .. vim.trim(next_line))
+        i = i + 2
+        goto continue
+      end
     end
-    vim.list_extend(out, format_prose_block(prose, width))
-    prose = {}
-  end
-
-  for _, ln in ipairs(lines) do
-    if is_table_line(ln) then
-      flush_prose()
-      out[#out + 1] = ln
-    else
-      prose[#prose + 1] = ln
+    if i < #lines and line:match('%[[^%]]*$') and not line:match('%]%[') then
+      local next_line = lines[i + 1]
+      if next_line:match('%]%[[^%]]+%]') then
+        table.insert(out, line .. ' ' .. vim.trim(next_line))
+        i = i + 2
+        goto continue
+      end
     end
+    table.insert(out, line)
+    i = i + 1
+    ::continue::
   end
-  flush_prose()
   return out
+end
+
+local function split_trailing_ref_defs(lines)
+  local refs = {}
+  local i = #lines
+  while i >= 1 do
+    local line = lines[i]
+    if line:match(REF_DEF) then
+      table.insert(refs, 1, line)
+      i = i - 1
+    elseif line:match('^%s*$') and #refs > 0 then
+      i = i - 1
+    else
+      break
+    end
+  end
+  local body = {}
+  for j = 1, i do
+    body[j] = lines[j]
+  end
+  return body, refs
+end
+
+local function inject_fmt_ignore(lines)
+  local out = {}
+  for _, line in ipairs(lines) do
+    if line_needs_guard(line) then
+      table.insert(out, FMT_IGNORE)
+    end
+    table.insert(out, line)
+  end
+  return out
+end
+
+local function strip_fmt_ignore(lines)
+  local out = {}
+  local i = 1
+  while i <= #lines do
+    local line = lines[i]
+    if line:match('^%s*<!%-%- md%-fmt%-ignore %-%->%s*$') then
+      i = i + 1
+      if i <= #lines and lines[i]:match('^%s*$') then
+        i = i + 1
+      end
+    else
+      table.insert(out, line)
+      i = i + 1
+    end
+  end
+  return out
+end
+
+local function resolve_filename(filename)
+  if filename and filename ~= '' then
+    return filename
+  end
+  local bufname = vim.api.nvim_buf_get_name(0)
+  if bufname ~= '' then
+    return bufname
+  end
+  return 'buffer.md'
+end
+
+local function prettier_cmd(filename)
+  local mason = vim.fs.find({ 'node_modules/.bin/prettier', 'node_modules/.bin/prettier.cmd' }, {
+    upward = true,
+    path = resolve_filename(filename),
+  })[1]
+  if mason then
+    return mason
+  end
+  return 'prettier'
+end
+
+function M.prettier_format_lines(lines, filename)
+  filename = resolve_filename(filename)
+  lines = collapse_prettier_ref_damage(lines)
+  local body, refs = split_trailing_ref_defs(lines)
+  local stdin_lines = inject_fmt_ignore(body)
+
+  local cwd = vim.fn.fnamemodify(filename, ':p:h')
+  if cwd == '' or cwd == filename then
+    cwd = vim.loop.cwd()
+  end
+
+  local result = vim.system({
+    prettier_cmd(filename),
+    '--parser',
+    'markdown',
+    '--prose-wrap',
+    'always',
+    '--stdin-filepath',
+    filename,
+  }, {
+    cwd = cwd,
+    stdin = table.concat(stdin_lines, '\n'),
+    text = true,
+  }):wait()
+
+  if result.code ~= 0 then
+    return false, lines
+  end
+
+  local stdout = result.stdout or ''
+  if vim.trim(stdout) == '' and #stdin_lines == 0 then
+    return true, refs
+  end
+
+  local out = vim.split(vim.trim(stdout, { trimempty = false }), '\n', { plain = true })
+  if #out == 1 and out[1] == '' and #stdin_lines == 1 and stdin_lines[1] == '' then
+    out = { '' }
+  end
+  out = strip_fmt_ignore(out)
+
+  if #refs > 0 then
+    if #out > 0 and out[#out] ~= '' then
+      table.insert(out, '')
+    end
+    vim.list_extend(out, refs)
+  end
+  return true, out
 end
 
 function M.formatexpr()
   local lnum = vim.v.lnum
   local count = vim.v.count
-  local width = effective_width()
-  if width <= 0 then
+  if lnum <= 0 or count <= 0 then
     return 1
   end
 
   local end_lnum = lnum + count - 1
   local lines = vim.api.nvim_buf_get_lines(0, lnum - 1, end_lnum, false)
-  local formatted = M.format_line_range(lines, { width = width })
+  if #lines == 0 or M.should_skip(lines) then
+    return 0
+  end
 
-  vim.api.nvim_buf_set_lines(0, lnum - 1, end_lnum, false, formatted)
+  local ok, out = M.prettier_format_lines(lines)
+  if not ok then
+    return 1
+  end
+
+  vim.api.nvim_buf_set_lines(0, lnum - 1, end_lnum, false, out)
   return 0
 end
+
+---@type conform.FileLuaFormatterConfig
+M.conform = {
+  meta = {
+    description = 'Prettier for markdown (ref-safe preprocessing)',
+  },
+  format = function(_, ctx, lines, callback)
+    local ok, out = M.prettier_format_lines(lines, ctx.filename)
+    if not ok then
+      callback('markdown prettier failed')
+      return
+    end
+    callback(nil, out)
+  end,
+}
 
 return M

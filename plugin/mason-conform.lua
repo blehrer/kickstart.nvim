@@ -45,9 +45,13 @@ require('conform').setup({
     project_ci = function(bufnr)
       return deference.formatter(bufnr)
     end,
+    markdown_prettier = require('format.markdown').conform,
     prettier = {
       condition = function(_, ctx)
         if deference.skip(ctx.buf) then
+          return false
+        end
+        if vim.bo[ctx.buf].filetype == 'markdown' then
           return false
         end
         vim.fn.system({ 'prettier', '--find-config-path', ctx.filename })
@@ -65,7 +69,7 @@ require('conform').setup({
     lua = { 'stylua' },
     python = { 'black' },
     json = { 'fixjson' },
-    markdown = { 'prettier' },
+    markdown = { 'markdown_prettier' },
     typescript = { 'prettier' },
     javascript = { 'prettier' },
   },
