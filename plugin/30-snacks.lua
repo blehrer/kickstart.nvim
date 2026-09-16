@@ -1,4 +1,6 @@
-if vim.g.vscode then return end
+if vim.g.vscode then
+  return
+end
 
 vim.pack.add({ 'https://github.com/folke/snacks.nvim' })
 
@@ -143,6 +145,10 @@ end, { desc = 'Search diagnostics' })
 vim.keymap.set('n', '<leader>sr', function()
   Snacks.picker.resume()
 end, { desc = 'Search resume' })
+
+vim.keymap.set('n', '<leader>sl', function()
+  Snacks.picker.lsp_workspace_symbols()
+end, { desc = 'Search LSP Workspace Symbols' })
 
 vim.keymap.set('n', '<leader><leader>', function()
   Snacks.picker.buffers()

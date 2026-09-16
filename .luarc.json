@@ -1,0 +1,9 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "format": {
+    "defaultConfig": {
+      "indent_style": "space",
+      "indent_size": "2"
+    }
+  }
+}
