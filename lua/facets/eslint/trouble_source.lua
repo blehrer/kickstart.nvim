@@ -17,12 +17,17 @@ M.config = {
         position = 'bottom',
         height = 16,
       },
+      -- Trouble draws border/title only on float previews, not splits.
       preview = {
-        type = 'split',
+        type = 'float',
         relative = 'win',
-        position = 'right',
-        size = 0.45,
+        border = 'rounded',
+        title = ' ESLint preview ',
+        title_pos = 'center',
+        position = { 0, 1 },
+        size = { width = 0.48, height = 0.92 },
         scratch = true,
+        focusable = false,
       },
       groups = {
         { 'directory' },
