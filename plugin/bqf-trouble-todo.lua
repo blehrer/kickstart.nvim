@@ -18,7 +18,12 @@ require("bqf").setup({
 })
 
 local nx_trouble = require("nx.trouble")
+local facet_trouble = require("facets.trouble")
+local eslint_trouble = require("facets.eslint.trouble_source")
 
+require("trouble").setup({})
+require("trouble.sources").register("facets_eslint", eslint_trouble)
+-- trouble.setup resets options; re-declare facet_eslint here or the mode vanishes.
 require("trouble").setup({
 	modes = {
 		nx_diagnostics = {
@@ -29,6 +34,7 @@ require("trouble").setup({
 			mode = "diagnostics",
 			filter = nx_trouble.make_filter("nx_diagnostics_dependents"),
 		},
+		facet_eslint = eslint_trouble.config.modes.facet_eslint,
 	},
 })
 
@@ -56,3 +62,6 @@ end, { desc = "Trouble Nx project diagnostics" })
 vim.keymap.set("n", "<leader>xP", function()
 	nx_trouble.open({ include_dependents = true })
 end, { desc = "Trouble Nx project + dependents diagnostics" })
+vim.keymap.set("n", "<leader>xe", function()
+	facet_trouble.open_eslint()
+end, { desc = "Trouble ESLint project lint (npx eslint)" })

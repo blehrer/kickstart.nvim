@@ -32,14 +32,23 @@ end
 
 e2e_config_by_pw_dir = load_e2e_cache()
 
-function M.find_pw_dir(start_path)
+local PW_CONFIG_NAMES = {
+  'playwright.config.ts',
+  'playwright.config.js',
+  'playwright.config.mjs',
+}
+
+--- Directory containing a Playwright config, or nil (no nx/cwd fallback).
+function M.find_pw_config_dir(start_path)
   local dir = vim.fn.fnamemodify(start_path or vim.loop.cwd(), ':p')
   if vim.fn.isdirectory(dir) ~= 1 then
     dir = vim.fn.fnamemodify(dir, ':h')
   end
   while dir ~= '/' and dir ~= '' do
-    if vim.fn.filereadable(dir .. '/playwright.config.ts') == 1 then
-      return dir
+    for _, name in ipairs(PW_CONFIG_NAMES) do
+      if vim.fn.filereadable(dir .. '/' .. name) == 1 then
+        return dir
+      end
     end
     local parent = vim.fn.fnamemodify(dir, ':h')
     if parent == dir then
@@ -47,7 +56,11 @@ function M.find_pw_dir(start_path)
     end
     dir = parent
   end
-  return workspace.root() or vim.loop.cwd()
+  return nil
+end
+
+function M.find_pw_dir(start_path)
+  return M.find_pw_config_dir(start_path) or workspace.root() or vim.loop.cwd()
 end
 
 function M.resolve_anchor_path()

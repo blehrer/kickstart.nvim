@@ -7,14 +7,26 @@ vim.pack.add({
 })
 
 local pw = require('nx.playwright')
-local pw_adapter = pw.wrap_adapter(require('neotest-playwright').adapter(pw.adapter_options()))
+local registry = require('facets.registry')
 
-require('neotest').setup({
-  adapters = { pw_adapter },
-  consumers = {
+local function playwright_neotest_enabled()
+  if registry.has_facet('playwright.e2e', vim.loop.cwd()) then
+    return true
+  end
+  return pw.find_pw_config_dir(vim.loop.cwd()) ~= nil
+end
+
+local adapters = {}
+local neotest_opts = { adapters = adapters }
+
+if playwright_neotest_enabled() then
+  adapters[#adapters + 1] = pw.wrap_adapter(require('neotest-playwright').adapter(pw.adapter_options()))
+  neotest_opts.consumers = {
     playwright = require('neotest-playwright.consumers').consumers,
-  },
-})
+  }
+end
+
+require('neotest').setup(neotest_opts)
 
 vim.keymap.set('n', '<leader>tr', function()
   require('neotest').run.run()

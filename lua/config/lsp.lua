@@ -6,8 +6,22 @@ local hammerspoon_dir = vim.fn.expand('~/.hammerspoon')
 --- Per-server vim.lsp.config overrides (merged by mason-lspconfig / vim.lsp.enable).
 M.servers = {
   ts_ls = {},
+  -- vscode-eslint / mason eslint: flat config repos (eslint.config.js) need useFlatConfig.
+  eslint = {
+    settings = {
+      experimental = { useFlatConfig = true },
+      workingDirectory = { mode = 'auto' },
+      validate = 'on',
+      run = 'onType',
+    },
+  },
   jdtls = {},
-  kotlin_language_server = {},
+  -- JetBrains kotlin-lsp (Gradle/Kotlin 2.3+). fwcd kotlin_language_server ships Kotlin 2.1 and
+  -- breaks on Gradle 9.x stdlib 2.3 metadata; keep it out of ensure_installed / automatic_enable.
+  kotlin_lsp = {
+    filetypes = { 'kotlin' },
+    cmd_env = vim.fn.environ(),
+  },
   superhtml = {},
   gradle_ls = {},
   pylsp = {},
@@ -123,7 +137,7 @@ function M.setup()
   require('mason-lspconfig').setup({
     ensure_installed = M.ensure_installed,
     automatic_install = true,
-    automatic_enable = true,
+    automatic_enable = { exclude = { 'kotlin_language_server' } },
   })
 
   M.setup_keymaps()
@@ -136,6 +150,25 @@ function M.setup()
   vim.api.nvim_create_user_command('LspInfo', function()
     vim.cmd('checkhealth vim.lsp')
   end, { desc = 'LSP health / attached clients' })
+
+  vim.api.nvim_create_user_command('KlsRestart', function()
+    for _, name in ipairs({ 'kotlin_lsp', 'kotlin_language_server' }) do
+      for _, client in ipairs(vim.lsp.get_clients({ name = name })) do
+        vim.lsp.stop_client(client.id, true)
+      end
+    end
+    local root = vim.fs.root(vim.fn.getcwd(), { 'build.gradle.kts', 'build.gradle', 'settings.gradle.kts' })
+    if root then
+      for _, name in ipairs({ 'kls_database.db', 'kls_database.db-journal' }) do
+        local path = root .. '/' .. name
+        if vim.uv.fs_stat(path) then
+          os.remove(path)
+        end
+      end
+    end
+    vim.lsp.enable('kotlin_lsp')
+    vim.notify('Kotlin language server restarted', vim.log.levels.INFO)
+  end, { desc = 'Restart Kotlin LSP (JetBrains) and clear fwcd classpath cache if present' })
 end
 
 return M

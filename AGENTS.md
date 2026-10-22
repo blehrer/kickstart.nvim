@@ -13,13 +13,16 @@
 - kickstart.nvim: Neovim 0.12+ config using native `vim.pack`, Snacks as sole picker, experimental ui2 + tiny-cmdline
 - Set `NVIM_APPNAME=kickstart.nvim` so plugin datadir is `~/.local/share/kickstart.nvim`
 - Custom Nx integration in `lua/nx/*` (`plugin/nx.lua`): project picker, Playwright debug wizard, Trouble-scoped diagnostics
+- Project facets (`lua/facets/*`, `plugin/facets.lua`): git-root anchor + stack manifests; `:FacetsInfo`; ESLint repo Trouble `<leader>xe`; Nx Trouble stays `<leader>xp` — see `docs/specs/2026-10-22-project-facets-design.md`
 - Cursor profile: `init.lua` early-returns to `lua/config/cursor.lua` when `vim.g.vscode`; heavy terminal plugins guarded with `if vim.g.vscode then return end`
 - Cursor dotfiles live in repo `cursor/` and sync via `cursor/sync.sh` to `~/Library/Application Support/Cursor/User/`
+- Format parity (terminal + Cursor): `<leader>ff` hunks/modified lines, `<leader>fF` whole file (`cursor/keybindings.json` uses `editor.action.formatChanges` / `formatDocument`); `<leader>uf` toggles format-on-save + EditorConfig (`lua/format/save_toggle.lua`)
 - sidekick.nvim mux backend is zellij (`plugin/sidekick.lua`)
 - Nx project list cache: `~/.local/share/kickstart.nvim/nx-projects`, keyed by resolved git remote URL
 - Primary Playwright debug target: `legal-web-playwright-e2e` with `shared-auth-setup` subproject
 - oil.nvim buffer-local `<leader>y` copies cwd-relative path; `<leader>af` sends oil entries to sidekick CLI
 - dial.nvim handles `<C-a>`/`<C-x>` increment/decrement in `plugin/editing.lua`
+- Kotlin LSP: Mason `kotlin-lsp` → `kotlin_lsp` (JetBrains); `kotlin_language_server` (fwcd) excluded—embedded Kotlin 2.1 cannot read Gradle 9 / stdlib 2.3 metadata. Refresh with `:MasonInstall kotlin-lsp` when builds expire. Nested Gradle roots: symlink `gradlew`; optional `kls-classpath` only for fwcd (`scripts/kls-classpath-gradlew.sh`). `:KlsRestart` stops Kotlin LSP and clears fwcd `kls_database.db`. `cmd_env = vim.fn.environ()` for mise Java/Gradle.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:970c3bf2 -->
 ## Beads Issue Tracker

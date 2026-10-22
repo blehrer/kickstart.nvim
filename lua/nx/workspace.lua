@@ -1,5 +1,10 @@
 local M = {}
 
+--- Git toplevel for any repo (delegates to facets.anchor).
+function M.git_toplevel(start)
+  return require('facets.anchor').git_toplevel(start)
+end
+
 function M.root(start)
   local dir = start or vim.loop.cwd()
   if vim.fn.isdirectory(dir) ~= 1 then

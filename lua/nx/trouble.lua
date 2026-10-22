@@ -1,32 +1,11 @@
 local discover = require('nx.discover')
 local graph = require('nx.graph')
 local workspace = require('nx.workspace')
+local path_filter = require('facets.path_filter')
 
 local M = {}
 
 local scopes = {}
-
-local function normalize_root(root)
-  root = vim.fn.fnamemodify(root, ':p')
-  if root:sub(-1) ~= '/' then
-    root = root .. '/'
-  end
-  return root
-end
-
-local function under_root(path, root)
-  path = vim.fn.fnamemodify(path, ':p')
-  return path:find(normalize_root(root), 1, true) == 1
-end
-
-local function under_any_root(path, roots)
-  for _, root in ipairs(roots) do
-    if under_root(path, root) then
-      return true
-    end
-  end
-  return false
-end
 
 function M.current_project()
   local pj = workspace.nearest_project_json()
@@ -67,7 +46,7 @@ function M.make_filter(mode)
   return function(items)
     local roots = scopes[mode] or {}
     return vim.tbl_filter(function(item)
-      return under_any_root(item.filename, roots)
+      return path_filter.under_any_root(item.filename, roots)
     end, items)
   end
 end
