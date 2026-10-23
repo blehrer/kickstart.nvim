@@ -1,7 +1,14 @@
---- Snacks gitbrowse with sane default remote when several remotes exist.
+--- Snacks gitbrowse: copy remote file URL to clipboard (+ and *).
 local M = {}
 
 local PROMPT = 'Select remote to browse'
+local COPY_NOTIFY_MS = 2000
+
+---@param url string
+local function copy_to_clipboard(url)
+  vim.fn.setreg('+', url, 'c')
+  vim.fn.setreg('*', url, 'c')
+end
 
 ---@param start string
 ---@return string?
@@ -57,6 +64,17 @@ end
 
 ---@param opts? snacks.gitbrowse.Config
 function M.open(opts)
+  opts = vim.tbl_extend('force', {
+    notify = false,
+    open = function(url)
+      copy_to_clipboard(url)
+      vim.notify('Remote URL copied to clipboard', vim.log.levels.INFO, {
+        title = 'Git Browse',
+        timeout = COPY_NOTIFY_MS,
+      })
+    end,
+  }, opts or {})
+
   local file = vim.api.nvim_buf_get_name(0)
   local start = (file ~= '' and vim.fn.fnamemodify(file, ':h')) or vim.fn.getcwd()
   local git_dir = git_toplevel(start)

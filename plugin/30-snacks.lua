@@ -125,7 +125,7 @@ end, { desc = 'Snacks dashboard' })
 
 vim.keymap.set({ 'n', 'x' }, '<leader>gx', function()
   require('config.gitbrowse').open()
-end, { desc = 'Open file on remote (GitLab/GitHub)' })
+end, { desc = 'Copy remote file URL to clipboard' })
 
 local toggle_terminal = function()
   Snacks.terminal.toggle()

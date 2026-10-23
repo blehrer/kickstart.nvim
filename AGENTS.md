@@ -3,7 +3,7 @@
 - Prefer native `vim.pack` plugin declarations over lazy.nvim-style config when adding plugins
 - In Cursor, use vscode-neovim with a slim `vim.g.vscode` profile; avoid VSCodeVim emulation to prevent two conflicting mental models
 - GitLab (not GitHub) for MR reviews; authenticate with a token stored in 1Password
-- `<leader>gx` opens the current file on the remote via Snacks gitbrowse (`what = file`, GitLab Disney URL patterns in `plugin/30-snacks.lua`); `lua/config/gitbrowse.lua` skips the remote picker when the branch tracking remote is unambiguous (Snacks otherwise lists every `git remote` fetch URL, e.g. `origin` + `upstream`)
+- `<leader>gx` copies a GitLab/GitHub file URL to `+`/`*` via Snacks gitbrowse (`what = file`, Disney patterns in `plugin/30-snacks.lua`, handler in `lua/config/gitbrowse.lua`); 2s notify, no browser; remote picker skipped when branch tracking remote is unambiguous
 - Playwright e2e tests default to INT/QAT SSO environment, not localhost
 - Do not edit attached plan files during implementation; execute against them as-is
 - `<C-/>` toggles the Snacks terminal
