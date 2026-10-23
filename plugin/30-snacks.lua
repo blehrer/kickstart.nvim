@@ -45,7 +45,20 @@ require('snacks').setup({
     },
   },
   explorer = { enabled = false },
-  gitbrowse = { enabled = true },
+  gitbrowse = {
+    enabled = true,
+    what = 'file', -- blob on current branch, not commit browse
+    url_patterns = {
+      ['gitlab%.disney%.com'] = {
+        branch = '/-/tree/{branch}',
+        file = '/-/blob/{branch}/{file}#L{line_start}-{line_end}',
+        permalink = '/-/blob/{commit}/{file}#L{line_start}-{line_end}',
+        commit = '/-/commit/{commit}',
+      },
+      -- github.com patterns are already in Snacks defaults; add enterprise host if needed:
+      -- ['github%.example%.com'] = { ... same as github%.com ... },
+    },
+  },
   indent = { enabled = true },
   input = { enabled = true },
   picker = {
@@ -109,6 +122,10 @@ vim.keymap.set('n', '|', function()
     Snacks.dashboard()
   end
 end, { desc = 'Snacks dashboard' })
+
+vim.keymap.set({ 'n', 'x' }, '<leader>gx', function()
+  require('config.gitbrowse').open()
+end, { desc = 'Open file on remote (GitLab/GitHub)' })
 
 local toggle_terminal = function()
   Snacks.terminal.toggle()
