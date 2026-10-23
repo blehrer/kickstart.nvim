@@ -147,8 +147,12 @@ vim.keymap.set('n', '<leader>sr', function()
 end, { desc = 'Search resume' })
 
 vim.keymap.set('n', '<leader>sl', function()
-  Snacks.picker.lsp_workspace_symbols()
-end, { desc = 'Search LSP Workspace Symbols' })
+  require('config.lsp_symbol_sources').search()
+end, { desc = 'Search workspace symbols (selected LSPs)' })
+
+vim.keymap.set('n', '<leader>sL', function()
+  require('config.lsp_symbol_sources').manage()
+end, { desc = 'LSP symbol sources' })
 
 vim.keymap.set('n', '<leader><leader>', function()
   Snacks.picker.buffers()
