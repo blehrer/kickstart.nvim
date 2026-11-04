@@ -1,4 +1,3 @@
-vim.g.editorconfig = true
 vim.g.have_nerd_font = true
 
 vim.g.markdown_fenced_languages = { 'ts=typescript' }
@@ -44,6 +43,9 @@ vim.o.exrc = true
 vim.o.conceallevel = 1
 vim.o.termguicolors = true
 
+-- Native vim.lsp.completion popup (see :help completeopt, lsp-completion)
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect', 'popup' }
+
 vim.diagnostic.config({
   severity_sort = true,
   float = { border = 'rounded', source = 'if_many' },
@@ -65,3 +67,5 @@ vim.diagnostic.config({
   },
   update_in_insert = true,
 })
+
+require('format.save_toggle').setup()

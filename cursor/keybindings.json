@@ -30,7 +30,12 @@
     "when": "editorTextFocus && neovim.init && neovim.mode == normal"
   },
   {
-    "key": "space f",
+    "key": "space f f",
+    "command": "editor.action.formatChanges",
+    "when": "editorTextFocus && neovim.init && neovim.mode == normal"
+  },
+  {
+    "key": "space f shift+f",
     "command": "editor.action.formatDocument",
     "when": "editorTextFocus && neovim.init && neovim.mode == normal"
   },

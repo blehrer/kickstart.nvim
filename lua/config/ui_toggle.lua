@@ -91,6 +91,7 @@ function M.setup_snacks()
 
   Snacks.toggle.dim():map('<leader>uD')
   require('config.gutter').setup_toggle()
+  require('format.save_toggle').setup_toggle()
 end
 
 return M

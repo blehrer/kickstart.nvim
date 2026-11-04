@@ -21,6 +21,7 @@
   "editor.scrollBeyondLastLine": false,
   "editor.minimap.enabled": false,
   "editor.stickyScroll.enabled": false,
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.formatOnSave": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editorconfig.enable": false
 }

@@ -2,3 +2,5 @@
 vim.g.have_nerd_font = true
 
 require('config.keymaps')
+require('format.save_toggle').setup()
+require('format.save_toggle').setup_toggle()
