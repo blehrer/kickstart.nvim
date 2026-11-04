@@ -41,6 +41,7 @@ local langs = {
   'rust',
   'sql',
   'terraform',
+  'toml',
   'tsx',
   'typescript',
   'vim',
