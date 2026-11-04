@@ -7,3 +7,4 @@ nvim.log
 .beads-credential-key
 .beads/proxieddb/
 .cursor
+state/
