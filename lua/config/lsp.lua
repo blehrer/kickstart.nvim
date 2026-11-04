@@ -92,6 +92,52 @@ function M.setup_lazydev()
   })
 end
 
+local highlight_group = vim.api.nvim_create_augroup('nvim-new-lsp-highlight', { clear = false })
+
+function M.setup_attach()
+  vim.api.nvim_create_autocmd('LspDetach', {
+    group = vim.api.nvim_create_augroup('nvim-new-lsp-detach', { clear = true }),
+    callback = function(event)
+      vim.lsp.buf.clear_references()
+      vim.api.nvim_clear_autocmds({ group = highlight_group, buffer = event.buf })
+    end,
+  })
+
+  vim.api.nvim_create_autocmd('LspAttach', {
+    group = vim.api.nvim_create_augroup('nvim-new-lsp-attach', { clear = true }),
+    callback = function(event)
+      local client = vim.lsp.get_client_by_id(event.data.client_id)
+      if not client then
+        return
+      end
+
+      local bufnr = event.buf
+
+      if client:supports_method(vim.lsp.protocol.Methods.textDocument_completion) then
+        vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = true })
+      end
+
+      vim.keymap.set('i', '<C-Space>', vim.lsp.completion.get, {
+        buffer = bufnr,
+        desc = 'LSP completion',
+      })
+
+      if client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+        vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+          buffer = bufnr,
+          group = highlight_group,
+          callback = vim.lsp.buf.document_highlight,
+        })
+        vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+          buffer = bufnr,
+          group = highlight_group,
+          callback = vim.lsp.buf.clear_references,
+        })
+      end
+    end,
+  })
+end
+
 function M.setup_keymaps()
   local map = function(mode, lhs, rhs, desc)
     vim.keymap.set(mode, lhs, rhs, { desc = desc, buffer = false })
@@ -133,6 +179,7 @@ function M.setup()
   end
 
   M.setup_lazydev()
+  M.setup_attach()
 
   require('mason-lspconfig').setup({
     ensure_installed = M.ensure_installed,
