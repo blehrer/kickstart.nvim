@@ -4,4 +4,3 @@ vim.filetype.add({
     ['build.gradle'] = 'groovy.gradle',
   },
 })
-vim.lsp.enable('gradle_ls')

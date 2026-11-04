@@ -67,7 +67,7 @@ codereview.nvim reads `GITLAB_TOKEN` from the environment, or from 1Password (`o
 |----------|--------|
 | TypeScript/JS | `ts_ls` |
 | Java | `jdtls` |
-| Kotlin | `kotlin_language_server` |
+| Kotlin | `kotlin_lsp` (Mason: `kotlin-lsp`) |
 | HTML | `superhtml` |
 | Gradle | `gradle_ls` |
 | Python | `pylsp` |
