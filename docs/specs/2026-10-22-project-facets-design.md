@@ -19,7 +19,11 @@ Design for git-root project facets in kickstart.nvim. Implementation lives under
 
 | ID | Requires | Detection (git root) | Integrations |
 |----|----------|----------------------|--------------|
-| `typescript.eslint` | `node` | ESLint config files or `eslint` / `@eslint/*` in `package.json` | ESLint LSP (inline diagnostics; flat config in `lsp.lua`), `<leader>xe` = full-repo CLI lint → Trouble |
+| `typescript.eslint` | `node` | ESLint config files or `eslint` / `@eslint/*` in `package.json` | ESLint LSP; `facet.trouble` → picker / `<leader>xE` → Trouble |
+| `typescript.tsc` | `node` | `tsconfig.json` or `tsconfig.build.json` at git root | `facet.trouble` → picker / `<leader>xT` → Trouble |
+| `typescript.knip` | `node` | `knip` in root `package.json` `devDependencies` or `dependencies` | `facet.trouble` → picker; `knip --reporter json` → Trouble |
+
+Facets that define `trouble = { label, runner }` appear in `<leader>xe` (Snacks select). Runners are implemented in `lua/facets/trouble.lua` (`RUNNERS` table).
 | `playwright.e2e` | `node` | Root Playwright config or `@playwright/test` dep | neotest-playwright when facet or nested config (`find_pw_config_dir`) |
 | `kotlin.jvm` | `gradle` | Kotlin plugin / `src/main/kotlin` / settings.gradle | `kotlin_lsp` + `gradle_ls` enable; conform `ktlint` when available |
 

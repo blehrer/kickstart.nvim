@@ -2,7 +2,11 @@ local M = {}
 
 M.id = 'typescript.eslint'
 M.requires = { 'node' }
-M.trouble_mode = 'facet_eslint'
+
+M.trouble = {
+  label = 'ESLint (npx eslint .)',
+  runner = 'eslint',
+}
 
 local CONFIG_NAMES = {
   'eslint.config.js',

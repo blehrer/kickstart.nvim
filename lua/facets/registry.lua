@@ -4,6 +4,8 @@ local M = {}
 
 local FACET_MODULES = {
   'facets.typescript.eslint',
+  'facets.typescript.tsc',
+  'facets.typescript.knip',
   'facets.playwright.e2e',
   'facets.kotlin.jvm',
 }
@@ -125,6 +127,33 @@ function M.has_facet(id, start)
     end
   end
   return false
+end
+
+--- Active facets only (detect + stack passed) with a wired facet.trouble runner.
+---@param ctx table|nil
+---@param runners table|nil optional set of runner names, e.g. RUNNERS from facets.trouble
+---@return table[]
+function M.trouble_choices(ctx, runners)
+  if not ctx then
+    return {}
+  end
+  local choices = {}
+  for _, entry in ipairs(M.active(ctx)) do
+    local trouble = entry.def.trouble
+    if trouble and trouble.label and trouble.runner then
+      if not runners or runners[trouble.runner] then
+        choices[#choices + 1] = {
+          facet_id = entry.def.id,
+          label = trouble.label,
+          runner = trouble.runner,
+        }
+      end
+    end
+  end
+  table.sort(choices, function(a, b)
+    return a.label < b.label
+  end)
+  return choices
 end
 
 return M

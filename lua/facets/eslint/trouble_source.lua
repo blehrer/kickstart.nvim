@@ -1,3 +1,5 @@
+local trouble_jump = require('facets.trouble_jump')
+
 ---@class trouble.Source.facets_eslint: trouble.Source
 local M = {}
 
@@ -35,6 +37,7 @@ M.config = {
       },
       sort = { 'severity', 'filename', 'pos', 'message' },
       format = '{severity_icon} {message} {code} {pos}',
+      keys = trouble_jump.keys(),
     },
   },
 }

@@ -16,12 +16,20 @@ local function eslint_severity(n)
 end
 
 ---@param results table[]
+---@param root? string git root for relative filePath values
 ---@return trouble.Item[]
-function M.parse_json_results(results)
+function M.parse_json_results(results, root)
   local items = {}
   for _, file in ipairs(results) do
     local path = file.filePath
     if type(path) == 'string' and type(file.messages) == 'table' then
+      path = vim.fs.normalize(path)
+      if root and not vim.uv.fs_stat(path) then
+        local abs = vim.fs.normalize(vim.fs.joinpath(root, path))
+        if vim.uv.fs_stat(abs) then
+          path = abs
+        end
+      end
       for _, msg in ipairs(file.messages) do
         local line = msg.line or 1
         local col = (msg.column or 1) - 1
@@ -101,7 +109,7 @@ function M.project_lint(ctx, cb)
         return
       end
 
-      cb(nil, M.parse_json_results(decoded))
+      cb(nil, M.parse_json_results(decoded, ctx.root))
     end)
   end)
 end
