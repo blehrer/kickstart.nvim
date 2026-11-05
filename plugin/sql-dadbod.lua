@@ -12,10 +12,3 @@ vim.g.db_ui_use_nerd_fonts = 1
 --   staging_db = 'mysql://user:password@staging-host:3306/staging_db',
 -- }
 
-vim.api.nvim_create_autocmd('FileType', {
-  group = vim.api.nvim_create_augroup('dadbod-completion', { clear = true }),
-  pattern = { 'sql', 'mysql', 'plsql' },
-  callback = function(event)
-    vim.bo[event.buf].omnifunc = 'vim_dadbod_completion#omni'
-  end,
-})

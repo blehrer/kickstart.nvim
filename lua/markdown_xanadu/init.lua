@@ -160,14 +160,6 @@ function M.setup()
 
   require('config.terminal_alt').set('n', '<A-2>', M.toggle, { desc = 'Xanadu panels (transclusions)' })
 
-  vim.api.nvim_create_autocmd('FileType', {
-    group = augroup,
-    pattern = 'markdown',
-    callback = function(ev)
-      M.setup_buffer(ev.buf)
-    end,
-  })
-
   vim.api.nvim_create_autocmd({ 'WinScrolled', 'CursorMoved', 'WinResized', 'VimResized' }, {
     group = augroup,
     callback = function()

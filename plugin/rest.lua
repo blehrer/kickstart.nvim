@@ -24,10 +24,3 @@ vim.keymap.set('n', '<leader>hE', '<cmd>Rest env show<cr>', { desc = 'HTTP: show
 vim.keymap.set('n', '<leader>hc', '<cmd>Rest cookies<cr>', { desc = 'HTTP: edit cookies' })
 vim.keymap.set('n', '<leader>hl', '<cmd>Rest logs<cr>', { desc = 'HTTP: edit logs' })
 
-vim.api.nvim_create_autocmd('FileType', {
-  group = vim.api.nvim_create_augroup('nvim-new-rest', { clear = true }),
-  pattern = 'http',
-  callback = function(args)
-    vim.keymap.set('n', '<CR>', '<cmd>Rest run<cr>', { buffer = args.buf, desc = 'HTTP: run request' })
-  end,
-})

@@ -60,18 +60,25 @@ This protocol applies when ending a Beads implementation workflow. It is subordi
 
 ## Build & Test
 
-_Add your build and test commands here_
-
 ```bash
-# Example:
-# npm install
-# npm test
+./scripts/check-plugins.sh
+./scripts/test-markdown-xanadu.sh
+./scripts/smoke-test-merge-tool-help.sh
+NVIM_APPNAME=kickstart.nvim nvim --headless -u init.lua -l scripts/test-format-markdown.lua
 ```
 
 ## Architecture Overview
 
-_Add a brief overview of your project architecture_
+- `init.lua` — Leader keys, `vim.g.vscode` early-return, and core editor modules (`lua/config/*`).
+- `filetype.lua` — Root `vim.filetype.add` rules.
+- `plugin/*.lua` — Native `vim.pack.add` declarations, plugin setup, and global keymaps.
+- `after/ftplugin/<ft>.lua` — Buffer-local filetype options and keymaps (`markdown`, `oil`, `http`, `sql`/`mysql`/`plsql`).
+- `lsp/<server>.lua` — Native Neovim 0.11+ per-server LSP configs merged by `vim.lsp.config`.
+- `lua/` — Feature packages (`config/`, `format/`, `facets/`, `nx/`, `markdown_xanadu/`, `merge-tool-help/`).
 
 ## Conventions & Patterns
 
-_Add your project-specific conventions here_
+- Prefer native `vim.pack.add` in `plugin/*.lua` over plugin-manager abstractions.
+- Put filetype detection in root `filetype.lua` (not `after/ftdetect/`).
+- Put per-filetype buffer options and mappings in `after/ftplugin/<ft>.lua` instead of `FileType` autocmds in `plugin/*.lua`.
+- Put per-server LSP overrides in `lsp/<server>.lua`; keep global `vim.lsp.config('*', ...)`, `ensure_installed`, and `LspAttach` in `lua/config/lsp.lua`.

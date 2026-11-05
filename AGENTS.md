@@ -21,9 +21,13 @@
 - sidekick.nvim mux backend is zellij (`plugin/sidekick.lua`)
 - Nx project list cache: `~/.local/share/kickstart.nvim/nx-projects`, keyed by resolved git remote URL
 - Primary Playwright debug target: `legal-web-playwright-e2e` with `shared-auth-setup` subproject
-- oil.nvim buffer-local `<leader>y` copies cwd-relative path; `<leader>af` sends oil entries to sidekick CLI
+- oil.nvim buffer-local `~`, `<leader>y` (copy cwd-relative path), and `<leader>af` (send oil entries to sidekick CLI) live in `after/ftplugin/oil.lua`
 - dial.nvim handles `<C-a>`/`<C-x>` increment/decrement in `plugin/editing.lua`
-- Kotlin LSP: Mason `kotlin-lsp` → `kotlin_lsp` (JetBrains); `kotlin_language_server` (fwcd) excluded—embedded Kotlin 2.1 cannot read Gradle 9 / stdlib 2.3 metadata. Refresh with `:MasonInstall kotlin-lsp` when builds expire. Nested Gradle roots: symlink `gradlew`; optional `kls-classpath` only for fwcd (`scripts/kls-classpath-gradlew.sh`). `:KlsRestart` stops Kotlin LSP and clears fwcd `kls_database.db`. `cmd_env = vim.fn.environ()` for mise Java/Gradle.
+- Runtimepath conventions:
+  - Root `filetype.lua` holds `vim.filetype.add` rules (do not add `after/ftdetect/` files)
+  - `after/ftplugin/<ft>.lua` holds buffer-local filetype options and keymaps (do not register `FileType` autocmds in `plugin/*.lua` for single-filetype buffer setup)
+  - `lsp/<server>.lua` holds per-server `vim.lsp.config` overrides (`lua_ls`, `eslint`, `kotlin_lsp`, `bashls`, `dockerls`, `markdown_oxide`); `lua/config/lsp.lua` holds global `vim.lsp.config('*', ...)`, `ensure_installed`, `LspAttach`, and LSP keymaps
+- Kotlin LSP: Mason `kotlin-lsp` → `kotlin_lsp` (JetBrains, `lsp/kotlin_lsp.lua`); `kotlin_language_server` (fwcd) excluded—embedded Kotlin 2.1 cannot read Gradle 9 / stdlib 2.3 metadata. Refresh with `:MasonInstall kotlin-lsp` when builds expire. Nested Gradle roots: symlink `gradlew`; optional `kls-classpath` only for fwcd (`scripts/kls-classpath-gradlew.sh`). `:KlsRestart` stops Kotlin LSP and clears fwcd `kls_database.db`. `cmd_env = vim.fn.environ()` for mise Java/Gradle.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:970c3bf2 -->
 ## Beads Issue Tracker

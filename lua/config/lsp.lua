@@ -1,75 +1,21 @@
 local M = {}
 
 local hammerspoon_annotations = vim.fn.expand('~/.hammerspoon/Spoons/EmmyLua.spoon/annotations')
-local hammerspoon_dir = vim.fn.expand('~/.hammerspoon')
 
---- Per-server vim.lsp.config overrides (merged by mason-lspconfig / vim.lsp.enable).
-M.servers = {
-  ts_ls = {},
-  -- vscode-eslint / mason eslint: flat config repos (eslint.config.js) need useFlatConfig.
-  eslint = {
-    settings = {
-      experimental = { useFlatConfig = true },
-      workingDirectory = { mode = 'auto' },
-      validate = 'on',
-      run = 'onType',
-    },
-  },
-  jdtls = {},
-  -- JetBrains kotlin-lsp (Gradle/Kotlin 2.3+). fwcd kotlin_language_server ships Kotlin 2.1 and
-  -- breaks on Gradle 9.x stdlib 2.3 metadata; keep it out of ensure_installed / automatic_enable.
-  kotlin_lsp = {
-    filetypes = { 'kotlin' },
-    cmd_env = vim.fn.environ(),
-  },
-  superhtml = {},
-  gradle_ls = {},
-  pylsp = {},
-  bashls = {
-    filetypes = { 'bash', 'sh', 'zsh' },
-  },
-  lua_ls = {
-    settings = {
-      Lua = {
-        format = { enable = false },
-      },
-    },
-    on_attach = function(client, bufnr)
-      local path = vim.api.nvim_buf_get_name(bufnr)
-      if path == '' or not path:find(hammerspoon_dir, 1, true) then
-        return
-      end
-
-      local library = {}
-      if vim.uv.fs_stat(hammerspoon_annotations) then
-        table.insert(library, hammerspoon_annotations)
-      end
-
-      if #library == 0 then
-        return
-      end
-
-      client.notify('workspace/didChangeConfiguration', {
-        settings = {
-          Lua = {
-            diagnostics = { globals = { 'hs', 'spoon' } },
-            workspace = { library = library },
-          },
-        },
-      })
-    end,
-  },
-  dockerls = {
-    filetypes = { 'dockerfile' },
-  },
-  -- Only attach in PKM vaults; upstream includes `.git` and wedges non-vault repos on open.
-  markdown_oxide = {
-    root_markers = { '.obsidian', '.moxide.toml' },
-    workspace_required = true,
-  },
+-- Per-server overrides live in lsp/<server>.lua (loaded natively by vim.lsp.config).
+M.ensure_installed = {
+  'ts_ls',
+  'eslint',
+  'jdtls',
+  'kotlin_lsp',
+  'superhtml',
+  'gradle_ls',
+  'pylsp',
+  'bashls',
+  'lua_ls',
+  'dockerls',
+  'markdown_oxide',
 }
-
-M.ensure_installed = vim.tbl_keys(M.servers)
 
 function M.setup_lazydev()
   local library = {
@@ -173,10 +119,6 @@ function M.setup()
       'settings.gradle.kts',
     },
   })
-
-  for name, cfg in pairs(M.servers) do
-    vim.lsp.config(name, cfg)
-  end
 
   M.setup_lazydev()
   M.setup_attach()
