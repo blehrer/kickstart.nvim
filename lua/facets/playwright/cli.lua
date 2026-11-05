@@ -249,48 +249,22 @@ function M.label(option)
 end
 
 function M.pick_flags(on_done)
-  local data = M.get()
-  if #data.options == 0 then
-    vim.notify('No Playwright CLI options cached — is playwright installed?', vim.log.levels.WARN)
-    return
-  end
-
-  local select_multiple = require('neotest-playwright.select-multiple').selectMultiple
-  local labels = vim.tbl_map(function(o)
-    return M.label(o)
-  end, data.options)
-  labels[#labels + 1] = 'Done'
-
-  local by_label = {}
-  for _, o in ipairs(data.options) do
-    by_label[M.label(o)] = o
-  end
-
-  local selected = select_multiple({
-    prompt = 'Playwright flags · toggle then Done (<leader>tP)',
-    choices = labels,
-    initial = 'none',
-  })
-
-  local args = {}
-  for _, label in ipairs(selected) do
-    local option = by_label[label]
-    if option then
-      if option.takes_value then
-        local val = vim.fn.input(option.flag .. '=', '')
-        if val ~= '' then
-          args[#args + 1] = option.flag .. '=' .. val
-        end
-      else
-        args[#args + 1] = option.flag
-      end
+  local current = require('neotest-playwright.adapter-options').options.extra_args or {}
+  M.input({
+    prompt = 'Playwright flags: ',
+    default = table.concat(current, ' '),
+  }, function(value)
+    if value == nil then
+      return
     end
-  end
-
-  if on_done then
-    on_done(args)
-  end
-  return args
+    local args = {}
+    for part in value:gmatch('%S+') do
+      args[#args + 1] = part
+    end
+    if on_done then
+      on_done(args)
+    end
+  end)
 end
 
 -- getcompletion() needs a global; require() in the spec does not work

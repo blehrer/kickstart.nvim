@@ -173,15 +173,40 @@ function M.saved_e2e_config(pw_dir)
   return e2e_config_by_pw_dir[pw_dir]
 end
 
-local function sync_pw_flags(args)
-  require('neotest-playwright.adapter-options').options.extra_args = args or {}
-end
-
 function M.pick_flags()
   cli.pick_flags(function(args)
-    sync_pw_flags(args)
+    require('neotest-playwright.adapter-options').options.extra_args = args or {}
     local msg = #args > 0 and table.concat(args, ' ') or 'none'
     vim.notify('Playwright flags: ' .. msg, vim.log.levels.INFO)
+  end)
+end
+
+function M.pick_project()
+  local options = require('neotest-playwright.adapter-options').options
+  local persist = require('neotest-playwright.persist')
+  local report = require('neotest-playwright.playwright').get_config()
+  local projects = vim.tbl_get(report, 'config', 'projects') or {}
+  local choices = { '(all projects)' }
+  for _, p in ipairs(projects) do
+    if p and p.name then
+      choices[#choices + 1] = p.name
+    end
+  end
+
+  local current = options.projects and options.projects[1] or '(all projects)'
+  Snacks.picker.select(choices, {
+    prompt = ('Playwright project (current: %s):'):format(current),
+  }, function(choice)
+    if not choice then
+      return
+    end
+    local selected = choice == '(all projects)' and {} or { choice }
+    options.projects = selected
+    if options.persist_project_selection then
+      persist.saveProjectCache({ projects = selected })
+    end
+    vim.cmd('NeotestPlaywrightRefresh')
+    vim.notify('Playwright project → ' .. choice, vim.log.levels.INFO)
   end)
 end
 
@@ -327,7 +352,43 @@ local function attach_dap_strategy(spec, label)
   return spec
 end
 
+local DISCOVER_QUERY = [[
+  ; -- Namespaces --
+  (call_expression
+    function: (member_expression) @func_name (#eq? @func_name "test.describe")
+    arguments: (arguments . (string (string_fragment) @namespace.name))) @namespace.definition
+
+  ; -- Tests --
+  (call_expression
+    function: (identifier) @func_name (#eq? @func_name "test")
+    arguments: (arguments . (string (string_fragment) @test.name))) @test.definition
+
+  (call_expression
+    function: (member_expression) @func_name (#any-of? @func_name "test.only" "test.fixme" "test.skip")
+    arguments: (arguments . (string (string_fragment) @test.name))) @test.definition
+]]
+
 function M.wrap_adapter(adapter)
+  -- ponytail: upstream neotest-playwright captures (arguments) as @test.definition (fails when `(` is on the line
+  -- before the title) and omits `.` anchor (matches `{ tag: [...] }` strings as test names).
+  adapter.discover_positions = function(path)
+    local lib = require('neotest.lib')
+    local discover = require('neotest-playwright.discover')
+    local options = require('neotest-playwright.adapter-options').options
+    if lib.subprocess.enabled() then
+      lib.subprocess.call("require('neotest-playwright.discover').populate_data")
+    else
+      discover.populate_data()
+    end
+    return lib.treesitter.parse_positions(path, DISCOVER_QUERY, {
+      nested_tests = true,
+      position_id = 'require("neotest-playwright.discover")._position_id',
+      build_position = options.enable_dynamic_test_discovery
+          and 'require("neotest-playwright.discover")._build_position'
+        or nil,
+    })
+  end
+
   local orig = adapter.build_spec
   adapter.build_spec = function(args)
     local pos = args.tree:data()

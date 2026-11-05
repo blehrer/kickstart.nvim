@@ -20,7 +20,9 @@ local adapters = {}
 local neotest_opts = { adapters = adapters }
 
 if playwright_neotest_enabled() then
-  adapters[#adapters + 1] = pw.wrap_adapter(require('neotest-playwright').adapter(pw.adapter_options()))
+  adapters[#adapters + 1] = pw.wrap_adapter(require('neotest-playwright').adapter({
+    options = pw.adapter_options(),
+  }))
   neotest_opts.consumers = {
     playwright = require('neotest-playwright.consumers').consumers,
   }
@@ -52,7 +54,7 @@ vim.keymap.set('n', '<leader>td', pw.run_dap, { desc = 'Test: debug (Playwright 
 
 vim.keymap.set('n', '<leader>te', pw.pick_e2e_env, { desc = 'Test: pick e2e env (.env.{name})' })
 
-vim.keymap.set('n', '<leader>tp', '<cmd>NeotestPlaywrightProject<cr>', { desc = 'Test: Playwright browser project' })
+vim.keymap.set('n', '<leader>tp', pw.pick_project, { desc = 'Test: Playwright browser project' })
 
 vim.keymap.set('n', '<leader>tP', pw.pick_flags, { desc = 'Test: Playwright CLI flags (<leader>tP)' })
 
