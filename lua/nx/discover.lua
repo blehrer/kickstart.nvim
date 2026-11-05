@@ -522,11 +522,4 @@ function M.invalidate()
   nx_unavailable = {}
 end
 
-if os.getenv('NVIM_NX_DISCOVER_SELF_CHECK') == '1' then
-  assert(workspace.normalize_remote('git@GitHub.com:Org/Repo.git') == 'git@github.com:Org/Repo')
-  assert(workspace.normalize_remote('https://GitHub.com/Org/Repo.git') == 'https://github.com/org/repo')
-  local stubs = names_to_stubs({ 'a', 'b' })
-  assert(#stubs == 2 and stubs[1].name == 'a')
-end
-
 return M

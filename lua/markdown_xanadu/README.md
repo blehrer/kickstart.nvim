@@ -13,4 +13,4 @@ Side-by-side transclusion viewports, link sidebar, gutter connectors, backlinks,
 
 * Buffer-local markdown mappings (`gd`, `gD`, `gr`, `<leader>yh`) attach in `init.setup_buffer` and fall back to LSP when the cursor is not on a markdown link.
 * Keep pure parsing, slugging, and grid math separate from window mutations so `test/markdown_xanadu/*_spec.lua` can test them headlessly.
-* Run `./scripts/test-markdown-xanadu.sh` after editing this module.
+* Run `./test/run.sh` after editing this module.

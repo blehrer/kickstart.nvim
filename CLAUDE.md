@@ -61,10 +61,7 @@ This protocol applies when ending a Beads implementation workflow. It is subordi
 ## Build & Test
 
 ```bash
-./scripts/check-plugins.sh
-./scripts/test-markdown-xanadu.sh
-./scripts/smoke-test-merge-tool-help.sh
-NVIM_APPNAME=kickstart.nvim nvim --headless -u init.lua -l scripts/test-format-markdown.lua
+./test/run.sh
 ```
 
 ## Architecture Overview

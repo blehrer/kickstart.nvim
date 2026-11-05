@@ -5,7 +5,7 @@ Fixture vault for manual walkthroughs and automated headless tests.
 ## Run tests
 
 ```bash
-./scripts/test-markdown-xanadu.sh
+./test/run.sh
 ```
 
 ## Scenario matrix

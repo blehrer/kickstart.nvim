@@ -25,7 +25,8 @@ init.lua              entry: leader keys, ui2, config/*
 lua/config/           options, keymaps, autocmds (kickstart port target)
 plugin/*.lua          one file per plugin group; each calls vim.pack.add()
 snippets/vscode/      nvim-scissors VS Code-style snippets
-scripts/              smoke checks
+scripts/              operational helpers (reinstall, gradle classpath)
+test/                 automated headless specs (./test/run.sh)
 ```
 
 ## Plugin updates
@@ -82,5 +83,5 @@ Hammerspoon: load the [EmmyLua spoon](https://www.hammerspoon.org/Spoons/EmmyLua
 ## Verify
 
 ```bash
-./scripts/check-plugins.sh
+./test/run.sh
 ```

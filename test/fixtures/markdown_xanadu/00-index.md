@@ -34,6 +34,6 @@ Hub linking every test scenario in this vault.
 - [[edge-cases/missing-target]]
 - [[edge-cases/escaped-and-literal]]
 
-Run automated tests: `./scripts/test-markdown-xanadu.sh`
+Run automated tests: `./test/run.sh`
 
 Demo command in Neovim: `:MarkdownXanaduDemo`

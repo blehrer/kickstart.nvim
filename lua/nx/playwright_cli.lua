@@ -299,15 +299,4 @@ _G.NxPlaywrightComplete = function(findstart, base, line, col, shift)
   return M.complete(findstart, base, line, col, shift)
 end
 
-if os.getenv('NVIM_PW_CLI_SELF_CHECK') == '1' then
-  assert(M.minor_version('1.62.0') == '1.62')
-  local sample = [[
-Options:
-  --debug [mode]                   Run tests with Playwright Inspector
-  -g, --grep <grep>                Only run tests matching
-]]
-  assert(#M.parse_help(sample) >= 2)
-  assert(M.complete(0, '--deb')[1] == '--debug')
-end
-
 return M

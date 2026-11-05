@@ -19,4 +19,4 @@ rm -f "$DATA/telescope_history" "$DATA/rplugin.vim"
 echo "Reinstalling plugins into $DATA/site/pack (from $CONFIG)..."
 nvim --headless "+lua vim.pack.update()" +qa 2>&1
 
-"$CONFIG/scripts/check-plugins.sh"
+nvim --headless -u "$CONFIG/init.lua" -l "$CONFIG/test/plugins_spec.lua"

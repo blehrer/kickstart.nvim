@@ -14,4 +14,4 @@ Buffer formatting helpers backing `conform.nvim` in `plugin/format.lua`.
 
 * All skip and `project_ci` routing goes through `format_opts(bufnr)` in `plugin/format.lua`.
 * Keep `save_toggle.lua` free of terminal-only plugin dependencies at load time so `cursor/nvim-init.lua` can require it directly.
-* Run `NVIM_APPNAME=kickstart.nvim nvim --headless -u init.lua -l scripts/test-format-markdown.lua` after changing `markdown.lua`.
+* Run `NVIM_APPNAME=kickstart.nvim nvim --headless -u init.lua -l test/format/markdown_spec.lua` (or `./test/run.sh`) after changing `markdown.lua`.
