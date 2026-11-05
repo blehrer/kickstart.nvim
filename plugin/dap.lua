@@ -107,9 +107,9 @@ vim.keymap.set('n', '<leader>dk', dap.step_out, { desc = 'Debug step out' })
 vim.keymap.set('n', '<leader>b', function()
   require('dap-breakpoints.api').toggle_breakpoint()
 end, { desc = 'Toggle breakpoint' })
-vim.keymap.set('n', '<leader>du', function()
+vim.keymap.set('n', '<leader>du', require('config.pane').toggle(function()
   dapview.toggle(true)
-end, { desc = 'Debug UI toggle' })
+end), { desc = 'Debug UI toggle' })
 
 local function open_dap_log()
   if vim.fn.filereadable(dap_log) ~= 1 then

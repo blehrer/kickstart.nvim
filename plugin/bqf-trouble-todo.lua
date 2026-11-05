@@ -42,24 +42,26 @@ vim.keymap.set("n", "<leader>z", function()
 	require("bqf").toggle()
 end, { desc = "Toggle quickfix enhancements" })
 
-vim.keymap.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Trouble diagnostics" })
+local pane = require('config.pane')
+
+vim.keymap.set('n', '<leader>xx', pane.toggle('Trouble diagnostics toggle'), { desc = 'Trouble diagnostics' })
 vim.keymap.set(
-	"n",
-	"<leader>xX",
-	"<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-	{ desc = "Trouble buffer diagnostics" }
+	'n',
+	'<leader>xX',
+	pane.toggle('Trouble diagnostics toggle filter.buf=0'),
+	{ desc = 'Trouble buffer diagnostics' }
 )
-vim.keymap.set("n", "<leader>xt", "<cmd>TodoTrouble<cr>", { desc = "Todo comments (Trouble)" })
-vim.keymap.set("n", "<leader>xq", "<cmd>Trouble qflist toggle<cr>", { desc = "Trouble quickfix" })
-vim.keymap.set("n", "<leader>xp", function()
+vim.keymap.set('n', '<leader>xt', pane.toggle('TodoTrouble'), { desc = 'Todo comments (Trouble)' })
+vim.keymap.set('n', '<leader>xq', pane.toggle('Trouble qflist toggle'), { desc = 'Trouble quickfix' })
+vim.keymap.set('n', '<leader>xp', pane.toggle(function()
 	nx_trouble.open({ include_dependents = false })
-end, { desc = "Trouble Nx project diagnostics" })
-vim.keymap.set("n", "<f3>", function()
+end), { desc = 'Trouble Nx project diagnostics' })
+vim.keymap.set('n', '<f3>', pane.toggle(function()
 	nx_trouble.open({ include_dependents = false })
-end, { desc = "Trouble Nx project diagnostics" })
-vim.keymap.set("n", "<leader>xP", function()
+end), { desc = 'Trouble Nx project diagnostics' })
+vim.keymap.set('n', '<leader>xP', pane.toggle(function()
 	nx_trouble.open({ include_dependents = true })
-end, { desc = "Trouble Nx project + dependents diagnostics" })
+end), { desc = 'Trouble Nx project + dependents diagnostics' })
 vim.keymap.set("n", "<leader>xe", function()
 	facet_trouble.pick()
 end, { desc = "Trouble project check (facet picker)" })

@@ -42,9 +42,9 @@ vim.keymap.set('n', '<leader>tl', function()
   require('neotest').run.run_last()
 end, { desc = 'Test: run last' })
 
-vim.keymap.set('n', '<leader>ts', function()
+vim.keymap.set('n', '<leader>ts', require('config.pane').toggle(function()
   require('neotest').summary.toggle()
-end, { desc = 'Test: summary' })
+end), { desc = 'Test: summary' })
 
 vim.keymap.set('n', '<leader>to', function()
   require('neotest').output.open({ enter = true })

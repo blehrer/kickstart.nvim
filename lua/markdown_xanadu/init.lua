@@ -158,7 +158,7 @@ function M.setup()
     resolve.yank_anchor()
   end, { desc = 'Yank GitLab heading anchor for cursor' })
 
-  require('config.terminal_alt').set('n', '<A-2>', M.toggle, { desc = 'Xanadu panels (transclusions)' })
+  require('config.terminal_alt').set('n', '<A-2>', require('config.pane').toggle(M.toggle), { desc = 'Xanadu panels (transclusions)' })
 
   vim.api.nvim_create_autocmd({ 'WinScrolled', 'CursorMoved', 'WinResized', 'VimResized' }, {
     group = augroup,
