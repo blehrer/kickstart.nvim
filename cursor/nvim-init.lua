@@ -12,4 +12,5 @@ vim.cmd('packadd dial.nvim')
 
 require('config.keymaps')
 require('config.dial').setup()
-require('config.cursor_format').setup()
+require('format.save_toggle').setup()
+require('format.save_toggle').setup_toggle()

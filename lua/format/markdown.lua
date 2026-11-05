@@ -116,14 +116,10 @@ local function resolve_filename(filename)
 end
 
 local function prettier_cmd(filename)
-  local mason = vim.fs.find({ 'node_modules/.bin/prettier', 'node_modules/.bin/prettier.cmd' }, {
+  return vim.fs.find({ 'node_modules/.bin/prettier', 'node_modules/.bin/prettier.cmd' }, {
     upward = true,
     path = resolve_filename(filename),
-  })[1]
-  if mason then
-    return mason
-  end
-  return 'prettier'
+  })[1] or 'prettier'
 end
 
 function M.prettier_format_lines(lines, filename)
