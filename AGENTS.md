@@ -1,33 +1,40 @@
-## Learned User Preferences
+# Agent Guide & Repository Sitemap
 
-- Prefer native `vim.pack` plugin declarations over lazy.nvim-style config when adding plugins
-- In Cursor, use vscode-neovim with a slim `vim.g.vscode` profile; avoid VSCodeVim emulation to prevent two conflicting mental models
-- GitLab (not GitHub) for MR reviews; authenticate with a token stored in 1Password
-- `<leader>gx` copies a GitLab/GitHub file URL to `+`/`*` via Snacks gitbrowse (`what = file`, Disney patterns in `plugin/30-snacks.lua`, handler in `lua/config/gitbrowse.lua`); 2s notify, no browser; remote picker skipped when branch tracking remote is unambiguous
-- Playwright e2e tests default to INT/QAT SSO environment, not localhost
-- Do not edit attached plan files during implementation; execute against them as-is
-- `<C-/>` toggles the Snacks terminal
-- When translating lazy.nvim configs, skip keybinds that conflict with existing mappings and report what was skipped
+Neovim 0.12+ configuration (`NVIM_APPNAME=kickstart.nvim`, datadir `~/.local/share/kickstart.nvim`) using native `vim.pack`, experimental `ui2` + `tiny-cmdline`, and `snacks.nvim` as the sole picker.
 
-## Learned Workspace Facts
+Before editing a subsystem, **read the linked `README.md` or spec** in the sitemap below rather than scanning the whole tree.
 
-- kickstart.nvim: Neovim 0.12+ config using native `vim.pack`, Snacks as sole picker, experimental ui2 + tiny-cmdline
-- Set `NVIM_APPNAME=kickstart.nvim` so plugin datadir is `~/.local/share/kickstart.nvim`
-- Custom Nx integration in `lua/nx/*` (`plugin/nx.lua`): project picker, Playwright debug wizard, Trouble-scoped diagnostics
-- Project facets (`lua/facets/*`, `plugin/facets.lua`): git-root anchor + stack manifests; `:FacetsInfo`; ESLint repo Trouble `<leader>xe`; Nx Trouble stays `<leader>xp` — see `docs/specs/2026-10-22-project-facets-design.md`
-- Cursor profile: `init.lua` early-returns to `lua/config/cursor.lua` when `vim.g.vscode`; heavy terminal plugins guarded with `if vim.g.vscode then return end`
-- Cursor dotfiles live in repo `cursor/` and sync via `cursor/sync.sh` to `~/Library/Application Support/Cursor/User/`
-- Format parity (terminal + Cursor): `<leader>ff` hunks/modified lines, `<leader>fF` whole file (`cursor/keybindings.json` uses `editor.action.formatChanges` / `formatDocument`); `<leader>uf` toggles format-on-save + EditorConfig (`lua/format/save_toggle.lua`)
-- sidekick.nvim mux backend is zellij (`plugin/sidekick.lua`)
-- Nx project list cache: `~/.local/share/kickstart.nvim/nx-projects`, keyed by resolved git remote URL
-- Primary Playwright debug target: `legal-web-playwright-e2e` with `shared-auth-setup` subproject
-- oil.nvim buffer-local `~`, `<leader>y` (copy cwd-relative path), and `<leader>af` (send oil entries to sidekick CLI) live in `after/ftplugin/oil.lua`
-- dial.nvim handles `<C-a>`/`<C-x>` increment/decrement in `plugin/editing.lua`
-- Runtimepath conventions:
-  - Root `filetype.lua` holds `vim.filetype.add` rules (do not add `after/ftdetect/` files)
-  - `after/ftplugin/<ft>.lua` holds buffer-local filetype options and keymaps (do not register `FileType` autocmds in `plugin/*.lua` for single-filetype buffer setup)
-  - `lsp/<server>.lua` holds per-server `vim.lsp.config` overrides (`lua_ls`, `eslint`, `kotlin_lsp`, `bashls`, `dockerls`, `markdown_oxide`); `lua/config/lsp.lua` holds global `vim.lsp.config('*', ...)`, `ensure_installed`, `LspAttach`, and LSP keymaps
-- Kotlin LSP: Mason `kotlin-lsp` → `kotlin_lsp` (JetBrains, `lsp/kotlin_lsp.lua`); `kotlin_language_server` (fwcd) excluded—embedded Kotlin 2.1 cannot read Gradle 9 / stdlib 2.3 metadata. Refresh with `:MasonInstall kotlin-lsp` when builds expire. Nested Gradle roots: symlink `gradlew`; optional `kls-classpath` only for fwcd (`scripts/kls-classpath-gradlew.sh`). `:KlsRestart` stops Kotlin LSP and clears fwcd `kls_database.db`. `cmd_env = vim.fn.environ()` for mise Java/Gradle.
+## Repository Sitemap
+
+| Area | Entrypoints | Detailed Docs (Read First) |
+|------|-------------|----------------------------|
+| **Core editor & startup** | `init.lua`, `lua/config/` (`options`, `keymaps`, `autocmds`, `ui2`, `exrc`, `statusline`) | `lua/config/README.md` |
+| **Filetype detection** | `filetype.lua` (root `vim.filetype.add` rules; no `after/ftdetect/`) | `filetype.lua` |
+| **Per-filetype buffer setup** | `after/ftplugin/<ft>.lua` (`markdown`, `oil`, `http`, `sql`, `mysql`, `plsql`) | `plugin/README.md` |
+| **Plugins & global keymaps** | `plugin/*.lua` (ordered `05-`..`30-` where load order matters, alphabetical otherwise) | `plugin/README.md` |
+| **LSP servers & panels** | `lsp/<server>.lua` (per-server overrides), `lua/config/lsp.lua`, `lua/config/lsp_panels.lua`, `lua/config/lsp_symbol_sources.lua` | `lua/config/README.md` |
+| **Formatting & CI deference** | `plugin/format.lua`, `lua/format/` (`policy`, `deference`, `hunks`, `markdown`, `save_toggle`) | `lua/format/README.md` |
+| **Project facets (git-root)** | `plugin/facets.lua`, `lua/facets/` (`:FacetsInfo`, `<leader>xe` / `<leader>xE` / `<leader>xT`) | `lua/facets/README.md`, `docs/specs/2026-10-22-project-facets-design.md` |
+| **Nx & Playwright** | `plugin/nx.lua`, `plugin/neotest.lua`, `plugin/dap.lua`, `lua/nx/` (`<leader>nx`, `<leader>nt`, `<leader>xp`) | `lua/nx/README.md` |
+| **Markdown Xanadu** | `plugin/markdown-xanadu.lua`, `after/ftplugin/markdown.lua`, `lua/markdown_xanadu/` (`<A-2>`) | `lua/markdown_xanadu/README.md`, `test/fixtures/markdown_xanadu/README.md` |
+| **Git mergetool overlay** | `plugin/merge-tool-help.lua`, `lua/merge-tool-help/` (`<F1>`, `:MergeToolHelp`) | `lua/merge-tool-help/README.md` |
+| **Cursor (`vscode-neovim`)** | `cursor/nvim-init.lua`, `cursor/settings.json`, `cursor/keybindings.json`, `cursor/sync.sh` | `cursor/README.md` |
+| **Tests & operational scripts** | `test/run.sh`, `test/*_spec.lua`, `scripts/reinstall-plugins.sh`, `scripts/kls-classpath-gradlew.sh` | `README.md` |
+
+## Conventions & Preferences
+
+- **Plugins:** Declare plugins with native `vim.pack.add` in `plugin/*.lua` (guarded with `if vim.g.vscode then return end`). When translating `lazy.nvim` configs, skip conflicting keymaps and report what was skipped.
+- **Runtimepath layout:**
+  - Put `vim.filetype.add` rules in root `filetype.lua` (never `after/ftdetect/`).
+  - Put buffer-local filetype options/keymaps in `after/ftplugin/<ft>.lua` instead of `FileType` autocmds in `plugin/*.lua`.
+  - Put per-server LSP overrides in `lsp/<server>.lua`; keep global `vim.lsp.config('*', ...)`, `ensure_installed`, `LspAttach`, and LSP keymaps in `lua/config/lsp.lua`.
+- **Cursor parity:** Use `vscode-neovim` with a slim profile (`cursor/nvim-init.lua`), never VSCodeVim. `<leader>ff` (hunks/changes), `<leader>fF` (whole file), and `<leader>uf` (toggle format-on-save + EditorConfig) match between terminal Neovim and Cursor.
+- **Key workflows & defaults:**
+  - `<C-/>` toggles the Snacks terminal; `sidekick.nvim` uses the `zellij` mux backend (`plugin/sidekick.lua`).
+  - `<leader>gx` copies a GitLab/GitHub file URL to `+`/`*` via Snacks gitbrowse (`plugin/30-snacks.lua`, `lua/config/gitbrowse.lua`) with a 2s notification and no browser; GitLab MR reviews use `codereview.nvim` (`<leader>gm`) with token from 1Password.
+  - Playwright e2e tests default to INT/QAT SSO (not localhost); primary debug target is `legal-web-playwright-e2e` with `shared-auth-setup`.
+  - Kotlin uses JetBrains `kotlin_lsp` (`lsp/kotlin_lsp.lua`); `kotlin_language_server` (fwcd) is excluded from Mason auto-enable because embedded Kotlin 2.1 fails on Gradle 9 / stdlib 2.3 metadata. `:KlsRestart` restarts Kotlin LSP and clears `kls_database.db`.
+- **Verification:** Run `./test/run.sh` after changing plugins, runtimepath files, or `lua/` modules.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:970c3bf2 -->
 ## Beads Issue Tracker
@@ -37,10 +44,11 @@ This project uses **bd (beads)** for issue tracking. Run `bd prime` to see full 
 ### Quick Reference
 
 ```bash
-bd ready              # Find available work
-bd show <id>          # View issue details
+bd ready                # Find available work
+bd show <id>            # View issue details
 bd update <id> --claim  # Claim work
-bd close <id>         # Complete work
+bd close <id>           # Complete work
+bd export --no-memories -o .beads/issues.jsonl
 ```
 
 ### Rules
@@ -64,17 +72,11 @@ The managed Beads block is task-tracking guidance, not permission to override re
 This protocol applies when ending a Beads implementation workflow. It is subordinate to explicit user, repository, and orchestrator instructions.
 
 1. **File issues for remaining work** - Create beads for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
+2. **Run quality gates** (if code changed) - `./test/run.sh`
+3. **Update issue status** - Close finished work, update in-progress items, export `.beads/issues.jsonl`
 4. **Handle git/sync by active profile**:
    ```bash
    # Conservative/minimal/default: report status and proposed commands; wait for approval.
-   git status
-
-   # Team-maintainer opt-in only, unless current instructions forbid it:
-   git pull --rebase
-   bd dolt push
-   git push
    git status
    ```
 5. **Hand off** - Summarize changes, validation, issue status, and any blocked sync/commit/push step
@@ -84,118 +86,3 @@ This protocol applies when ending a Beads implementation workflow. It is subordi
 - Do not commit or push without clear authority from the active profile or the current user request.
 - If a required sync or push is blocked, stop and report the exact command and error.
 <!-- END BEADS INTEGRATION -->
-
-<!-- BEGIN BEADS CODEX SETUP: generated by bd setup codex -->
-## Beads Issue Tracker
-
-Use Beads (`bd`) for durable task tracking in repositories that include it. Use the `beads` skill at `.agents/skills/beads/SKILL.md` (project install) or `~/.agents/skills/beads/SKILL.md` (global install) for Beads workflow guidance, then use the `bd` CLI for issue operations.
-
-### Quick Reference
-
-```bash
-bd ready                # Find available work
-bd show <id>            # View issue details
-bd update <id> --claim  # Claim work
-bd close <id>           # Complete work
-bd prime                # Refresh Beads context
-```
-
-### Rules
-
-- Use `bd` for all task tracking; do not create markdown TODO lists.
-- Run `bd prime` when Beads context is missing or stale. Codex 0.129.0+ can load Beads context automatically through native hooks; use `/hooks` to inspect or toggle them.
-- Keep persistent project memory in Beads via `bd remember`; do not create ad hoc memory files.
-
-**Architecture in one line:** issues live in a local Dolt DB; sync uses `refs/dolt/data` on your git remote; `.beads/issues.jsonl` is a passive export. See https://github.com/gastownhall/beads/blob/main/docs/SYNC_CONCEPTS.md for details and anti-patterns.
-<!-- END BEADS CODEX SETUP -->
-
-<!-- bv-agent-instructions-v3 -->
-
----
-
-## Beads Workflow Integration
-
-This project uses [beads_rust](https://github.com/Dicklesworthstone/beads_rust) (`bd`) for issue tracking and [beads_viewer](https://github.com/Dicklesworthstone/beads_viewer) (`bv`) for graph-aware triage. Issues are stored in `.beads/` and tracked in git. Current `bd` workspaces normally export `.beads/issues.jsonl`; older `bd`/legacy workspaces may use `.beads/beads.jsonl`. `bv` auto-discovers the supported JSONL files, so agents should use `bd`/`bv` commands instead of hard-coding a single filename.
-
-### Using bv as an AI sidecar
-
-bv is a graph-aware triage engine for Beads projects. Instead of parsing .beads/issues.jsonl / .beads/beads.jsonl directly or hallucinating graph traversal, use robot flags for deterministic, dependency-aware outputs with precomputed metrics (PageRank, betweenness, critical path, cycles, HITS, eigenvector, k-core).
-
-**Scope boundary:** bv handles *what to work on* (triage, priority, planning). `bd` handles creating, modifying, and closing beads.
-
-**CRITICAL: Use ONLY --robot-* flags. Bare bv launches an interactive TUI that blocks your session.**
-
-#### The Workflow: Start With Triage
-
-**`bv --robot-triage` is your single entry point.** It returns everything you need in one call:
-- `quick_ref`: at-a-glance counts + top 3 picks
-- `recommendations`: ranked actionable items with scores, reasons, unblock info
-- `quick_wins`: low-effort high-impact items
-- `blockers_to_clear`: items that unblock the most downstream work
-- `project_health`: status/type/priority distributions, graph metrics
-- `commands`: copy-paste shell commands for next steps
-
-```bash
-bv --robot-triage        # THE MEGA-COMMAND: start here
-bv --robot-next          # Minimal: just the single top pick + claim command
-
-# Token-optimized output (TOON) for lower LLM context usage:
-bv --robot-triage --format toon
-```
-
-Before claiming, verify current state with `bd show <id> --json` or `bd ready --json`. `recommendations` can include graph-important blocked or assigned work; only `quick_ref.top_picks` and non-empty `claim_command` fields represent claimable work.
-
-#### Other bv Commands
-
-| Command | Returns |
-|---------|---------|
-| `--robot-plan` | Parallel execution tracks with unblocks lists |
-| `--robot-priority` | Priority misalignment detection with confidence |
-| `--robot-insights` | Full metrics: PageRank, betweenness, HITS, eigenvector, critical path, cycles, k-core |
-| `--robot-alerts` | Stale issues, blocking cascades, priority mismatches |
-| `--robot-suggest` | Hygiene: duplicates, missing deps, label suggestions, cycle breaks |
-| `--robot-diff --diff-since <ref>` | Changes since ref: new/closed/modified issues |
-| `--robot-graph [--graph-format=json\|dot\|mermaid]` | Dependency graph export |
-
-#### Scoping & Filtering
-
-```bash
-bv --robot-plan --label backend              # Scope to label's subgraph
-bv --robot-insights --as-of HEAD~30          # Historical point-in-time
-bv --recipe actionable --robot-plan          # Pre-filter: ready to work (no blockers)
-bv --recipe high-impact --robot-triage       # Pre-filter: top PageRank scores
-```
-
-### br Commands for Issue Management
-
-```bash
-bd ready --json                       # Show issues ready to work (no blockers)
-bd list --status=open --json          # All open issues
-bd show <id> --json                   # Full issue details with dependencies
-bd create --title="..." --type=task --priority=2 --json
-bd update <id> --status=in_progress --json
-bd close <id> --reason="Completed" --json
-bd close <id1> <id2> --reason="Completed" --json
-bd export --no-memories -o .beads/issues.jsonl                  # Export DB to JSONL after Beads mutations
-```
-
-### Workflow Pattern
-
-1. **Triage**: Run `bv --robot-triage` to find the highest-impact actionable work
-2. **Claim**: Use `bd update <id> --status=in_progress --json`
-3. **Work**: Implement the task
-4. **Complete**: Use `bd close <id> --reason="Completed" --json`
-5. **Sync**: Run `bd export --no-memories -o .beads/issues.jsonl` after Beads mutations so the JSONL export is current
-
-### Key Concepts
-
-- **Dependencies**: Issues can block other issues. `bd ready --json` shows only unblocked work.
-- **Priority**: P0=critical, P1=high, P2=medium, P3=low, P4=backlog (use numbers 0-4, not words)
-- **Types**: task, bug, feature, epic, chore, docs, question
-- **Blocking**: `bd dep add <issue> <depends-on>` to add dependencies
-
-### Git Policy
-
-`bd` never commits or pushes. Follow this repository's own git instructions before staging, committing, or pushing. If the repository says "commit only when asked," that rule overrides any generic workflow advice.
-
-<!-- end-bv-agent-instructions -->
