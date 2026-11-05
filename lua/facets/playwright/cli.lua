@@ -1,4 +1,4 @@
-local workspace = require('nx.workspace')
+local anchor = require('facets.anchor')
 
 local M = {}
 
@@ -17,7 +17,7 @@ function M.minor_version(full)
 end
 
 local function pw_cmd(args)
-  local ws = workspace.root() or vim.loop.cwd()
+  local ws = anchor.git_toplevel() or vim.loop.cwd()
   local bin = ws .. '/node_modules/.bin/playwright'
   if vim.fn.executable(bin) == 1 then
     return vim.list_extend({ bin }, args)
@@ -100,8 +100,7 @@ local function read_cache()
   if vim.fn.filereadable(CACHE_FILE) ~= 1 then
     return nil
   end
-  local ok, decoded = pcall(vim.fn.json_decode, table.concat(vim.fn.readfile(CACHE_FILE), '\n'))
-  return ok and decoded or nil
+  return anchor.read_json(CACHE_FILE)
 end
 
 local function write_cache(data)
@@ -111,7 +110,7 @@ end
 function M.refresh()
   local full, minor = M.current_version()
   if not full then
-    return nil, 'playwright not found (install in monorepo root)'
+    return nil, 'playwright not found (install in repo root)'
   end
 
   local help = run_playwright({ 'test', '--help' })

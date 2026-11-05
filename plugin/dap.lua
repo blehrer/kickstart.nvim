@@ -54,7 +54,7 @@ else
   end, {})
 end
 
-local dap_log = vim.fn.stdpath('data') .. '/nx-dap-last.log'
+local dap_log = vim.fn.stdpath('data') .. '/dap-last.log'
 
 local function append_dap_log(text)
   if not text or text == '' then
@@ -64,13 +64,13 @@ local function append_dap_log(text)
   vim.fn.writefile({ prior .. text }, dap_log)
 end
 
-dap.listeners.after.event_output['nx-dap-log'] = function(_, body)
+dap.listeners.after.event_output['dap-log'] = function(_, body)
   if body and body.output then
     append_dap_log(body.output)
   end
 end
 
-dap.listeners.after.event_exited['nx-dap-log'] = function(_, body)
+dap.listeners.after.event_exited['dap-log'] = function(_, body)
   local code = body and body.exitCode or '?'
   local msg = ('DAP process exited (code %s) — log: %s'):format(tostring(code), dap_log)
   if code == 0 or code == '0' then
@@ -111,10 +111,13 @@ vim.keymap.set('n', '<leader>du', function()
   dapview.toggle(true)
 end, { desc = 'Debug UI toggle' })
 
-vim.api.nvim_create_user_command('NxDapLog', function()
+local function open_dap_log()
   if vim.fn.filereadable(dap_log) ~= 1 then
     vim.notify('No DAP log yet: ' .. dap_log, vim.log.levels.WARN)
     return
   end
   vim.cmd('edit ' .. vim.fn.fnameescape(dap_log))
-end, { desc = 'Open last Playwright DAP log' })
+end
+
+vim.api.nvim_create_user_command('DapLog', open_dap_log, { desc = 'Open last DAP log' })
+vim.api.nvim_create_user_command('NxDapLog', open_dap_log, { desc = 'Open last DAP log (alias)' })

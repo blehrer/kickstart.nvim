@@ -1,7 +1,38 @@
-local workspace = require('nx.workspace')
-local cli = require('nx.playwright_cli')
+local anchor = require('facets.anchor')
+local cli = require('facets.playwright.cli')
 
 local M = {}
+
+M.id = 'playwright.e2e'
+M.requires = { 'node' }
+
+local PW_CONFIG_NAMES = {
+  'playwright.config.ts',
+  'playwright.config.js',
+  'playwright.config.mjs',
+}
+
+local function has_playwright_dep(pkg)
+  if not pkg then
+    return false
+  end
+  for _, key in ipairs({ 'dependencies', 'devDependencies' }) do
+    local deps = pkg[key]
+    if type(deps) == 'table' and deps['@playwright/test'] then
+      return true
+    end
+  end
+  return false
+end
+
+function M.detect(ctx)
+  for _, name in ipairs(PW_CONFIG_NAMES) do
+    if vim.fn.filereadable(ctx.root .. '/' .. name) == 1 then
+      return true
+    end
+  end
+  return has_playwright_dep(anchor.read_json(ctx.root .. '/package.json'))
+end
 
 M.pw_context_path = nil
 M.active_session = nil
@@ -16,31 +47,15 @@ local function in_project(path, nx_root)
 end
 
 local E2E_ENV_CACHE = vim.fn.stdpath('data') .. '/neotest-pw-e2e-env.json'
-local e2e_config_by_pw_dir = {}
-
-local function load_e2e_cache()
-  if vim.fn.filereadable(E2E_ENV_CACHE) ~= 1 then
-    return {}
-  end
-  local ok, decoded = pcall(vim.fn.json_decode, table.concat(vim.fn.readfile(E2E_ENV_CACHE), '\n'))
-  return ok and type(decoded) == 'table' and decoded or {}
-end
+local e2e_config_by_pw_dir = anchor.read_json(E2E_ENV_CACHE) or {}
 
 local function save_e2e_cache()
   vim.fn.writefile({ vim.fn.json_encode(e2e_config_by_pw_dir) }, E2E_ENV_CACHE)
 end
 
-e2e_config_by_pw_dir = load_e2e_cache()
-
-local PW_CONFIG_NAMES = {
-  'playwright.config.ts',
-  'playwright.config.js',
-  'playwright.config.mjs',
-}
-
---- Directory containing a Playwright config, or nil (no nx/cwd fallback).
+--- Directory containing a Playwright config, or nil (no git/cwd fallback).
 function M.find_pw_config_dir(start_path)
-  local dir = vim.fn.fnamemodify(start_path or vim.loop.cwd(), ':p')
+  local dir = vim.fn.fnamemodify(start_path or vim.loop.cwd(), ':p'):gsub('/$', '')
   if vim.fn.isdirectory(dir) ~= 1 then
     dir = vim.fn.fnamemodify(dir, ':h')
   end
@@ -60,7 +75,7 @@ function M.find_pw_config_dir(start_path)
 end
 
 function M.find_pw_dir(start_path)
-  return M.find_pw_config_dir(start_path) or workspace.root() or vim.loop.cwd()
+  return M.find_pw_config_dir(start_path) or anchor.git_toplevel(start_path) or vim.loop.cwd()
 end
 
 function M.resolve_anchor_path()
@@ -81,17 +96,17 @@ function M.is_pw_spec(path)
   if not (path:match('%.spec%.[tj]sx?$') or path:match('%.test%.[tj]sx?$')) then
     return false
   end
-  return path:find('%-e2e', 1, true) ~= nil or path:find('/e2e/', 1, true) ~= nil
+  return path:find('-e2e', 1, true) ~= nil or path:find('/e2e/', 1, true) ~= nil
 end
 
-function M.spec_files(nx_root)
-  if not nx_root or vim.fn.isdirectory(nx_root) ~= 1 then
+function M.spec_files(root_dir)
+  if not root_dir or vim.fn.isdirectory(root_dir) ~= 1 then
     return {}
   end
   local specs = {}
   local seen = {}
   for _, pat in ipairs({ '**/*.spec.ts', '**/*.spec.tsx', '**/*.test.ts', '**/*.test.tsx' }) do
-    for _, path in ipairs(vim.fn.globpath(nx_root, pat, false, true)) do
+    for _, path in ipairs(vim.fn.globpath(root_dir, pat, false, true)) do
       if not seen[path] and M.is_pw_spec(path) then
         seen[path] = true
         specs[#specs + 1] = path
@@ -103,17 +118,25 @@ function M.spec_files(nx_root)
 end
 
 function M.e2e_configurations(pw_dir)
-  local data = workspace.read_json(pw_dir .. '/project.json')
+  local data = anchor.read_json(pw_dir .. '/project.json')
   local configs = data and vim.tbl_get(data, 'targets', 'e2e', 'configurations')
-  if type(configs) ~= 'table' then
-    return {}
+  if type(configs) == 'table' then
+    local names = vim.tbl_keys(configs)
+    table.sort(names)
+    return names
   end
-  local names = vim.tbl_keys(configs)
+  local names = {}
+  for _, file in ipairs(vim.fn.globpath(pw_dir, '.env.*', true, true)) do
+    local name = vim.fn.fnamemodify(file, ':t'):match('^%.env%.(.+)$')
+    if name and name ~= 'example' and name ~= 'local' then
+      names[#names + 1] = name
+    end
+  end
   table.sort(names)
   return names
 end
 
-local function parse_dotenv(path)
+function M.parse_dotenv(path)
   local result = {}
   if vim.fn.filereadable(path) ~= 1 then
     return result
@@ -132,7 +155,7 @@ local function parse_dotenv(path)
 end
 
 function M.apply_env(pw_dir, config_name)
-  local merged = vim.tbl_extend('force', parse_dotenv(pw_dir .. '/.env'), parse_dotenv(pw_dir .. '/.env.' .. config_name))
+  local merged = vim.tbl_extend('force', M.parse_dotenv(pw_dir .. '/.env'), M.parse_dotenv(pw_dir .. '/.env.' .. config_name))
   require('neotest-playwright.adapter-options').options.env = merged
   e2e_config_by_pw_dir[pw_dir] = config_name
   save_e2e_cache()
@@ -205,7 +228,7 @@ local function dap_playwright_args(cmd)
   return args
 end
 
-M.dap_log_path = vim.fn.stdpath('data') .. '/nx-dap-last.log'
+M.dap_log_path = vim.fn.stdpath('data') .. '/dap-last.log'
 
 local function log_dap(line)
   local path = M.dap_log_path
@@ -244,7 +267,7 @@ function M.run_nx_dap(session)
   local ws = session.workspace_root
   local pw_dir = session.nx_root
   if not ws or not pw_dir then
-    vim.notify('Nx DAP: missing workspace_root or nx_root', vim.log.levels.ERROR)
+    vim.notify('Playwright DAP: missing workspace_root or nx_root', vim.log.levels.ERROR)
     return
   end
 
@@ -339,7 +362,9 @@ function M.adapter_options()
     enable_dynamic_test_discovery = true,
     experimental = { telescope = { enabled = false } },
     get_playwright_binary = function()
-      return (workspace.root() or vim.loop.cwd()) .. '/node_modules/.bin/playwright'
+      local start = M.resolve_anchor_path()
+      local root = anchor.git_toplevel(start) or M.find_pw_dir(start)
+      return root .. '/node_modules/.bin/playwright'
     end,
     get_playwright_config = function()
       return M.find_pw_dir(M.resolve_anchor_path()) .. '/playwright.config.ts'
@@ -379,7 +404,7 @@ function M.pick_e2e_env()
   local pw_dir = M.find_pw_dir(M.resolve_anchor_path())
   local configs = M.e2e_configurations(pw_dir)
   if #configs == 0 then
-    vim.notify('No targets.e2e.configurations in ' .. pw_dir .. '/project.json', vim.log.levels.WARN)
+    vim.notify('No e2e configurations or .env.* files in ' .. pw_dir, vim.log.levels.WARN)
     return
   end
 

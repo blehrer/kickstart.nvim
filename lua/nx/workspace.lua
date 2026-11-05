@@ -24,14 +24,7 @@ function M.root(start)
 end
 
 function M.read_json(path)
-  if vim.fn.filereadable(path) ~= 1 then
-    return nil
-  end
-  local ok, decoded = pcall(vim.fn.json_decode, table.concat(vim.fn.readfile(path), '\n'))
-  if not ok or type(decoded) ~= 'table' then
-    return nil
-  end
-  return decoded
+  return require('facets.anchor').read_json(path)
 end
 
 function M.nearest_project_json(start)

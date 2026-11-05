@@ -1,8 +1,8 @@
 local registry = require('facets.registry')
 local trouble_jump = require('facets.trouble_jump')
-local eslint_run = require('facets.eslint.run')
-local tsc_run = require('facets.tsc.run')
-local knip_run = require('facets.knip.run')
+local eslint_run = require('facets.eslint')
+local tsc_run = require('facets.tsc')
+local knip_run = require('facets.knip')
 
 local M = {}
 

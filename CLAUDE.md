@@ -14,8 +14,8 @@ Before editing a subsystem, **read the linked `README.md` or spec** in the sitem
 | **Plugins & global keymaps** | `plugin/*.lua` (ordered `05-`..`30-` where load order matters, alphabetical otherwise) | `plugin/README.md` |
 | **LSP servers & panels** | `lsp/<server>.lua` (per-server overrides), `lua/config/lsp.lua`, `lua/config/lsp_panels.lua`, `lua/config/lsp_symbol_sources.lua` | `lua/config/README.md` |
 | **Formatting & CI deference** | `plugin/format.lua`, `lua/format/` (`policy`, `deference`, `hunks`, `markdown`, `save_toggle`) | `lua/format/README.md` |
-| **Project facets (git-root)** | `plugin/facets.lua`, `lua/facets/` (`:FacetsInfo`, `<leader>xe` / `<leader>xE` / `<leader>xT`) | `lua/facets/README.md`, `docs/specs/2026-10-22-project-facets-design.md` |
-| **Nx & Playwright** | `plugin/nx.lua`, `plugin/neotest.lua`, `plugin/dap.lua`, `lua/nx/` (`<leader>nx`, `<leader>nt`, `<leader>xp`) | `lua/nx/README.md` |
+| **Project facets (git-root)** | `plugin/facets.lua`, `plugin/neotest.lua`, `lua/facets/` (`eslint`, `tsc`, `knip`, `kotlin`, `playwright/`) | `lua/facets/README.md`, `docs/specs/2026-10-22-project-facets-design.md` |
+| **Nx monorepo scope & wizard** | `plugin/nx.lua`, `lua/nx/` (`<leader>nx`, `<leader>nt`, `<leader>xp`, `<leader>xP`) | `lua/nx/README.md` |
 | **Markdown Xanadu** | `plugin/markdown-xanadu.lua`, `after/ftplugin/markdown.lua`, `lua/markdown_xanadu/` (`<A-2>`) | `lua/markdown_xanadu/README.md`, `test/fixtures/markdown_xanadu/README.md` |
 | **Git mergetool overlay** | `plugin/merge-tool-help.lua`, `lua/merge-tool-help/` (`<F1>`, `:MergeToolHelp`) | `lua/merge-tool-help/README.md` |
 | **Cursor (`vscode-neovim`)** | `cursor/nvim-init.lua`, `cursor/settings.json`, `cursor/keybindings.json`, `cursor/sync.sh` | `cursor/README.md` |

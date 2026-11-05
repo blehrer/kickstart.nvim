@@ -1,6 +1,29 @@
 local Item = require('trouble.item')
+local anchor = require('facets.anchor')
 
 local M = {}
+
+M.id = 'typescript.knip'
+M.requires = { 'node' }
+
+M.trouble = {
+  label = 'Knip (unused deps/exports)',
+  runner = 'knip',
+}
+
+function M.detect(ctx)
+  local pkg = anchor.read_json(ctx.root .. '/package.json')
+  if not pkg then
+    return false
+  end
+  for _, key in ipairs({ 'devDependencies', 'dependencies' }) do
+    local deps = pkg[key]
+    if type(deps) == 'table' and deps.knip then
+      return true
+    end
+  end
+  return false
+end
 
 local NOTIFY_ID = 'facet-knip-run'
 local inflight ---@type table|nil

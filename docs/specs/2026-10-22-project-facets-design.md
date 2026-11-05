@@ -23,15 +23,15 @@ Design for git-root project facets in kickstart.nvim. Implementation lives under
 | `typescript.tsc` | `node` | `tsconfig.json` or `tsconfig.build.json` at git root | `facet.trouble` → picker / `<leader>xT` → Trouble |
 | `typescript.knip` | `node` | `knip` in root `package.json` `devDependencies` or `dependencies` | `facet.trouble` → picker; `knip --reporter json` → Trouble |
 
-Facets that define `trouble = { label, runner }` appear in `<leader>xe` (Snacks select). Runners are implemented in `lua/facets/trouble.lua` (`RUNNERS` table).
-| `playwright.e2e` | `node` | Root Playwright config or `@playwright/test` dep | neotest-playwright when facet or nested config (`find_pw_config_dir`) |
-| `kotlin.jvm` | `gradle` | Kotlin plugin / `src/main/kotlin` / settings.gradle | `kotlin_lsp` + `gradle_ls` enable; conform `ktlint` when available |
+Facets that define `trouble = { label, runner }` appear in `<leader>xe` (Snacks select). Runners and Trouble sources are built in `lua/facets/trouble.lua` (`SPECS` / `make_source`).
+| `playwright.e2e` | `node` | Root Playwright config or `@playwright/test` dep (`lua/facets/playwright/`) | `neotest-playwright`, `.env.<cfg>` (`<leader>te`), CLI flags (`<leader>tP`), `pwa-node` DAP (`<leader>td`) |
+| `kotlin.jvm` | `gradle` | Kotlin plugin / `src/main/kotlin` / settings.gradle (`lua/facets/kotlin.lua`) | `kotlin_lsp` + `gradle_ls` enable; conform `ktlint` when available |
 
 ## Nx
 
-Nx remains a **scope overlay**: `<leader>xp` / `nx.trouble` filter diagnostics to an Nx project (and optional dependents). Facets describe repo-level tooling at the git root.
+Nx remains a **scope overlay**: `<leader>xp` / `nx.trouble` filter diagnostics to an Nx project (and optional dependents), and `<leader>nx` / `<leader>nt` drive the Nx target wizard (`lua/nx/`). Facets describe stack tooling (`lua/facets/`).
 
-Nested Playwright/ESLint configs under Nx apps are still discovered by `nx.playwright` (`find_pw_config_dir`) even when the root facet is off.
+Nested Playwright configs under Nx apps are still discovered by `facets.playwright` (`find_pw_config_dir`) even when the root facet is off.
 
 ## Commands
 

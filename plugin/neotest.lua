@@ -6,7 +6,7 @@ vim.pack.add({
   'https://github.com/thenbe/neotest-playwright',
 })
 
-local pw = require('nx.playwright')
+local pw = require('facets.playwright')
 local registry = require('facets.registry')
 
 local function playwright_neotest_enabled()

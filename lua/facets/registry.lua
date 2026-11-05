@@ -3,11 +3,11 @@ local anchor = require('facets.anchor')
 local M = {}
 
 local FACET_MODULES = {
-  'facets.typescript.eslint',
-  'facets.typescript.tsc',
-  'facets.typescript.knip',
-  'facets.playwright.e2e',
-  'facets.kotlin.jvm',
+  'facets.eslint',
+  'facets.tsc',
+  'facets.knip',
+  'facets.playwright',
+  'facets.kotlin',
 }
 
 local facet_defs = {}

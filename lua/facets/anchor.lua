@@ -1,5 +1,16 @@
 local M = {}
 
+function M.read_json(path)
+  if vim.fn.filereadable(path) ~= 1 then
+    return nil
+  end
+  local ok, decoded = pcall(vim.fn.json_decode, table.concat(vim.fn.readfile(path), '\n'))
+  if not ok or type(decoded) ~= 'table' then
+    return nil
+  end
+  return decoded
+end
+
 local MANIFESTS = {
   { kind = 'node', paths = { 'package.json' } },
   { kind = 'gradle', paths = { 'build.gradle.kts', 'build.gradle' } },

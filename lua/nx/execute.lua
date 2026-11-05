@@ -1,4 +1,4 @@
-local pw = require('nx.playwright')
+local pw = require('facets.playwright')
 local run = require('nx.run')
 
 local M = {}

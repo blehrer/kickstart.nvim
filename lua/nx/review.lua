@@ -1,6 +1,6 @@
 local discover = require('nx.discover')
 local pickers = require('nx.pickers')
-local pw_cli = require('nx.playwright_cli')
+local pw_cli = require('facets.playwright.cli')
 
 local M = {}
 
