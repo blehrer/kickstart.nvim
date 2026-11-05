@@ -38,17 +38,20 @@ function M.detect(ctx)
 end
 
 function M.lsp(_ctx)
-  return { enable = { 'kotlin_lsp', 'gradle_ls' } }
+  return { enable = { 'kotlin_lsp' } }
 end
 
----@return string[]|nil formatters for conform when ktlint is available
+---@return string[]|nil formatters for conform when ktlint or ktfmt is available
 function M.conform_formatters(_ctx)
-  if vim.fn.executable('ktlint') == 1 then
-    return { 'ktlint' }
-  end
   local ok, registry = pcall(require, 'mason-registry')
-  if ok and registry.is_installed('ktlint') then
-    return { 'ktlint' }
+  local out = {}
+  for _, name in ipairs({ 'ktlint', 'ktfmt' }) do
+    if vim.fn.executable(name) == 1 or (ok and registry.is_installed(name)) then
+      out[#out + 1] = name
+    end
+  end
+  if #out > 0 then
+    return out
   end
   return nil
 end

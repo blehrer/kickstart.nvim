@@ -34,6 +34,20 @@ local function is_project_ci(opts)
   return opts.formatters and opts.formatters[1] == 'project_ci'
 end
 
+local function kotlin_formatters(bufnr)
+  local reg = require('facets.registry')
+  local ctx = reg.resolve(bufnr)
+  if not ctx then
+    return {}
+  end
+  for _, entry in ipairs(reg.active(ctx)) do
+    if entry.def.id == 'kotlin.jvm' and entry.def.conform_formatters then
+      return entry.def.conform_formatters(ctx) or {}
+    end
+  end
+  return {}
+end
+
 require('conform').setup({
   notify_on_error = false,
   format_on_save = function(bufnr)
@@ -72,25 +86,42 @@ require('conform').setup({
   formatters_by_ft = {
     lua = { 'stylua' },
     python = { 'black' },
-    json = { 'fixjson' },
+    json = { 'fixjson', 'prettier', 'jq' },
+    jsonc = { 'prettier' },
     markdown = { 'markdown_prettier' },
     typescript = { 'prettier' },
+    typescriptreact = { 'prettier' },
     javascript = { 'prettier' },
-    kotlin = function(bufnr)
-      local reg = require('facets.registry')
-      local ctx = reg.resolve(bufnr)
-      if not ctx then
-        return {}
-      end
-      for _, entry in ipairs(reg.active(ctx)) do
-        if entry.def.id == 'kotlin.jvm' and entry.def.conform_formatters then
-          return entry.def.conform_formatters(ctx) or {}
-        end
-      end
-      return {}
-    end,
+    javascriptreact = { 'prettier' },
+    css = { 'prettier' },
+    html = { 'prettier' },
+    graphql = { 'prettier' },
+    yaml = { 'prettier' },
+    go = { 'gofmt' },
+    rust = { 'rustfmt' },
+    toml = { 'taplo' },
+    kotlin = kotlin_formatters,
   },
 })
+
+function _G.KickstartFormatexpr()
+  if vim.list_contains({ 'i', 'R', 'ic', 'ix' }, vim.fn.mode()) then
+    return 1
+  end
+  local bufnr = vim.api.nvim_get_current_buf()
+  local opts = format_opts(bufnr)
+  if not opts or is_project_ci(opts) then
+    return 1
+  end
+  local conform = require('conform')
+  local formatters, use_lsp = conform.list_formatters_to_run(bufnr)
+  if #formatters == 0 and (not use_lsp or opts.lsp_format == 'never') then
+    return 1
+  end
+  return conform.formatexpr(opts)
+end
+
+vim.o.formatexpr = 'v:lua.KickstartFormatexpr()'
 
 local function format_whole()
   local opts = format_opts(0)
@@ -116,4 +147,3 @@ end
 
 vim.keymap.set('n', '<leader>ff', format_hunks_key, { desc = 'Format git hunks' })
 vim.keymap.set('n', '<leader>fF', format_whole, { desc = 'Format whole buffer' })
-

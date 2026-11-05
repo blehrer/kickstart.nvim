@@ -9,7 +9,6 @@ M.ensure_installed = {
   'jdtls',
   'kotlin_lsp',
   'superhtml',
-  'gradle_ls',
   'pylsp',
   'bashls',
   'lua_ls',
@@ -126,7 +125,7 @@ function M.setup()
   require('mason-lspconfig').setup({
     ensure_installed = M.ensure_installed,
     automatic_install = true,
-    automatic_enable = { exclude = { 'kotlin_language_server' } },
+    automatic_enable = { exclude = { 'kotlin_language_server', 'stylua', 'gradle_ls' } },
   })
 
   M.setup_keymaps()

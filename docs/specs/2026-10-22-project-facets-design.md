@@ -25,7 +25,7 @@ Design for git-root project facets in kickstart.nvim. Implementation lives under
 
 Facets that define `trouble = { label, runner }` appear in `<leader>xe` (Snacks select). Runners and Trouble sources are built in `lua/facets/trouble.lua` (`SPECS` / `make_source`).
 | `playwright.e2e` | `node` | Root Playwright config or `@playwright/test` dep (`lua/facets/playwright/`) | `neotest-playwright`, `.env.<cfg>` (`<leader>te`), CLI flags (`<leader>tP`), `pwa-node` DAP (`<leader>td`) |
-| `kotlin.jvm` | `gradle` | Kotlin plugin / `src/main/kotlin` / settings.gradle (`lua/facets/kotlin.lua`) | `kotlin_lsp` + `gradle_ls` enable; conform `ktlint` when available |
+| `kotlin.jvm` | `gradle` | Kotlin plugin / `src/main/kotlin` / settings.gradle (`lua/facets/kotlin.lua`) | `kotlin_lsp` enable; conform `ktlint`/`ktfmt` when available |
 
 ## Nx
 

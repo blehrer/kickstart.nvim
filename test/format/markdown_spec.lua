@@ -1,4 +1,5 @@
 local md = require('format.markdown')
+local hunks = require('format.hunks')
 
 local pass = 0
 
@@ -35,5 +36,28 @@ for _, line in ipairs(out) do
   end
 end
 pass = pass + 1
+
+-- Per-hunk ranges stay separate instead of collapsing into one file-wide span
+local hunk_buf = vim.api.nvim_create_buf(false, true)
+vim.api.nvim_buf_set_lines(hunk_buf, 0, -1, false, {
+  'local a = 1',
+  'local   b   =   2',
+  'local untouched = "keep   me"',
+  'local   c   =   3',
+  'local d = 4',
+})
+local ranges = hunks.ranges(hunk_buf, {
+  { added = { start = 2, count = 1 } },
+  { added = { start = 4, count = 2 } },
+})
+assert_eq('hunks.ranges count', #ranges, 2)
+assert_eq('hunks.ranges[1] start', ranges[1].start[1], 2)
+assert_eq('hunks.ranges[1] end', ranges[1]['end'][1], 2)
+assert_eq('hunks.ranges[2] start', ranges[2].start[1], 4)
+assert_eq('hunks.ranges[2] end', ranges[2]['end'][1], 5)
+vim.api.nvim_buf_delete(hunk_buf, { force = true })
+
+-- Mason-lspconfig excludes stylua LSP and global formatexpr uses KickstartFormatexpr
+assert_eq('global formatexpr wired', vim.o.formatexpr, 'v:lua.KickstartFormatexpr()')
 
 print(string.format('format.markdown: %d checks passed', pass))

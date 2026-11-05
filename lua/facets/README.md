@@ -7,7 +7,7 @@ Repo-level project detection and stack tooling anchored at `git rev-parse --show
 * `anchor.lua` resolves the git root, reads JSON files (`anchor.read_json`), and collects stack manifests (`package.json`, `build.gradle.kts`, `pyproject.toml`, `go.mod`, `Cargo.toml`).
 * `registry.lua` loads facet modules from `FACET_MODULES` and caches active facets by repo remote and manifest mtime.
 * `eslint.lua`, `tsc.lua`, and `knip.lua` each define a facet (`id`, `requires`, `detect(ctx)`, `trouble`, optional `lsp`) alongside its async CLI runner and output parser.
-* `kotlin.lua` detects Gradle/Kotlin repos, enables `kotlin_lsp` + `gradle_ls`, and wires `ktlint` for `conform.nvim`.
+* `kotlin.lua` detects Gradle/Kotlin repos, enables `kotlin_lsp`, and wires `ktlint`/`ktfmt` for `conform.nvim`.
 * `playwright/` (`init.lua`, `cli.lua`) owns Playwright detection, `neotest-playwright` adapter wiring, `.env.<configuration>` loading (`<leader>te`), `playwright test --help` flag completion/picker (`<leader>tP`), and `pwa-node` DAP (`<leader>td`).
 * `trouble.lua` and `trouble_jump.lua` build and register the `facets_*` Trouble sources and modes (`<leader>xe`, `<leader>xE`, `<leader>xT`) from a single source factory.
 
