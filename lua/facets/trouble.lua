@@ -1,79 +1,132 @@
 local registry = require('facets.registry')
 local trouble_jump = require('facets.trouble_jump')
 local eslint_run = require('facets.eslint.run')
-local eslint_source = require('facets.eslint.trouble_source')
 local tsc_run = require('facets.tsc.run')
-local tsc_source = require('facets.tsc.trouble_source')
 local knip_run = require('facets.knip.run')
-local knip_source = require('facets.knip.trouble_source')
 
 local M = {}
 
+---@param opts { mode: string, source: string, desc: string, preview_title: string }
+---@return trouble.Source
+local function make_source(opts)
+  local src = { items = {} }
+  src.config = {
+    modes = {
+      [opts.mode] = {
+        desc = opts.desc,
+        source = opts.source,
+        focus = true,
+        follow = false,
+        auto_preview = true,
+        win = {
+          type = 'split',
+          position = 'bottom',
+          height = 16,
+        },
+        -- Trouble draws border/title only on float previews, not splits.
+        preview = {
+          type = 'float',
+          relative = 'win',
+          border = 'rounded',
+          title = opts.preview_title,
+          title_pos = 'center',
+          position = { 0, 1 },
+          size = { width = 0.48, height = 0.92 },
+          scratch = true,
+          focusable = false,
+        },
+        groups = {
+          { 'directory' },
+          { 'filename', format = '{file_icon} {basename} {count}' },
+        },
+        sort = { 'severity', 'filename', 'pos', 'message' },
+        format = '{severity_icon} {message} {code} {pos}',
+        keys = trouble_jump.keys(),
+      },
+    },
+  }
+  function src.set_items(items)
+    src.items = items or {}
+  end
+  function src.get(cb, _ctx)
+    cb(src.items)
+  end
+  return src
+end
+
+local SPECS = {
+  eslint = {
+    facet_id = 'typescript.eslint',
+    label = 'ESLint',
+    clean_msg = 'no problems',
+    mode = 'facet_eslint',
+    source = 'facets_eslint',
+    desc = 'ESLint project lint (npx eslint .)',
+    preview_title = ' ESLint preview ',
+    run = eslint_run.project_lint,
+  },
+  tsc = {
+    facet_id = 'typescript.tsc',
+    label = 'tsc',
+    clean_msg = 'no errors',
+    mode = 'facet_tsc',
+    source = 'facets_tsc',
+    desc = 'TypeScript project check (tsc --noEmit)',
+    preview_title = ' tsc preview ',
+    run = tsc_run.project_check,
+  },
+  knip = {
+    facet_id = 'typescript.knip',
+    label = 'Knip',
+    clean_msg = 'no issues',
+    mode = 'facet_knip',
+    source = 'facets_knip',
+    desc = 'Knip project report',
+    preview_title = ' Knip preview ',
+    run = knip_run.project_run,
+  },
+}
+
+M.sources = {}
+M.modes = {}
 local RUNNERS = {}
 
-function M.run_eslint(ctx, _opts)
-  trouble_jump.capture_origin(ctx.root)
-  eslint_run.project_lint(ctx, function(err, items)
-    if err then
-      vim.notify('ESLint: ' .. err, vim.log.levels.ERROR)
-      return
-    end
-    eslint_source.set_items(items or {})
-    local count = #(items or {})
-    require('trouble').open({
-      mode = 'facet_eslint',
-      focus = true,
-      title = count == 0 and 'ESLint (project): clean' or ('ESLint (project): %d'):format(count),
-    })
-    if count == 0 then
-      vim.notify('ESLint: no problems', vim.log.levels.INFO)
-    end
-  end)
+for key, spec in pairs(SPECS) do
+  local src = make_source(spec)
+  M.sources[spec.source] = src
+  M.modes[spec.mode] = src.config.modes[spec.mode]
+
+  RUNNERS[key] = function(ctx, _opts)
+    trouble_jump.capture_origin(ctx.root)
+    spec.run(ctx, function(err, items)
+      if err then
+        vim.notify(spec.label .. ': ' .. err, vim.log.levels.ERROR)
+        return
+      end
+      src.set_items(items or {})
+      local count = #(items or {})
+      require('trouble').open({
+        mode = spec.mode,
+        focus = true,
+        title = count == 0 and (spec.label .. ' (project): clean') or ('%s (project): %d'):format(spec.label, count),
+      })
+      if count == 0 then
+        vim.notify(spec.label .. ': ' .. spec.clean_msg, vim.log.levels.INFO)
+      end
+    end)
+  end
 end
 
-function M.run_tsc(ctx, _opts)
-  trouble_jump.capture_origin(ctx.root)
-  tsc_run.project_check(ctx, function(err, items)
-    if err then
-      vim.notify('tsc: ' .. err, vim.log.levels.ERROR)
-      return
-    end
-    tsc_source.set_items(items or {})
-    local count = #(items or {})
-    require('trouble').open({
-      mode = 'facet_tsc',
-      focus = true,
-      title = count == 0 and 'tsc (project): clean' or ('tsc (project): %d'):format(count),
-    })
-    if count == 0 then
-      vim.notify('tsc: no errors', vim.log.levels.INFO)
-    end
-  end)
-end
+M.run_eslint = RUNNERS.eslint
+M.run_tsc = RUNNERS.tsc
+M.run_knip = RUNNERS.knip
 
-function M.run_knip(ctx, _opts)
-  trouble_jump.capture_origin(ctx.root)
-  knip_run.project_run(ctx, function(err, items)
-    if err then
-      vim.notify('Knip: ' .. err, vim.log.levels.ERROR)
-      return
-    end
-    knip_source.set_items(items or {})
-    local count = #(items or {})
-    require('trouble').open({
-      mode = 'facet_knip',
-      focus = true,
-      title = count == 0 and 'Knip (project): clean' or ('Knip (project): %d'):format(count),
-    })
-    if count == 0 then
-      vim.notify('Knip: no issues', vim.log.levels.INFO)
-    end
-  end)
+function M.register_sources()
+  local sources = require('trouble.sources')
+  for name, src in pairs(M.sources) do
+    sources.register(name, src)
+  end
 end
-
-RUNNERS.eslint = M.run_eslint
-RUNNERS.tsc = M.run_tsc
-RUNNERS.knip = M.run_knip
 
 local function resolve_ctx(opts)
   opts = opts or {}
@@ -123,26 +176,24 @@ function M.pick(opts)
   end)
 end
 
-function M.open_eslint(opts)
+local function open_for_facet(key, opts)
+  local spec = SPECS[key]
   local ctx = resolve_ctx(opts)
-  if not ctx or not registry.has_facet('typescript.eslint', ctx.root) then
+  if not ctx or not registry.has_facet(spec.facet_id, ctx.root) then
     if ctx then
-      vim.notify('Facets: typescript.eslint not active for this repo', vim.log.levels.WARN)
+      vim.notify('Facets: ' .. spec.facet_id .. ' not active for this repo', vim.log.levels.WARN)
     end
     return
   end
-  M.run_eslint(ctx, opts)
+  RUNNERS[key](ctx, opts)
+end
+
+function M.open_eslint(opts)
+  open_for_facet('eslint', opts)
 end
 
 function M.open_tsc(opts)
-  local ctx = resolve_ctx(opts)
-  if not ctx or not registry.has_facet('typescript.tsc', ctx.root) then
-    if ctx then
-      vim.notify('Facets: typescript.tsc not active for this repo', vim.log.levels.WARN)
-    end
-    return
-  end
-  M.run_tsc(ctx, opts)
+  open_for_facet('tsc', opts)
 end
 
 return M

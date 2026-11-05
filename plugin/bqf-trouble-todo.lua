@@ -17,31 +17,23 @@ require("bqf").setup({
 	},
 })
 
-local nx_trouble = require("nx.trouble")
-local facet_trouble = require("facets.trouble")
-local eslint_trouble = require("facets.eslint.trouble_source")
-local tsc_trouble = require("facets.tsc.trouble_source")
-local knip_trouble = require("facets.knip.trouble_source")
+local nx_trouble = require('nx.trouble')
+local facet_trouble = require('facets.trouble')
 
-require("trouble").setup({})
-require("trouble.sources").register("facets_eslint", eslint_trouble)
-require("trouble.sources").register("facets_tsc", tsc_trouble)
-require("trouble.sources").register("facets_knip", knip_trouble)
--- trouble.setup resets options; re-declare facet_eslint here or the mode vanishes.
-require("trouble").setup({
-	modes = {
-		nx_diagnostics = {
-			mode = "diagnostics",
-			filter = nx_trouble.make_filter("nx_diagnostics"),
-		},
-		nx_diagnostics_dependents = {
-			mode = "diagnostics",
-			filter = nx_trouble.make_filter("nx_diagnostics_dependents"),
-		},
-		facet_eslint = eslint_trouble.config.modes.facet_eslint,
-		facet_tsc = tsc_trouble.config.modes.facet_tsc,
-		facet_knip = knip_trouble.config.modes.facet_knip,
-	},
+require('trouble').setup({})
+facet_trouble.register_sources()
+-- trouble.setup resets options; re-declare facet modes here or they vanish.
+require('trouble').setup({
+  modes = vim.tbl_extend('force', {
+    nx_diagnostics = {
+      mode = 'diagnostics',
+      filter = nx_trouble.make_filter('nx_diagnostics'),
+    },
+    nx_diagnostics_dependents = {
+      mode = 'diagnostics',
+      filter = nx_trouble.make_filter('nx_diagnostics_dependents'),
+    },
+  }, facet_trouble.modes),
 })
 
 require("todo-comments").setup({ signs = false })

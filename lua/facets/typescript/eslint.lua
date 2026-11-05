@@ -1,3 +1,5 @@
+local workspace = require('nx.workspace')
+
 local M = {}
 
 M.id = 'typescript.eslint'
@@ -18,18 +20,6 @@ local CONFIG_NAMES = {
   '.eslintrc.yaml',
   '.eslintrc.yml',
 }
-
-local function read_package_json(root)
-  local path = root .. '/package.json'
-  if vim.fn.filereadable(path) ~= 1 then
-    return nil
-  end
-  local ok, data = pcall(vim.fn.json_decode, table.concat(vim.fn.readfile(path), '\n'))
-  if not ok or type(data) ~= 'table' then
-    return nil
-  end
-  return data
-end
 
 local function deps_have_eslint(pkg)
   if not pkg then
@@ -54,7 +44,7 @@ function M.detect(ctx)
       return true
     end
   end
-  if deps_have_eslint(read_package_json(ctx.root)) then
+  if deps_have_eslint(workspace.read_json(ctx.root .. '/package.json')) then
     return true
   end
   return false

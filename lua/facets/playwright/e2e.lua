@@ -1,3 +1,5 @@
+local workspace = require('nx.workspace')
+
 local M = {}
 
 M.id = 'playwright.e2e'
@@ -8,18 +10,6 @@ local PW_CONFIGS = {
   'playwright.config.js',
   'playwright.config.mjs',
 }
-
-local function read_package_json(root)
-  local path = root .. '/package.json'
-  if vim.fn.filereadable(path) ~= 1 then
-    return nil
-  end
-  local ok, data = pcall(vim.fn.json_decode, table.concat(vim.fn.readfile(path), '\n'))
-  if not ok or type(data) ~= 'table' then
-    return nil
-  end
-  return data
-end
 
 local function has_playwright_dep(pkg)
   if not pkg then
@@ -40,7 +30,7 @@ function M.detect(ctx)
       return true
     end
   end
-  return has_playwright_dep(read_package_json(ctx.root))
+  return has_playwright_dep(workspace.read_json(ctx.root .. '/package.json'))
 end
 
 return M

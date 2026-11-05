@@ -1,3 +1,5 @@
+local workspace = require('nx.workspace')
+
 local M = {}
 
 M.id = 'typescript.knip'
@@ -8,20 +10,8 @@ M.trouble = {
   runner = 'knip',
 }
 
-local function read_package_json(root)
-  local path = root .. '/package.json'
-  if vim.fn.filereadable(path) ~= 1 then
-    return nil
-  end
-  local ok, data = pcall(vim.fn.json_decode, table.concat(vim.fn.readfile(path), '\n'))
-  if not ok or type(data) ~= 'table' then
-    return nil
-  end
-  return data
-end
-
 function M.detect(ctx)
-  local pkg = read_package_json(ctx.root)
+  local pkg = workspace.read_json(ctx.root .. '/package.json')
   if not pkg then
     return false
   end
