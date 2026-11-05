@@ -8,6 +8,8 @@ local FACET_MODULES = {
   'facets.knip',
   'facets.playwright',
   'facets.kotlin',
+  'facets.python',
+  'facets.go',
 }
 
 local facet_defs = {}
@@ -27,6 +29,10 @@ local function load_facets()
     end
   end
   return facet_defs
+end
+
+function M.all_defs()
+  return load_facets()
 end
 
 local function requires_met(def, ctx)

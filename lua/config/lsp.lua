@@ -9,11 +9,16 @@ M.ensure_installed = {
   'jdtls',
   'kotlin_lsp',
   'superhtml',
-  'pylsp',
+  'ruff',
+  'basedpyright',
   'bashls',
   'lua_ls',
   'dockerls',
   'markdown_oxide',
+  'jsonls',
+  'yamlls',
+  'gitlab_ci_ls',
+  'taplo',
 }
 
 function M.setup_lazydev()
@@ -138,6 +143,10 @@ function M.setup()
   vim.api.nvim_create_user_command('LspInfo', function()
     vim.cmd('checkhealth vim.lsp')
   end, { desc = 'LSP health / attached clients' })
+
+  vim.api.nvim_create_user_command('LspSwitch', function()
+    require('config.lsp_switcher').open()
+  end, { desc = 'Toggle / solo LSP servers for the current buffer' })
 
   vim.api.nvim_create_user_command('KlsRestart', function()
     for _, name in ipairs({ 'kotlin_lsp', 'kotlin_language_server' }) do

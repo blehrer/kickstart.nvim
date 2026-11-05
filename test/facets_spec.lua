@@ -5,8 +5,11 @@ local eslint = require('facets.eslint')
 local tsc = require('facets.tsc')
 local knip = require('facets.knip')
 local kotlin = require('facets.kotlin')
+local python_facet = require('facets.python')
+local go_facet = require('facets.go')
 local pw = require('facets.playwright')
 local pw_cli = require('facets.playwright.cli')
+local dap = require('dap')
 
 local checks = 0
 local function check(label, cond)
@@ -113,7 +116,40 @@ local kt_ctx = {
 local active_kt = registry.active(kt_ctx)
 check('detect kotlin.jvm', #active_kt == 1 and active_kt[1].def.id == 'kotlin.jvm')
 check('kotlin lsp spec', vim.tbl_contains(kotlin.lsp(kt_ctx).enable, 'kotlin_lsp'))
+check('kotlin dap spec', kotlin.dap(kt_ctx).adapters.kotlin ~= nil and #kotlin.dap(kt_ctx).configurations.kotlin >= 2)
 vim.fn.delete(tmp_kt, 'rf')
+
+-- 5b. Synthetic Python + Go repo detection and uniform DAP facet contract
+local tmp_py = vim.fn.tempname()
+vim.fn.mkdir(tmp_py, 'p')
+vim.fn.writefile({ '[project]\nname = "demo"' }, tmp_py .. '/pyproject.toml')
+local py_ctx = {
+  root = tmp_py,
+  stacks = anchor.stacks_at(tmp_py),
+  stack_kinds = { python = true },
+  cache_key = 'test-py',
+}
+local active_py = registry.active(py_ctx)
+check('detect python.env', #active_py == 1 and active_py[1].def.id == 'python.env')
+check('python dap spec', python_facet.dap(py_ctx).adapters.python ~= nil and #python_facet.dap(py_ctx).configurations.python >= 2)
+vim.fn.delete(tmp_py, 'rf')
+
+local tmp_go = vim.fn.tempname()
+vim.fn.mkdir(tmp_go, 'p')
+vim.fn.writefile({ 'module example.com/demo\ngo 1.23' }, tmp_go .. '/go.mod')
+local go_ctx = {
+  root = tmp_go,
+  stacks = anchor.stacks_at(tmp_go),
+  stack_kinds = { go = true },
+  cache_key = 'test-go',
+}
+local active_go = registry.active(go_ctx)
+check('detect go.mod', #active_go == 1 and active_go[1].def.id == 'go.mod')
+check('go dap spec', type(go_facet.dap(go_ctx).adapters.delve) == 'function' and #go_facet.dap(go_ctx).configurations.go >= 2)
+vim.fn.delete(tmp_go, 'rf')
+
+check('tsc dap spec', tsc.dap({ root = '/repo' }).adapters['pwa-node'] ~= nil and #tsc.dap({ root = '/repo' }).configurations.typescript >= 2)
+check('dap defaults registered pwa-node/kotlin/python/delve', dap.adapters['pwa-node'] ~= nil and dap.adapters.kotlin ~= nil and dap.adapters.python ~= nil and dap.adapters.delve ~= nil)
 
 -- 6. Architectural boundary check: neotest, dap, and facets/playwright do not require('nx.*')
 for _, rel in ipairs({

@@ -60,4 +60,26 @@ vim.api.nvim_buf_delete(hunk_buf, { force = true })
 -- Mason-lspconfig excludes stylua LSP and global formatexpr uses KickstartFormatexpr
 assert_eq('global formatexpr wired', vim.o.formatexpr, 'v:lua.KickstartFormatexpr()')
 
+-- Buffer LSP switcher discovers overlapping servers for compound filetypes (yaml.gitlab, typescript, python)
+local switcher = require('config.lsp_switcher')
+local gitlab_buf = vim.api.nvim_create_buf(false, true)
+vim.bo[gitlab_buf].filetype = 'yaml.gitlab'
+local gitlab_srvs = {}
+for _, item in ipairs(switcher.discover_for_buf(gitlab_buf)) do
+  gitlab_srvs[item.name] = true
+end
+assert_eq('lsp_switcher yaml.gitlab discovers yamlls', gitlab_srvs.yamlls, true)
+assert_eq('lsp_switcher yaml.gitlab discovers gitlab_ci_ls', gitlab_srvs.gitlab_ci_ls, true)
+vim.api.nvim_buf_delete(gitlab_buf, { force = true })
+
+local py_buf = vim.api.nvim_create_buf(false, true)
+vim.bo[py_buf].filetype = 'python'
+local py_srvs = {}
+for _, item in ipairs(switcher.discover_for_buf(py_buf)) do
+  py_srvs[item.name] = true
+end
+assert_eq('lsp_switcher python discovers ruff', py_srvs.ruff, true)
+assert_eq('lsp_switcher python discovers basedpyright', py_srvs.basedpyright, true)
+vim.api.nvim_buf_delete(py_buf, { force = true })
+
 print(string.format('format.markdown: %d checks passed', pass))

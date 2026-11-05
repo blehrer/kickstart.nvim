@@ -1,3 +1,5 @@
+local anchor = require('facets.anchor')
+
 local M = {}
 
 M.id = 'kotlin.jvm'
@@ -54,6 +56,42 @@ function M.conform_formatters(_ctx)
     return out
   end
   return nil
+end
+
+function M.dap(ctx)
+  local root = (ctx and ctx.root) or vim.loop.cwd()
+  local adapter = {
+    type = 'executable',
+    command = anchor.mason_bin('kotlin-debug-adapter'),
+    options = { auto_continue_if_many_stopped = false },
+  }
+  return {
+    adapters = {
+      kotlin = adapter,
+    },
+    configurations = {
+      kotlin = {
+        {
+          type = 'kotlin',
+          request = 'attach',
+          name = 'Kotlin: Attach to Gradle/JVM (:5005 --debug-jvm)',
+          projectRoot = root,
+          hostName = 'localhost',
+          port = 5005,
+          timeout = 10000,
+        },
+        {
+          type = 'kotlin',
+          request = 'launch',
+          name = 'Kotlin: Launch main class',
+          projectRoot = root,
+          mainClass = function()
+            return vim.fn.input('Main class (e.g. com.example.AppKt): ')
+          end,
+        },
+      },
+    },
+  }
 end
 
 return M

@@ -1,4 +1,5 @@
 local Item = require('trouble.item')
+local anchor = require('facets.anchor')
 
 local M = {}
 
@@ -121,6 +122,80 @@ function M.project_check(ctx, cb)
       cb(nil, items)
     end)
   end)
+end
+
+function M.dap(ctx)
+  local root = (ctx and ctx.root) or vim.loop.cwd()
+  local js_server = vim.fn.stdpath('data') .. '/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js'
+  local pwa_node = {
+    type = 'server',
+    host = 'localhost',
+    port = '${port}',
+    executable = vim.fn.filereadable(js_server) == 1 and {
+      command = 'node',
+      args = { js_server, '${port}' },
+    } or {
+      command = anchor.mason_bin('js-debug-adapter'),
+      args = { '${port}' },
+    },
+  }
+  -- ponytail: monorepo .vscode/launch.json uses "node"; js-debug only registers as pwa-node
+  local node_alias = function(cb, config)
+    config.type = 'pwa-node'
+    cb(pwa_node)
+  end
+
+  local ts_configs = {
+    {
+      type = 'pwa-node',
+      request = 'launch',
+      name = 'TS/Node: Launch current file (tsx / node)',
+      runtimeExecutable = function()
+        local local_tsx = root .. '/node_modules/.bin/tsx'
+        if vim.fn.executable(local_tsx) == 1 then
+          return local_tsx
+        end
+        return vim.fn.executable('tsx') == 1 and 'tsx' or 'node'
+      end,
+      runtimeArgs = { '${file}' },
+      cwd = root,
+      sourceMaps = true,
+      outputCapture = 'std',
+      resolveSourceMapLocations = { '${workspaceFolder}/**', '!**/node_modules/**' },
+    },
+    {
+      type = 'pwa-node',
+      request = 'attach',
+      name = 'TS/Node: Attach to inspector (:9229)',
+      port = 9229,
+      cwd = root,
+      sourceMaps = true,
+      resolveSourceMapLocations = { '${workspaceFolder}/**', '!**/node_modules/**' },
+    },
+    {
+      type = 'pwa-node',
+      request = 'attach',
+      name = 'TS/Node: Pick process (PID)',
+      processId = function()
+        return require('dap.utils').pick_process()
+      end,
+      cwd = root,
+      sourceMaps = true,
+    },
+  }
+
+  return {
+    adapters = {
+      ['pwa-node'] = pwa_node,
+      node = node_alias,
+    },
+    configurations = {
+      typescript = ts_configs,
+      typescriptreact = ts_configs,
+      javascript = ts_configs,
+      javascriptreact = ts_configs,
+    },
+  }
 end
 
 return M

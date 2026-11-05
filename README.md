@@ -66,14 +66,16 @@ codereview.nvim reads `GITLAB_TOKEN` from the environment, or from 1Password (`o
 
 | Language | Server |
 |----------|--------|
-| TypeScript/JS | `ts_ls` |
+| TypeScript/JS | `ts_ls`, `eslint` |
 | Java | `jdtls` |
 | Kotlin / Gradle (`.kts`) | `kotlin_lsp` (Mason: `kotlin-lsp`) |
 | HTML | `superhtml` |
-| Python | `pylsp` |
+| Python | `ruff`, `basedpyright` |
+| JSON / YAML / TOML | `jsonls`, `yamlls`, `gitlab_ci_ls`, `taplo` |
 | bash/sh/zsh | `bashls` |
 | Lua (incl. Neovim config) | `lua_ls` + lazydev |
 | Docker | `dockerls` |
+| Markdown (PKM vaults) | `markdown_oxide` |
 
 Neovim config Lua uses **lazydev** so `vim.*` and plugin APIs resolve without undeclared-global noise.
 

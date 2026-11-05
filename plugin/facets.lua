@@ -31,7 +31,13 @@ local function facets_info(start)
     lines[#lines + 1] = '  (none)'
   else
     for _, entry in ipairs(active) do
-      lines[#lines + 1] = '  ' .. entry.def.id
+      local caps = {}
+      if entry.def.lsp then caps[#caps + 1] = 'lsp' end
+      if entry.def.dap then caps[#caps + 1] = 'dap' end
+      if entry.def.trouble then caps[#caps + 1] = 'trouble' end
+      if entry.def.conform_formatters then caps[#caps + 1] = 'format' end
+      local suffix = #caps > 0 and ('  [' .. table.concat(caps, ', ') .. ']') or ''
+      lines[#lines + 1] = '  ' .. entry.def.id .. suffix
     end
   end
 

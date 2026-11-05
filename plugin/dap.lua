@@ -15,44 +15,9 @@ require('dap-breakpoints').setup({
 
 local dap = require('dap')
 local dapview = require('dap-view')
+local lsp_apply = require('facets.lsp_apply')
 
-local function js_debug_server()
-  local path = vim.fn.stdpath('data') .. '/mason/packages/js-debug-adapter/js-debug/src/dapDebugServer.js'
-  if vim.fn.filereadable(path) == 1 then
-    return path
-  end
-  return nil
-end
-
-local js_server = js_debug_server()
-if js_server then
-  dap.adapters['pwa-node'] = {
-    type = 'server',
-    host = 'localhost',
-    port = '${port}',
-    executable = {
-      command = 'node',
-      args = { js_server, '${port}' },
-    },
-  }
-
-  -- ponytail: monorepo .vscode/launch.json uses "node"; js-debug only registers as pwa-node
-  if not dap.adapters.node then
-    dap.adapters.node = function(cb, config)
-      config.type = 'pwa-node'
-      local native = dap.adapters['pwa-node']
-      if type(native) == 'function' then
-        native(cb, config)
-      else
-        cb(native)
-      end
-    end
-  end
-else
-  vim.api.nvim_create_user_command('DapInstallJsDebug', function()
-    vim.notify('Run :MasonInstall js-debug-adapter then restart nvim', vim.log.levels.ERROR)
-  end, {})
-end
+lsp_apply.setup_dap_defaults()
 
 local dap_log = vim.fn.stdpath('data') .. '/dap-last.log'
 
@@ -90,7 +55,7 @@ end
 dap.listeners.before.event_terminated.dapview = function()
   dapview.close()
 end
-dap.listeners.before.event_exited.dapview = function(session, body)
+dap.listeners.before.event_exited.dapview = function(_, body)
   local code = body and body.exitCode
   if code and code ~= 0 then
     vim.notify(('DAP failed (exit %d) — <leader>du to inspect, log: %s'):format(code, dap_log), vim.log.levels.ERROR)
@@ -99,8 +64,13 @@ dap.listeners.before.event_exited.dapview = function(session, body)
   dapview.close()
 end
 
-vim.keymap.set('n', '<leader>d<space>', dap.continue, { desc = 'Debug continue' })
-vim.keymap.set('n', '<F5>', dap.continue, { desc = 'Debug continue' })
+local function dap_continue()
+  lsp_apply.apply_for_buffer(vim.api.nvim_get_current_buf())
+  dap.continue()
+end
+
+vim.keymap.set('n', '<leader>d<space>', dap_continue, { desc = 'Debug continue' })
+vim.keymap.set('n', '<F5>', dap_continue, { desc = 'Debug continue' })
 vim.keymap.set('n', '<leader>dl', dap.step_into, { desc = 'Debug step into' })
 vim.keymap.set('n', '<leader>dj', dap.step_over, { desc = 'Debug step over' })
 vim.keymap.set('n', '<leader>dk', dap.step_out, { desc = 'Debug step out' })

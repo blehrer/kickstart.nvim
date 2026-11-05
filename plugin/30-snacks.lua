@@ -198,3 +198,7 @@ require('config.ui_toggle').setup_snacks()
 vim.keymap.set('n', '<leader>uc', function()
   Snacks.picker.colorschemes()
 end, { desc = 'Colorscheme picker' })
+
+vim.keymap.set('n', '<leader>uL', function()
+  require('config.lsp_switcher').open()
+end, { desc = 'Buffer LSP switcher (toggle/solo)' })

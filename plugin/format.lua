@@ -85,7 +85,7 @@ require('conform').setup({
   },
   formatters_by_ft = {
     lua = { 'stylua' },
-    python = { 'black' },
+    python = { 'ruff_organize_imports', 'ruff_format', stop_after_first = false },
     json = { 'fixjson', 'prettier', 'jq' },
     jsonc = { 'prettier' },
     markdown = { 'markdown_prettier' },

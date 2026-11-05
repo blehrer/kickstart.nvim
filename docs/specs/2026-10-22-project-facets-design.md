@@ -20,12 +20,14 @@ Design for git-root project facets in kickstart.nvim. Implementation lives under
 | ID | Requires | Detection (git root) | Integrations |
 |----|----------|----------------------|--------------|
 | `typescript.eslint` | `node` | ESLint config files or `eslint` / `@eslint/*` in `package.json` | ESLint LSP; `facet.trouble` → picker / `<leader>xE` → Trouble |
-| `typescript.tsc` | `node` | `tsconfig.json` or `tsconfig.build.json` at git root | `facet.trouble` → picker / `<leader>xT` → Trouble |
+| `typescript.tsc` | `node` | `tsconfig.json` or `tsconfig.build.json` at git root | `facet.trouble` → picker / `<leader>xT` → Trouble; `pwa-node` / `node` DAP (`js-debug-adapter`) |
 | `typescript.knip` | `node` | `knip` in root `package.json` `devDependencies` or `dependencies` | `facet.trouble` → picker; `knip --reporter json` → Trouble |
 
 Facets that define `trouble = { label, runner }` appear in `<leader>xe` (Snacks select). Runners and Trouble sources are built in `lua/facets/trouble.lua` (`SPECS` / `make_source`).
 | `playwright.e2e` | `node` | Root Playwright config or `@playwright/test` dep (`lua/facets/playwright/`) | `neotest-playwright`, `.env.<cfg>` (`<leader>te`), CLI flags (`<leader>tP`), `pwa-node` DAP (`<leader>td`) |
-| `kotlin.jvm` | `gradle` | Kotlin plugin / `src/main/kotlin` / settings.gradle (`lua/facets/kotlin.lua`) | `kotlin_lsp` enable; conform `ktlint`/`ktfmt` when available |
+| `kotlin.jvm` | `gradle` | Kotlin plugin / `src/main/kotlin` / settings.gradle (`lua/facets/kotlin.lua`) | `kotlin_lsp` enable; conform `ktlint`/`ktfmt`; `kotlin-debug-adapter` DAP |
+| `python.env` | `python` | `pyproject.toml`, `requirements.txt`, or `setup.py` (`lua/facets/python.lua`) | `ruff` + `basedpyright` enable; `.venv` resolution + `debugpy` DAP |
+| `go.mod` | `go` | `go.mod` at git root (`lua/facets/go.lua`) | `gopls` enable; `delve` (`dlv dap`) DAP |
 
 ## Nx
 

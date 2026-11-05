@@ -14,10 +14,21 @@ end
 local MANIFESTS = {
   { kind = 'node', paths = { 'package.json' } },
   { kind = 'gradle', paths = { 'build.gradle.kts', 'build.gradle' } },
-  { kind = 'python', paths = { 'pyproject.toml' } },
+  { kind = 'python', paths = { 'pyproject.toml', 'requirements.txt', 'setup.py' } },
   { kind = 'go', paths = { 'go.mod' } },
   { kind = 'rust', paths = { 'Cargo.toml' } },
 }
+
+function M.mason_bin(name)
+  local bin = vim.fn.stdpath('data') .. '/mason/bin/' .. name
+  if vim.fn.executable(bin) == 1 then
+    return bin
+  end
+  if vim.fn.executable(name) == 1 then
+    return vim.fn.exepath(name)
+  end
+  return bin
+end
 
 local function git_toplevel_dir(dir)
   dir = vim.fn.fnamemodify(dir, ':p')
