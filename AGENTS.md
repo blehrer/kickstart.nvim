@@ -8,7 +8,7 @@ Before editing a subsystem, **read the linked `README.md` or spec** in the sitem
 
 | Area | Entrypoints | Detailed Docs (Read First) |
 |------|-------------|----------------------------|
-| **Core editor & startup** | `init.lua`, `lua/config/` (`options`, `keymaps`, `autocmds`, `ui2`, `exrc`, `statusline`) | `lua/config/README.md` |
+| **Core editor & startup** | `init.lua`, `lua/config/` (`options`, `keymaps`, `autocmds`, `ui2`, `exrc`, `statusline`, `logs`) | `lua/config/README.md` |
 | **Filetype detection** | `filetype.lua` (root `vim.filetype.add` rules; no `after/ftdetect/`) | `filetype.lua` |
 | **Per-filetype buffer setup** | `after/ftplugin/<ft>.lua` (`markdown`, `oil`, `http`, `sql`, `mysql`, `plsql`) | `plugin/README.md` |
 | **Plugins & global keymaps** | `plugin/*.lua` (ordered `05-`..`30-` where load order matters, alphabetical otherwise) | `plugin/README.md` |

@@ -9,6 +9,7 @@ nvim --headless -u init.lua -l test/format/markdown_spec.lua
 nvim --headless -u init.lua -l test/nx_spec.lua
 nvim --headless -u init.lua -l test/facets_spec.lua
 nvim --headless -u init.lua -l test/merge_tool_help_spec.lua
+nvim --headless -u init.lua -l test/logs_spec.lua
 nvim --headless -u NONE \
   -c "lua vim.opt.rtp:prepend(vim.fn.getcwd())" \
   -c "lua dofile('test/markdown_xanadu/runner.lua').run()" \
