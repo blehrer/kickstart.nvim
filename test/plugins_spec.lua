@@ -53,3 +53,17 @@ if #failed > 0 then
 end
 
 vim.api.nvim_echo({ { ('check-plugins OK (%d modules)\n'):format(#modules), 'MoreMsg' } }, true, {})
+
+-- Regression: hidden oil:// buffers during :restart session restore must not clobber active buffer filetype/treesitter
+do
+  local tmp = vim.fn.tempname() .. '.vim'
+  vim.cmd('silent! badd ' .. vim.fn.fnameescape('oil://' .. vim.fn.getcwd() .. '/'))
+  vim.cmd('silent! edit init.lua')
+  vim.cmd.mksession({ tmp, bang = true })
+  vim.cmd('silent! source ' .. vim.fn.fnameescape(tmp))
+  vim.wait(150, function() return false end)
+  vim.fs.rm(tmp, { force = true })
+  local buf = vim.api.nvim_get_current_buf()
+  assert(vim.bo[buf].filetype == 'lua', 'expected filetype=lua after session restore, got ' .. tostring(vim.bo[buf].filetype))
+  assert(vim.treesitter.highlighter.active[buf] ~= nil, 'expected treesitter highlighter active after session restore')
+end

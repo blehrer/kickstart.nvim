@@ -57,9 +57,9 @@ end
 
 vim.api.nvim_create_autocmd('FileType', {
   group = vim.api.nvim_create_augroup('nvim-new-treesitter-highlight', { clear = true }),
-  callback = function()
-    if pcall(vim.treesitter.start) then
-      vim.bo.syntax = 'OFF'
+  callback = function(args)
+    if pcall(vim.treesitter.start, args.buf) then
+      vim.bo[args.buf].syntax = 'OFF'
     end
   end,
 })
