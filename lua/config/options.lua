@@ -44,7 +44,7 @@ vim.o.conceallevel = 1
 vim.o.termguicolors = true
 
 -- Native vim.lsp.completion popup (see :help completeopt, lsp-completion)
-vim.opt.completeopt = { 'menu', 'menuone', 'preinsert', 'popup' , 'preview' }
+vim.opt.completeopt = { 'menu', 'menuone', 'preinsert', 'popup', 'preview' }
 
 vim.diagnostic.config({
   severity_sort = true,
